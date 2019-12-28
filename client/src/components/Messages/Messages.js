@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback, Fragment } from 'react';
 import { useQuery } from '@apollo/react-hooks';
 
+import MessagePlayer from '../MessagePlayer/MessagePlayer';
 import MessageDelete from '../MessageDelete/MessageDelete';
 import Loading from '../Loading/Loading';
 import withSession from '../../session/withSession';
@@ -117,16 +118,23 @@ const MessageList = ({ messages, subscribeToMore }) => {
     subscribeToMoreMessage();
   }, [subscribeToMoreMessage]);
 
-  return messages.map(message => (
-    <MessageItem key={message.id} message={message} />
-  ));
+  const domain = 'http://localhost:8000/uploads/';
+  return messages.map(message => {
+    // <MessageItem key={message.id} message={message} />
+    return (
+      <MessagePlayer
+        key={message.id}
+        path={`${domain}${message.file.path}`}
+      />
+    );
+  });
 };
 
 const MessageItemBase = ({ message, session }) => (
   <div>
     <h3>{message.user.username}</h3>
     <small>{message.createdAt}</small>
-    <p>{message.text}</p>
+    <p>{message.file.path}</p>
 
     {session && session.me && message.user.id === session.me.id && (
       <MessageDelete message={message} />
