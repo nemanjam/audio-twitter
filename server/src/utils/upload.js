@@ -9,8 +9,8 @@ const uploadDir = resolve(__dirname, '../../uploads');
 // Ensure upload directory exists.
 sync(uploadDir);
 
-const storeDB = (userId, text, file) => {
-  const { filename, mimetype, path } = file;
+const storeDB = args => {
+  const { userId, text, filename, mimetype, path } = args;
 
   try {
     let message = new Message({
