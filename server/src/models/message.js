@@ -4,7 +4,15 @@ const messageSchema = new mongoose.Schema(
   {
     text: {
       type: String,
-      required: true,
+    },
+    filename: {
+      type: String,
+    },
+    mimetype: {
+      type: String,
+    },
+    path: {
+      type: String,
     },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   },

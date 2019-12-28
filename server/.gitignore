@@ -3,3 +3,4 @@ logfile
 .env
 
 node_modules/
+uploads/

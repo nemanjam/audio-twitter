@@ -11,6 +11,9 @@ export const GET_ALL_MESSAGES_WITH_USERS = gql`
           id
           username
         }
+        file {
+          path
+        }
       }
       pageInfo {
         hasNextPage
@@ -30,6 +33,9 @@ export const GET_PAGINATED_MESSAGES_WITH_USERS = gql`
         user {
           id
           username
+        }
+        file {
+          path
         }
       }
       pageInfo {

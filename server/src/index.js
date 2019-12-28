@@ -99,6 +99,7 @@ const isTest = !!process.env.TEST_DATABASE_URL;
 const isProduction = process.env.NODE_ENV === 'production';
 const port = process.env.PORT || 8000;
 
+// vraca promise sa konekcijom
 connectDb().then(async () => {
   if (isTest || isProduction) {
     // reset database

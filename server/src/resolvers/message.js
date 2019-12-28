@@ -2,6 +2,7 @@ import { combineResolvers } from 'graphql-resolvers';
 
 import pubsub, { EVENTS } from '../subscription';
 import { isAuthenticated, isMessageOwner } from './authorization';
+import { processMessage } from '../utils/upload';
 
 // to base64, da klijent aplikacija ne bi radila sa datumom nego sa stringom
 const toCursorHash = string => Buffer.from(string).toString('base64');
@@ -56,11 +57,14 @@ export default {
       // resolver middleware
       isAuthenticated,
       // obican resolver
-      async (parent, { text }, { models, me }) => {
-        const message = await models.Message.create({
-          text,
-          userId: me.id,
-        });
+      async (parent, { text, file }, { models, me }) => {
+        let message;
+        if (file) message = await processMessage(me.id, text, file);
+        else
+          message = await models.Message.create({
+            text,
+            userId: me.id,
+          });
 
         pubsub.publish(EVENTS.MESSAGE.CREATED, {
           messageCreated: { message },
@@ -90,6 +94,13 @@ export default {
     user: async (message, args, { loaders }) => {
       // loaders iz contexta koji je prosledjen
       return await loaders.user.load(message.userId);
+    },
+    file: async (message, args, ctx) => {
+      return {
+        path: message.path,
+        filename: message.filename,
+        mimetype: message.mimetype,
+      };
     },
   },
 

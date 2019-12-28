@@ -6,20 +6,24 @@ import { CREATE_MESSAGE } from '../../graphql/mutations';
 
 const MessageCreate = () => {
   const [text, setText] = useState('');
+  const [file, setFile] = useState(null);
 
   const [createMessage, { error }] = useMutation(CREATE_MESSAGE);
 
   const onChange = event => {
-    const { value } = event.target;
-    setText(value);
+    const { name, value, files } = event.target;
+    if (name === 'text') setText(value);
+    if (name === 'file') setFile(files[0]);
   };
 
   const onSubmit = async event => {
     event.preventDefault();
+    console.log(file);
 
     try {
-      await createMessage({ variables: { text } });
+      await createMessage({ variables: { text, file } });
       setText('');
+      setFile(null);
     } catch (error) {}
   };
 
@@ -32,6 +36,7 @@ const MessageCreate = () => {
         type="text"
         placeholder="Your message ..."
       />
+      <input type="file" name="file" onChange={onChange} />
       <button type="submit">Send</button>
 
       {error && <ErrorMessage error={error} />}

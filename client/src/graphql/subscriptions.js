@@ -11,6 +11,9 @@ export const MESSAGE_CREATED = gql`
           id
           username
         }
+        file {
+          path
+        }
       }
     }
   }

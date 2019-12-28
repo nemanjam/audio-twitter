@@ -4,7 +4,8 @@ import { ApolloProvider } from '@apollo/react-hooks';
 import { ApolloClient } from 'apollo-client';
 import { getMainDefinition } from 'apollo-utilities';
 import { ApolloLink, split } from 'apollo-link';
-import { HttpLink } from 'apollo-link-http';
+// import { HttpLink } from 'apollo-link-http';
+import { createUploadLink } from 'apollo-upload-client';
 import { WebSocketLink } from 'apollo-link-ws';
 import { onError } from 'apollo-link-error';
 import { InMemoryCache } from 'apollo-cache-inmemory';
@@ -12,9 +13,13 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 import Routes from './Routes';
 import { signOut } from './components/SignOutButton/SignOutButton';
 
-const httpLink = new HttpLink({
+const httpLink = createUploadLink({
   uri: 'http://localhost:8000/graphql',
 });
+
+// const httpLink = new HttpLink({
+//   uri: 'http://localhost:8000/graphql',
+// });
 
 const wsLink = new WebSocketLink({
   uri: `ws://localhost:8000/graphql`,
