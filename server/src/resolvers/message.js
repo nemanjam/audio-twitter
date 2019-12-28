@@ -57,15 +57,8 @@ export default {
       // resolver middleware
       isAuthenticated,
       // obican resolver
-      async (parent, { text, file }, { models, me }) => {
-        let message;
-        if (file) message = await processMessage(me.id, text, file);
-        else
-          message = await models.Message.create({
-            text,
-            userId: me.id,
-          });
-
+      async (parent, { file }, { models, me }) => {
+        const message = await processMessage(me.id, file);
         pubsub.publish(EVENTS.MESSAGE.CREATED, {
           messageCreated: { message },
         });

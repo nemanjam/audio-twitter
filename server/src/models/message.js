@@ -2,17 +2,17 @@ import mongoose from 'mongoose';
 
 const messageSchema = new mongoose.Schema(
   {
-    text: {
-      type: String,
-    },
     filename: {
       type: String,
+      required: [true, 'The filename is necessary'],
     },
     mimetype: {
       type: String,
+      required: [true, 'The mimetype is necessary'],
     },
     path: {
       type: String,
+      required: [true, 'The path is necessary'],
     },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   },

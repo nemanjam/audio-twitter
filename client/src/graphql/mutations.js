@@ -1,10 +1,9 @@
 import gql from 'graphql-tag';
 
 export const CREATE_MESSAGE = gql`
-  mutation($text: String!, $file: Upload) {
-    createMessage(text: $text, file: $file) {
+  mutation($file: Upload!) {
+    createMessage(file: $file) {
       id
-      text
       createdAt
       user {
         id

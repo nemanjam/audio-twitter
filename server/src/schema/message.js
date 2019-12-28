@@ -7,7 +7,7 @@ export default gql`
   }
 
   extend type Mutation {
-    createMessage(text: String!, file: Upload): Message!
+    createMessage(file: Upload!): Message!
     deleteMessage(id: ID!): Boolean!
   }
 
@@ -23,10 +23,9 @@ export default gql`
 
   type Message {
     id: ID!
-    text: String!
     createdAt: Date!
     user: User!
-    file: File
+    file: File!
   }
 
   type File {

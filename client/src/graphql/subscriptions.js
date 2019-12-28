@@ -5,7 +5,6 @@ export const MESSAGE_CREATED = gql`
     messageCreated {
       message {
         id
-        text
         createdAt
         user {
           id

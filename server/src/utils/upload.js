@@ -15,7 +15,6 @@ const storeDB = args => {
   try {
     let message = new Message({
       userId,
-      text,
       filename,
       mimetype,
       path,
@@ -29,6 +28,7 @@ const storeDB = args => {
 const storeFS = ({ stream, filename }) => {
   const id = uuidv4();
   const path = `${uploadDir}/${id}-${filename}`;
+  const webPath = `${id}-${filename}`;
 
   return new Promise((resolve, reject) =>
     stream
@@ -38,13 +38,13 @@ const storeFS = ({ stream, filename }) => {
       })
       .pipe(createWriteStream(path))
       .on('error', error => reject(error))
-      .on('finish', () => resolve({ path })),
+      .on('finish', () => resolve({ webPath })),
   );
 };
 
-export const processMessage = async (userId, text, file) => {
+export const processMessage = async (userId, file) => {
   const { createReadStream, filename, mimetype } = await file;
   const stream = createReadStream();
-  const { path } = await storeFS({ stream, filename });
-  return storeDB({ userId, text, filename, mimetype, path });
+  const { webPath } = await storeFS({ stream, filename });
+  return storeDB({ userId, filename, mimetype, path: webPath });
 };

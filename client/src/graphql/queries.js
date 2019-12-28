@@ -5,7 +5,6 @@ export const GET_ALL_MESSAGES_WITH_USERS = gql`
     messages(order: "DESC") @connection(key: "MessagesConnection") {
       edges {
         id
-        text
         createdAt
         user {
           id
@@ -28,7 +27,6 @@ export const GET_PAGINATED_MESSAGES_WITH_USERS = gql`
       @connection(key: "MessagesConnection") {
       edges {
         id
-        text
         createdAt
         user {
           id

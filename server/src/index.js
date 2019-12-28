@@ -10,6 +10,9 @@ import {
   AuthenticationError,
 } from 'apollo-server-express';
 
+import { existsSync, mkdirSync } from 'fs';
+import path from 'path';
+
 import schema from './schema';
 import resolvers from './resolvers';
 import models, { connectDb } from './models';
@@ -18,8 +21,14 @@ import loaders from './loaders';
 const app = express();
 
 app.use(cors());
-
 app.use(morgan('dev'));
+
+existsSync(path.join(__dirname, '../uploads')) ||
+  mkdirSync(path.join(__dirname, '../uploads'));
+app.use(
+  '/uploads',
+  express.static(path.join(__dirname, '../uploads')),
+);
 
 // vadi usera iz tokena, a ne iz baze
 // i mece ga u context
@@ -132,19 +141,25 @@ const createUsersWithMessages = async date => {
   });
 
   const message1 = new models.Message({
-    text: 'Published the Road to learn React',
+    path: 'test.mp3',
+    mimetype: 'audio/mpeg',
+    filename: 'test.mp3',
     createdAt: date.setSeconds(date.getSeconds() + 1),
     userId: user1.id,
   });
 
   const message2 = new models.Message({
-    text: 'Happy to release ...',
+    path: 'test.mp3',
+    mimetype: 'audio/mpeg',
+    filename: 'test.mp3',
     createdAt: date.setSeconds(date.getSeconds() + 1),
     userId: user2.id,
   });
 
   const message3 = new models.Message({
-    text: 'Published a complete ...',
+    path: 'test.mp3',
+    mimetype: 'audio/mpeg',
+    filename: 'test.mp3',
     createdAt: date.setSeconds(date.getSeconds() + 1),
     userId: user2.id,
   });
