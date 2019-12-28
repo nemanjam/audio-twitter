@@ -8,7 +8,7 @@ const customScalarResolver = {
 };
 
 export default [
-  customScalarResolver,
+  customScalarResolver, // datum umesto stringa broja sekundi, Date scalar
   userResolvers,
   messageResolvers,
 ];

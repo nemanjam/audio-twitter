@@ -21,6 +21,8 @@ app.use(cors());
 
 app.use(morgan('dev'));
 
+// vadi usera iz tokena, a ne iz baze
+// i mece ga u context
 const getMe = async req => {
   const token = req.headers['x-token'];
 
@@ -43,7 +45,7 @@ const server = new ApolloServer({
     // remove the internal sequelize error message
     // leave only the important validation error
     const message = error.message
-      .replace('SequelizeValidationError: ', '')
+      .replace('SequelizeValidationError: ', '') // string replace
       .replace('Validation error: ', '');
 
     return {
@@ -52,10 +54,17 @@ const server = new ApolloServer({
     };
   },
   context: async ({ req, connection }) => {
+    // subskribcije
     if (connection) {
       return {
         models,
         loaders: {
+          // batching, samo unique keys usera, nema ponavljanja
+          // batching: puno malih sql upita u jedan veci i brzi mnogo
+          // DataLoader facebookova biblioteka
+          // cache u okviru jednog zahteva, ako van server scope onda vise kesira...
+          // ide u context
+          // gledas koliko upita baza izvrsava negde u mongo konzoli
           user: new DataLoader(keys =>
             loaders.user.batchUsers(keys, models),
           ),
@@ -63,6 +72,7 @@ const server = new ApolloServer({
       };
     }
 
+    // http, mutacije i queries
     if (req) {
       const me = await getMe(req);
 
@@ -83,7 +93,7 @@ const server = new ApolloServer({
 server.applyMiddleware({ app, path: '/graphql' });
 
 const httpServer = http.createServer(app);
-server.installSubscriptionHandlers(httpServer);
+server.installSubscriptionHandlers(httpServer); // subscribtions
 
 const isTest = !!process.env.TEST_DATABASE_URL;
 const isProduction = process.env.NODE_ENV === 'production';

@@ -3,13 +3,18 @@ import { combineResolvers } from 'graphql-resolvers';
 import pubsub, { EVENTS } from '../subscription';
 import { isAuthenticated, isMessageOwner } from './authorization';
 
+// to base64, da klijent aplikacija ne bi radila sa datumom nego sa stringom
 const toCursorHash = string => Buffer.from(string).toString('base64');
 
+// from base64
 const fromCursorHash = string =>
   Buffer.from(string, 'base64').toString('ascii');
 
 export default {
   Query: {
+    // kursor je vazan za vrednost podatka, a ne index elementa kao u offset/limmit paginaciji
+    // kad se izbrise iz izvadjenih offset postaje nevalidan, a kursor ostaje uvek isti
+    // createdAt za cursor
     messages: async (parent, { cursor, limit = 100 }, { models }) => {
       const cursorOptions = cursor
         ? {
@@ -17,12 +22,12 @@ export default {
               $lt: fromCursorHash(cursor),
             },
           }
-        : {};
+        : {}; // za prvi upit ne treba cursor
       const messages = await models.Message.find(
         cursorOptions,
         null,
         {
-          sort: { createdAt: -1 },
+          sort: { createdAt: -1 }, //-1 smer sortiranja, cursor mora da bude sortiran
           limit: limit + 1,
         },
       );
@@ -46,8 +51,11 @@ export default {
   },
 
   Mutation: {
+    // combine middlewares
     createMessage: combineResolvers(
+      // resolver middleware
       isAuthenticated,
+      // obican resolver
       async (parent, { text }, { models, me }) => {
         const message = await models.Message.create({
           text,
@@ -80,6 +88,7 @@ export default {
 
   Message: {
     user: async (message, args, { loaders }) => {
+      // loaders iz contexta koji je prosledjen
       return await loaders.user.load(message.userId);
     },
   },

@@ -77,7 +77,7 @@ export default {
     ),
 
     deleteUser: combineResolvers(
-      isAdmin,
+      isAdmin, // samo admin moze da brise
       async (parent, { id }, { models }) => {
         const user = await models.User.findById(id);
 
