@@ -94,7 +94,7 @@ const MoreMessagesButton = ({
 
 const useStyles = makeStyles(theme => ({
   root: {},
-  item: { width: '100%' },
+  item: { flex: 1 },
 }));
 
 const MessageList = ({ messages, subscribeToMore }) => {
@@ -132,20 +132,12 @@ const MessageList = ({ messages, subscribeToMore }) => {
     <Grid
       container
       direction="column"
-      alignItems="center"
       spacing={2}
       className={classes.root}
     >
       {messages.map(message => {
-        // <MessageItem key={message.id} message={message} />
         return (
-          <Grid
-            item
-            className={classes.item}
-            md={8}
-            sm={12}
-            key={message.id}
-          >
+          <Grid item className={classes.item} key={message.id}>
             <MessagePlayer path={`${domain}${message.file.path}`} />
           </Grid>
         );

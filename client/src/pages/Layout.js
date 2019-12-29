@@ -3,12 +3,12 @@ import React, { Fragment } from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { makeStyles } from '@material-ui/core/styles';
 
-import Navigation from '../../components/Navigation/Navigation';
+import Navigation from '../components/Navigation/Navigation';
 
 const useStyles = makeStyles(theme => ({
   content: {
     maxWidth: 1100,
-    padding: theme.spacing(4),
+    padding: theme.spacing(2),
     margin: 'auto',
   },
 }));

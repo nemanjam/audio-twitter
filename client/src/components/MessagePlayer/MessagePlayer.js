@@ -4,9 +4,6 @@ import uuidv4 from 'uuid/v4';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
-import Card from '@material-ui/core/Card';
-import CardMedia from '@material-ui/core/CardMedia';
-import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
@@ -19,11 +16,7 @@ import { green, red, blue } from '@material-ui/core/colors';
 import PauseIcon from '@material-ui/icons/Pause';
 import Grid from '@material-ui/core/Grid';
 
-import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import Divider from '@material-ui/core/Divider';
 
 const faces = [
   'http://i.pravatar.cc/300?img=1',
@@ -34,7 +27,6 @@ const faces = [
 
 const useStyles = makeStyles(theme => ({
   root: {
-    maxWidth: 600,
     minWidth: 240,
     backgroundColor: theme.palette.background.paper,
   },
@@ -165,7 +157,7 @@ function MessagePlayer({ path }) {
                 justify="space-between"
                 className={classes.buttons}
               >
-                <Grid item container xs={5} spacing={1}>
+                <Grid item container sm={5} xs={12} spacing={1}>
                   <Grid item>{transportPlayButton}</Grid>
                   <Grid item>
                     <IconButton onClick={stopPlayback}>
@@ -173,7 +165,13 @@ function MessagePlayer({ path }) {
                     </IconButton>
                   </Grid>
                 </Grid>
-                <Grid item container xs={7} justify="space-between">
+                <Grid
+                  item
+                  container
+                  sm={7}
+                  xs={12}
+                  justify="space-between"
+                >
                   <Grid item>
                     <IconButton>
                       <FavoriteIcon

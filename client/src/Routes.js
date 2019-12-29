@@ -1,26 +1,20 @@
 import React from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Switch } from 'react-router-dom';
 
-import CssBaseline from '@material-ui/core/CssBaseline';
-
-import Navigation from './components/Navigation/Navigation';
-import LandingPage from './pages/Landing/Landing';
-import SignUpPage from './pages/SignUp/SignUp';
-import SignInPage from './pages/SignIn/SignIn';
-import AccountPage from './pages/Account/Account';
-import AdminPage from './pages/Admin/Admin';
-import RouteWithLayout from './pages/RouteWithLayout/RouteWithLayout';
-import Layout from './pages/Layout/Layout';
+import LandingPage from './pages/Landing';
+import SignUpPage from './pages/SignUp';
+import SignInPage from './pages/SignIn';
+import AccountPage from './pages/Account';
+import AdminPage from './pages/Admin';
+import RouteWithLayout from './pages/RouteWithLayout';
+import Layout from './pages/Layout';
 import withSession from './session/withSession';
 
 import * as routes from './constants/routes';
-// import history from './constants/history';
 
 const App = ({ session, refetch }) => (
   <BrowserRouter>
     <Switch>
-      {/* <Navigation session={session} /> */}
-
       <RouteWithLayout
         path={routes.LANDING}
         component={LandingPage}
@@ -54,23 +48,6 @@ const App = ({ session, refetch }) => (
         layout={Layout}
         layoutProps={{ session }}
       />
-      {/* 
-      <Route
-        exact
-        path={routes.SIGN_IN}
-        component={() => <SignInPage refetch={refetch} />}
-      />
-      <Route
-        exact
-        path={routes.ACCOUNT}
-        component={() => <AccountPage />}
-      />
-      <Route
-        exact
-        path={routes.ADMIN}
-        component={() => <AdminPage />}
-      />
-       */}
     </Switch>
   </BrowserRouter>
 );

@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { useMutation } from '@apollo/react-hooks';
 
-import * as routes from '../../constants/routes';
-import ErrorMessage from '../../components/Error/Error';
+import * as routes from '../constants/routes';
+import ErrorMessage from '../components/Error/Error';
 
-import { SIGN_UP } from '../../graphql/mutations';
+import { SIGN_UP } from '../graphql/mutations';
 
 const SignUp = ({ history, refetch }) => (
   <div>
