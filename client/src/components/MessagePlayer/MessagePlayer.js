@@ -138,7 +138,7 @@ function MessagePlayer({ path }) {
           <Grid item className={classes.avatarItem}>
             <Avatar className={classes.avatar} src={faces[0]} />
           </Grid>
-          <Grid item className={classes.flex}>
+          <Grid item container className={classes.flex}>
             <Grid item>
               <Typography className={classes.bold} display="inline">
                 Username
@@ -158,49 +158,44 @@ function MessagePlayer({ path }) {
                 className={classes.wavesurfer}
                 id={wavesurferId}
               />
-              <Grid item>
-                <Grid
-                  container
-                  justify="space-between"
-                  className={classes.buttons}
-                >
+              <Grid
+                item
+                container
+                justify="space-between"
+                className={classes.buttons}
+              >
+                <Grid item container xs={5} spacing={1}>
+                  <Grid item>{transportPlayButton}</Grid>
                   <Grid item>
-                    <Grid container spacing={1}>
-                      <Grid item>{transportPlayButton}</Grid>
-                      <Grid item>
-                        <IconButton onClick={stopPlayback}>
-                          <StopIcon className={classes.icon} />
-                        </IconButton>
-                      </Grid>
-                    </Grid>
+                    <IconButton onClick={stopPlayback}>
+                      <StopIcon className={classes.icon} />
+                    </IconButton>
+                  </Grid>
+                </Grid>
+                <Grid item container xs={7} justify="space-between">
+                  <Grid item>
+                    <IconButton>
+                      <FavoriteIcon
+                        style={{ color: blue[500] }}
+                        className={classes.icon}
+                      />
+                    </IconButton>
                   </Grid>
                   <Grid item>
-                    <Grid container spacing={3}>
-                      <Grid item>
-                        <IconButton>
-                          <FavoriteIcon
-                            style={{ color: blue[500] }}
-                            className={classes.icon}
-                          />
-                        </IconButton>
-                      </Grid>
-                      <Grid item>
-                        <IconButton>
-                          <ShareIcon
-                            style={{ color: red[500] }}
-                            className={classes.icon}
-                          />
-                        </IconButton>
-                      </Grid>
-                      <Grid item>
-                        <IconButton>
-                          <ChatBubbleIcon
-                            style={{ color: green[500] }}
-                            className={classes.icon}
-                          />
-                        </IconButton>
-                      </Grid>
-                    </Grid>
+                    <IconButton>
+                      <ShareIcon
+                        style={{ color: red[500] }}
+                        className={classes.icon}
+                      />
+                    </IconButton>
+                  </Grid>
+                  <Grid item>
+                    <IconButton>
+                      <ChatBubbleIcon
+                        style={{ color: green[500] }}
+                        className={classes.icon}
+                      />
+                    </IconButton>
                   </Grid>
                 </Grid>
               </Grid>
