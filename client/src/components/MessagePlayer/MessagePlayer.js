@@ -36,6 +36,7 @@ const useStyles = makeStyles(theme => ({
   root: {
     maxWidth: 600,
     minWidth: 240,
+    backgroundColor: theme.palette.background.paper,
   },
   wavesurfer: {
     width: '100%',
@@ -203,7 +204,6 @@ function MessagePlayer({ path }) {
           </Grid>
         </Grid>
       </ListItem>
-      <Divider />
     </>
   );
 }

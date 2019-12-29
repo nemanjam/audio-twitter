@@ -2,7 +2,7 @@ import React, { useEffect, useCallback, Fragment } from 'react';
 import { useQuery } from '@apollo/react-hooks';
 
 import { makeStyles } from '@material-ui/core/styles';
-import List from '@material-ui/core/List';
+import Grid from '@material-ui/core/Grid';
 
 import MessagePlayer from '../MessagePlayer/MessagePlayer';
 import MessageDelete from '../MessageDelete/MessageDelete';
@@ -93,12 +93,8 @@ const MoreMessagesButton = ({
 );
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    width: '100%',
-    maxWidth: 600,
-    margin: '0 auto',
-    backgroundColor: theme.palette.background.paper,
-  },
+  root: {},
+  item: { width: '100%' },
 }));
 
 const MessageList = ({ messages, subscribeToMore }) => {
@@ -133,17 +129,28 @@ const MessageList = ({ messages, subscribeToMore }) => {
 
   const domain = 'http://localhost:8000/uploads/';
   return (
-    <List className={classes.root}>
+    <Grid
+      container
+      direction="column"
+      alignItems="center"
+      spacing={2}
+      className={classes.root}
+    >
       {messages.map(message => {
         // <MessageItem key={message.id} message={message} />
         return (
-          <MessagePlayer
+          <Grid
+            item
+            className={classes.item}
+            md={8}
+            sm={12}
             key={message.id}
-            path={`${domain}${message.file.path}`}
-          />
+          >
+            <MessagePlayer path={`${domain}${message.file.path}`} />
+          </Grid>
         );
       })}
-    </List>
+    </Grid>
   );
 };
 

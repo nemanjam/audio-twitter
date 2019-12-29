@@ -1,5 +1,5 @@
 import React from 'react';
-import { Router, Route } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 
@@ -9,29 +9,52 @@ import SignUpPage from './pages/SignUp/SignUp';
 import SignInPage from './pages/SignIn/SignIn';
 import AccountPage from './pages/Account/Account';
 import AdminPage from './pages/Admin/Admin';
+import RouteWithLayout from './pages/RouteWithLayout/RouteWithLayout';
+import Layout from './pages/Layout/Layout';
 import withSession from './session/withSession';
 
 import * as routes from './constants/routes';
-import history from './constants/history';
+// import history from './constants/history';
 
 const App = ({ session, refetch }) => (
-  <Router history={history}>
-    <div>
-      <CssBaseline />
-      <Navigation session={session} />
+  <BrowserRouter>
+    <Switch>
+      {/* <Navigation session={session} /> */}
 
-      <hr />
-
-      <Route
-        exact
+      <RouteWithLayout
         path={routes.LANDING}
-        component={() => <LandingPage />}
-      />
-      <Route
+        component={LandingPage}
+        layout={Layout}
+        layoutProps={{ session }}
         exact
-        path={routes.SIGN_UP}
-        component={() => <SignUpPage refetch={refetch} />}
       />
+      <RouteWithLayout
+        path={routes.SIGN_UP}
+        component={SignUpPage}
+        componentProps={{ refetch }}
+        layout={Layout}
+        layoutProps={{ session }}
+      />
+      <RouteWithLayout
+        path={routes.SIGN_IN}
+        component={SignInPage}
+        componentProps={{ refetch }}
+        layout={Layout}
+        layoutProps={{ session }}
+      />
+      <RouteWithLayout
+        path={routes.ACCOUNT}
+        component={AccountPage}
+        layout={Layout}
+        layoutProps={{ session }}
+      />
+      <RouteWithLayout
+        path={routes.ADMIN}
+        component={AdminPage}
+        layout={Layout}
+        layoutProps={{ session }}
+      />
+      {/* 
       <Route
         exact
         path={routes.SIGN_IN}
@@ -47,8 +70,9 @@ const App = ({ session, refetch }) => (
         path={routes.ADMIN}
         component={() => <AdminPage />}
       />
-    </div>
-  </Router>
+       */}
+    </Switch>
+  </BrowserRouter>
 );
 
 export default withSession(App);
