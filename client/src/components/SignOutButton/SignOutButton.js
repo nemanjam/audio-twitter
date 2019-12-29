@@ -1,16 +1,19 @@
 import React from 'react';
+
 import { useApolloClient } from '@apollo/react-hooks';
+
+import Button from '@material-ui/core/Button';
 
 import * as routes from '../../constants/routes';
 import history from '../../constants/history';
 
-const SignOutButton = () => {
+const SignOutButton = ({ history }) => {
   const client = useApolloClient();
 
   return (
-    <button type="button" onClick={() => signOut(client)}>
+    <Button color="inherit" onClick={() => signOut(client)}>
       Sign Out
-    </button>
+    </Button>
   );
 };
 

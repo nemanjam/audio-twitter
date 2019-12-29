@@ -1,15 +1,15 @@
 import React, { Fragment } from 'react';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
+import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
 
 import Navigation from '../components/Navigation/Navigation';
 
 const useStyles = makeStyles(theme => ({
-  content: {
-    maxWidth: 1100,
+  container: {
     padding: theme.spacing(2),
-    margin: 'auto',
+    paddingTop: theme.spacing(8),
   },
 }));
 
@@ -20,7 +20,10 @@ const Layout = ({ children, session }) => {
     <Fragment>
       <CssBaseline />
       <Navigation session={session} />
-      <div className={classes.content}>{children}</div>
+      <Container className={classes.container} maxWidth="lg">
+        {children}
+      </Container>
+      <div></div>
     </Fragment>
   );
 };
