@@ -23,6 +23,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import Divider from '@material-ui/core/Divider';
 
 const faces = [
   'http://i.pravatar.cc/300?img=1',
@@ -32,27 +33,18 @@ const faces = [
 ];
 
 const useStyles = makeStyles(theme => ({
-  card: {
+  root: {
     maxWidth: 600,
     minWidth: 240,
-    margin: 'auto',
-    transition: '0.3s',
-    boxShadow: '0 8px 40px -12px rgba(0,0,0,0.3)',
-    '&:hover': {
-      boxShadow: '0 16px 70px -12.125px rgba(0,0,0,0.3)',
-    },
   },
-  media: {
+  wavesurfer: {
     width: '100%',
   },
-  list: {
-    padding: 0,
-  },
-  listItem: {
-    //paddingBottom: 0
+  flex: {
+    flex: 1,
   },
   buttons: {
-    padding: theme.spacing(1),
+    paddingTop: theme.spacing(1),
   },
   controls: {
     minWidth: '100px',
@@ -63,12 +55,17 @@ const useStyles = makeStyles(theme => ({
   },
   avatar: {
     display: 'inline-block',
+    width: theme.spacing(7),
+    height: theme.spacing(7),
+  },
+  avatarItem: {
+    paddingRight: theme.spacing(1),
+  },
+  bold: {
+    fontWeight: 700,
   },
 }));
-/*
-avatar username ostalo layout sa grid
 
-*/
 function MessagePlayer({ path }) {
   const wavesurfer = useRef(null);
 
@@ -106,13 +103,6 @@ function MessagePlayer({ path }) {
     window.addEventListener('resize', handleResize, false);
   }, []);
 
-  useEffect(() => {
-    console.log('path', path);
-    if (path) {
-      wavesurfer.current.load(path);
-    }
-  }, [path]);
-
   const togglePlayback = () => {
     if (!isPlaying) {
       wavesurfer.current.play();
@@ -143,61 +133,82 @@ function MessagePlayer({ path }) {
 
   return (
     <>
-      <Card className={classes.card}>
-        <Grid container direction="column">
-          <Grid item>
-            <List className={classes.list}>
-              <ListItem
-                alignItems="flex-start"
-                className={classes.listItem}
-              >
-                <ListItemAvatar>
-                  <Avatar className={classes.avatar} src={faces[0]} />
-                </ListItemAvatar>
-                <ListItemText
-                  primary="Username"
-                  secondary="@username · 11h ago"
-                />
-              </ListItem>
-            </List>
+      <ListItem className={classes.root}>
+        <Grid container>
+          <Grid item className={classes.avatarItem}>
+            <Avatar className={classes.avatar} src={faces[0]} />
           </Grid>
-          <Grid item id={wavesurferId} />
-          <Grid item container className={classes.buttons}>
-            <Grid item xs={5}>
-              {transportPlayButton}
-              <IconButton onClick={stopPlayback}>
-                <StopIcon className={classes.icon} />
-              </IconButton>
+          <Grid item className={classes.flex}>
+            <Grid item>
+              <Typography className={classes.bold} display="inline">
+                Username
+              </Typography>
+              <Typography display="inline"> · </Typography>
+              <Typography
+                variant="body2"
+                color="textSecondary"
+                display="inline"
+              >
+                11h
+              </Typography>
             </Grid>
-            <Grid item xs={7} container justify="space-around">
+            <Grid container direction="column">
+              <Grid
+                item
+                className={classes.wavesurfer}
+                id={wavesurferId}
+              />
               <Grid item>
-                <IconButton>
-                  <FavoriteIcon
-                    style={{ color: blue[500] }}
-                    className={classes.icon}
-                  />
-                </IconButton>
-              </Grid>
-              <Grid item>
-                <IconButton>
-                  <ShareIcon
-                    style={{ color: red[500] }}
-                    className={classes.icon}
-                  />
-                </IconButton>
-              </Grid>
-              <Grid item>
-                <IconButton>
-                  <ChatBubbleIcon
-                    style={{ color: green[500] }}
-                    className={classes.icon}
-                  />
-                </IconButton>
+                <Grid
+                  container
+                  justify="space-between"
+                  className={classes.buttons}
+                >
+                  <Grid item>
+                    <Grid container spacing={1}>
+                      <Grid item>{transportPlayButton}</Grid>
+                      <Grid item>
+                        <IconButton onClick={stopPlayback}>
+                          <StopIcon className={classes.icon} />
+                        </IconButton>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                  <Grid item>
+                    <Grid container spacing={3}>
+                      <Grid item>
+                        <IconButton>
+                          <FavoriteIcon
+                            style={{ color: blue[500] }}
+                            className={classes.icon}
+                          />
+                        </IconButton>
+                      </Grid>
+                      <Grid item>
+                        <IconButton>
+                          <ShareIcon
+                            style={{ color: red[500] }}
+                            className={classes.icon}
+                          />
+                        </IconButton>
+                      </Grid>
+                      <Grid item>
+                        <IconButton>
+                          <ChatBubbleIcon
+                            style={{ color: green[500] }}
+                            className={classes.icon}
+                          />
+                        </IconButton>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
           </Grid>
         </Grid>
-      </Card>
+      </ListItem>
+      <Divider />
     </>
   );
 }

@@ -1,6 +1,8 @@
 import React from 'react';
 import { Router, Route } from 'react-router-dom';
 
+import CssBaseline from '@material-ui/core/CssBaseline';
+
 import Navigation from './components/Navigation/Navigation';
 import LandingPage from './pages/Landing/Landing';
 import SignUpPage from './pages/SignUp/SignUp';
@@ -15,6 +17,7 @@ import history from './constants/history';
 const App = ({ session, refetch }) => (
   <Router history={history}>
     <div>
+      <CssBaseline />
       <Navigation session={session} />
 
       <hr />

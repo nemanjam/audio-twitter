@@ -1,6 +1,9 @@
 import React, { useEffect, useCallback, Fragment } from 'react';
 import { useQuery } from '@apollo/react-hooks';
 
+import { makeStyles } from '@material-ui/core/styles';
+import List from '@material-ui/core/List';
+
 import MessagePlayer from '../MessagePlayer/MessagePlayer';
 import MessageDelete from '../MessageDelete/MessageDelete';
 import Loading from '../Loading/Loading';
@@ -89,7 +92,17 @@ const MoreMessagesButton = ({
   </button>
 );
 
+const useStyles = makeStyles(theme => ({
+  root: {
+    width: '100%',
+    maxWidth: 600,
+    margin: '0 auto',
+    backgroundColor: theme.palette.background.paper,
+  },
+}));
+
 const MessageList = ({ messages, subscribeToMore }) => {
+  const classes = useStyles();
   const subscribeToMoreMessage = useCallback(() => {
     subscribeToMore({
       document: MESSAGE_CREATED,
@@ -119,15 +132,19 @@ const MessageList = ({ messages, subscribeToMore }) => {
   }, [subscribeToMoreMessage]);
 
   const domain = 'http://localhost:8000/uploads/';
-  return messages.map(message => {
-    // <MessageItem key={message.id} message={message} />
-    return (
-      <MessagePlayer
-        key={message.id}
-        path={`${domain}${message.file.path}`}
-      />
-    );
-  });
+  return (
+    <List className={classes.root}>
+      {messages.map(message => {
+        // <MessageItem key={message.id} message={message} />
+        return (
+          <MessagePlayer
+            key={message.id}
+            path={`${domain}${message.file.path}`}
+          />
+        );
+      })}
+    </List>
+  );
 };
 
 const MessageItemBase = ({ message, session }) => (
