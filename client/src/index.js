@@ -10,7 +10,7 @@ import { WebSocketLink } from 'apollo-link-ws';
 import { onError } from 'apollo-link-error';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 
-import Routes from './Routes';
+import App from './App';
 import { signOut } from './components/SignOutButton/SignOutButton';
 
 const httpLink = createUploadLink({
@@ -84,7 +84,7 @@ const client = new ApolloClient({
 
 ReactDOM.render(
   <ApolloProvider client={client}>
-    <Routes />
+    <App />
   </ApolloProvider>,
   document.getElementById('root'),
 );

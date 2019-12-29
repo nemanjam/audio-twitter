@@ -74,13 +74,22 @@ const Navigation = ({ session }) => {
               </Typography>
             </>
           ) : (
-            <Button
-              color="inherit"
-              component={Link}
-              to={routes.SIGN_IN}
-            >
-              Sign In
-            </Button>
+            <>
+              <Button
+                color="inherit"
+                component={Link}
+                to={routes.SIGN_UP}
+              >
+                Sign Up
+              </Button>
+              <Button
+                color="inherit"
+                component={Link}
+                to={routes.SIGN_IN}
+              >
+                Sign In
+              </Button>
+            </>
           )}
         </Toolbar>
       </AppBar>
