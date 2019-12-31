@@ -23,9 +23,13 @@ const Landing = ({ session }) => {
       direction="column"
       className={classes.root}
     >
-      <Grid item md={6} sm={8} xs={12} className={classes.item}>
-        <h2>Landing Page</h2>
-      </Grid>
+      <Grid
+        item
+        md={6}
+        sm={8}
+        xs={12}
+        className={classes.item}
+      ></Grid>
       <Grid item md={6} sm={8} xs={12} className={classes.item}>
         {/* {session && session.me && <MessageCreate />} */}
         {session && session.me && <Microphone />}

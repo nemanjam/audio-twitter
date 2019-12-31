@@ -86,14 +86,8 @@ function MessagePlayer({ path }) {
       setPlayerReady(true);
     });
 
-    const handleResize = wavesurfer.current.util.debounce(() => {
-      wavesurfer.current.empty();
-      wavesurfer.current.drawBuffer();
-    }, 150);
-
     wavesurfer.current.on('play', () => setIsPlaying(true));
     wavesurfer.current.on('pause', () => setIsPlaying(false));
-    window.addEventListener('resize', handleResize, false);
   }, []);
 
   const togglePlayback = () => {

@@ -90,19 +90,7 @@ export default function Microphone() {
 
     wavesurfer.current.on('play', () => setIsPlaying(true));
     wavesurfer.current.on('pause', () => setIsPlaying(false));
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
   }, [open, tempFile]);
-
-  const handleResize = useCallback(() => {
-    wavesurfer.current.util.debounce(() => {
-      wavesurfer.current.empty();
-      wavesurfer.current.drawBuffer();
-    }, 150);
-  });
 
   useEffect(() => {
     if (tempFile && wavesurfer.current) {
@@ -188,7 +176,14 @@ export default function Microphone() {
           </Fab>
         </Grid>
       </Grid>
-      <Dialog maxWidth="sm" open={open} onClose={handleCancel}>
+      <Dialog
+        maxWidth="sm"
+        open={open}
+        onClose={handleCancel}
+        PaperProps={{
+          style: { backgroundColor: 'rgba(255, 255, 255, 1)' },
+        }}
+      >
         <DialogTitle className={classes.flex}>Record</DialogTitle>
         <DialogContent>
           {tempFile ? (
@@ -200,7 +195,7 @@ export default function Microphone() {
               onStop={onStop}
               onData={onData}
               strokeColor="grey"
-              backgroundColor="white"
+              backgroundColor="transparent"
             />
           )}
         </DialogContent>
