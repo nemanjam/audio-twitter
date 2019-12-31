@@ -1,6 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+} from 'react';
 import { ReactMic } from 'react-mic';
-import WaveSurfer from 'wavesurfer';
+import WaveSurfer from 'wavesurfer.js';
 import { useMutation } from '@apollo/react-hooks';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -48,6 +53,7 @@ const useStyles = makeStyles(theme => ({
     position: 'absolute',
     bottom: theme.spacing(2),
     right: theme.spacing(2),
+    zIndex: 2,
   },
 }));
 
@@ -82,20 +88,28 @@ export default function Microphone() {
       setPlayerReady(true);
     });
 
-    const handleResize = wavesurfer.current.util.debounce(() => {
+    wavesurfer.current.on('play', () => setIsPlaying(true));
+    wavesurfer.current.on('pause', () => setIsPlaying(false));
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [open, tempFile]);
+
+  const handleResize = useCallback(() => {
+    wavesurfer.current.util.debounce(() => {
       wavesurfer.current.empty();
       wavesurfer.current.drawBuffer();
     }, 150);
-
-    wavesurfer.current.on('play', () => setIsPlaying(true));
-    wavesurfer.current.on('pause', () => setIsPlaying(false));
-    window.addEventListener('resize', handleResize, false);
-  }, [open, tempFile]);
+  });
 
   useEffect(() => {
-    console.log('tempFile', tempFile);
-    if (tempFile) {
+    if (tempFile && wavesurfer.current) {
       wavesurfer.current.load(tempFile.blobURL);
+    } else {
+      wavesurfer.current = null;
+      setTempFile(null);
     }
   }, [tempFile]);
 

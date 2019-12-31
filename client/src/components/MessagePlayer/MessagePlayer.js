@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import WaveSurfer from 'wavesurfer';
+import WaveSurfer from 'wavesurfer.js';
 import uuidv4 from 'uuid/v4';
 
 import { makeStyles } from '@material-ui/core/styles';
