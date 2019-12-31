@@ -6,6 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import withSession from '../session/withSession';
 
 import MessageCreate from '../components/MessageCreate/MessageCreate';
+import Microphone from '../components/Microphone/Microphone';
 import Messages from '../components/Messages/Messages';
 
 const useStyles = makeStyles(theme => ({
@@ -26,7 +27,8 @@ const Landing = ({ session }) => {
         <h2>Landing Page</h2>
       </Grid>
       <Grid item md={6} sm={8} xs={12} className={classes.item}>
-        {session && session.me && <MessageCreate />}
+        {/* {session && session.me && <MessageCreate />} */}
+        {session && session.me && <Microphone />}
       </Grid>
       <Grid item md={6} sm={8} xs={12} className={classes.item}>
         <Messages limit={2} />

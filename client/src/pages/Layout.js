@@ -23,7 +23,6 @@ const Layout = ({ children, session }) => {
       <Container className={classes.container} maxWidth="lg">
         {children}
       </Container>
-      <div></div>
     </Fragment>
   );
 };

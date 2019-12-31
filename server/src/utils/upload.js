@@ -43,7 +43,9 @@ const storeFS = ({ stream, filename }) => {
 };
 
 export const processMessage = async (userId, file) => {
-  const { createReadStream, filename, mimetype } = await file;
+  const fileData = await file;
+  // console.log(fileData);
+  const { createReadStream, filename, mimetype } = fileData;
   const stream = createReadStream();
   const { webPath } = await storeFS({ stream, filename });
   return storeDB({ userId, filename, mimetype, path: webPath });

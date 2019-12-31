@@ -30,6 +30,7 @@ const SignInForm = ({ history, refetch }) => {
 
   const onSubmit = async event => {
     event.preventDefault();
+    localStorage.removeItem('token');
 
     const { data } = await signIn({ variables: { login, password } });
 
