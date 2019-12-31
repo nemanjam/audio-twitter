@@ -3,6 +3,7 @@ import { useQuery } from '@apollo/react-hooks';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core/Button';
 
 import MessagePlayer from '../MessagePlayer/MessagePlayer';
 import MessageDelete from '../MessageDelete/MessageDelete';
@@ -44,13 +45,17 @@ const Messages = ({ limit }) => {
       />
 
       {pageInfo.hasNextPage && (
-        <MoreMessagesButton
-          limit={limit}
-          pageInfo={pageInfo}
-          fetchMore={fetchMore}
-        >
-          More
-        </MoreMessagesButton>
+        <Grid container justify="center" style={{ paddingTop: 16 }}>
+          <Grid item>
+            <MoreMessagesButton
+              limit={limit}
+              pageInfo={pageInfo}
+              fetchMore={fetchMore}
+            >
+              More
+            </MoreMessagesButton>
+          </Grid>
+        </Grid>
       )}
     </Fragment>
   );
@@ -62,8 +67,9 @@ const MoreMessagesButton = ({
   fetchMore,
   children,
 }) => (
-  <button
-    type="button"
+  <Button
+    color="primary"
+    variant="contained"
     onClick={() =>
       fetchMore({
         variables: {
@@ -89,7 +95,7 @@ const MoreMessagesButton = ({
     }
   >
     {children}
-  </button>
+  </Button>
 );
 
 const useStyles = makeStyles(theme => ({

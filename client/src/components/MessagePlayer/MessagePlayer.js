@@ -12,6 +12,7 @@ import ChatBubbleIcon from '@material-ui/icons/ChatBubble';
 import ShareIcon from '@material-ui/icons/Share';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import { green, red, blue } from '@material-ui/core/colors';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import PauseIcon from '@material-ui/icons/Pause';
 import Grid from '@material-ui/core/Grid';
@@ -19,7 +20,7 @@ import Grid from '@material-ui/core/Grid';
 import ListItem from '@material-ui/core/ListItem';
 
 const faces = [
-  'http://i.pravatar.cc/300?img=1',
+  'http://i.pravatar.cc/300?img=3',
   'http://i.pravatar.cc/300?img=2',
   'http://i.pravatar.cc/300?img=3',
   'http://i.pravatar.cc/300?img=4',
@@ -81,11 +82,10 @@ function MessagePlayer({ path }) {
     });
 
     wavesurfer.current.load(path);
-
+    wavesurfer.current.on('loading', (X, evt) => {});
     wavesurfer.current.on('ready', () => {
       setPlayerReady(true);
     });
-
     wavesurfer.current.on('play', () => setIsPlaying(true));
     wavesurfer.current.on('pause', () => setIsPlaying(false));
   }, []);
@@ -142,9 +142,18 @@ function MessagePlayer({ path }) {
             <Grid container direction="column">
               <Grid
                 item
-                className={classes.wavesurfer}
                 id={wavesurferId}
+                className={classes.wavesurfer}
               />
+              {!playerReady && (
+                <CircularProgress
+                  style={{
+                    position: 'absolute',
+                    top: '50px',
+                    right: '50%',
+                  }}
+                />
+              )}
               <Grid
                 item
                 container
