@@ -8,6 +8,8 @@ import withSession from '../session/withSession';
 import MessageCreate from '../components/MessageCreate/MessageCreate';
 import Microphone from '../components/Microphone/Microphone';
 import Messages from '../components/Messages/Messages';
+import Autoplay from '../components/Autoplay/Autoplay';
+import WhoToFollow from '../components/WhoToFollow/WhoToFollow';
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -17,27 +19,36 @@ const useStyles = makeStyles(theme => ({
 const Landing = ({ session }) => {
   const classes = useStyles();
   return (
-    <Grid
-      container
-      alignContent="center"
-      direction="column"
-      className={classes.root}
-    >
+    <>
       <Grid
-        item
-        md={6}
-        sm={8}
-        xs={12}
-        className={classes.item}
-      ></Grid>
-      <Grid item md={6} sm={8} xs={12} className={classes.item}>
-        {/* {session && session.me && <MessageCreate />} */}
-        {session && session.me && <Microphone />}
+        container
+        spacing={2}
+        justify="center"
+        direction="row-reverse"
+      >
+        <Grid
+          item
+          container
+          md={4}
+          sm={6}
+          xs={12}
+          className={classes.item}
+          spacing={2}
+          direction="column"
+        >
+          <Grid item>
+            <Autoplay />
+          </Grid>
+          <Grid item>
+            <WhoToFollow />
+          </Grid>
+        </Grid>
+        <Grid item md={8} sm={6} xs={12} className={classes.item}>
+          <Messages limit={2} />
+        </Grid>
       </Grid>
-      <Grid item md={6} sm={8} xs={12} className={classes.item}>
-        <Messages limit={2} />
-      </Grid>
-    </Grid>
+      {session && session.me && <Microphone />}
+    </>
   );
 };
 

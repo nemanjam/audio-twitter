@@ -20,7 +20,7 @@ import Grid from '@material-ui/core/Grid';
 import ListItem from '@material-ui/core/ListItem';
 
 const faces = [
-  'http://i.pravatar.cc/300?img=3',
+  'http://i.pravatar.cc/300?img=5',
   'http://i.pravatar.cc/300?img=2',
   'http://i.pravatar.cc/300?img=3',
   'http://i.pravatar.cc/300?img=4',
@@ -56,7 +56,7 @@ const useStyles = makeStyles(theme => ({
     paddingRight: theme.spacing(1),
   },
   bold: {
-    fontWeight: 700,
+    //fontWeight: 500,
   },
 }));
 
@@ -129,7 +129,12 @@ function MessagePlayer({ path }) {
           </Grid>
           <Grid item container className={classes.flex}>
             <Grid item>
-              <Typography className={classes.bold} display="inline">
+              <Typography
+                variant="body1"
+                color="textPrimary"
+                className={classes.bold}
+                display="inline"
+              >
                 Username
               </Typography>
               <Typography display="inline"> · </Typography>

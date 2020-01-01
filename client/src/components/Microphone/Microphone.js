@@ -194,7 +194,7 @@ export default function Microphone() {
               onStop={onStop}
               onData={onData}
               strokeColor="grey"
-              backgroundColor="transparent"
+              backgroundColor="white"
             />
           )}
         </DialogContent>

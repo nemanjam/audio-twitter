@@ -13,6 +13,7 @@ const useStyles = makeStyles(theme => ({
   container: {
     padding: theme.spacing(2),
     paddingTop: theme.spacing(10),
+    maxWidth: 1000,
   },
 }));
 
@@ -23,9 +24,7 @@ const Layout = ({ children, session }) => {
     <Fragment>
       <CssBaseline />
       <Navigation session={session} />
-      <Container className={classes.container} maxWidth="lg">
-        {children}
-      </Container>
+      <Container className={classes.container}>{children}</Container>
     </Fragment>
   );
 };
