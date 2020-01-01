@@ -50,7 +50,7 @@ const useStyles = makeStyles(theme => ({
     flex: 1,
   },
   fab: {
-    position: 'absolute',
+    position: 'fixed',
     bottom: theme.spacing(2),
     right: theme.spacing(2),
     zIndex: 2,
@@ -87,7 +87,6 @@ export default function Microphone() {
     wavesurfer.current.on('ready', () => {
       setPlayerReady(true);
     });
-
     wavesurfer.current.on('play', () => setIsPlaying(true));
     wavesurfer.current.on('pause', () => setIsPlaying(false));
   }, [open, tempFile]);

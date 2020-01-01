@@ -82,7 +82,9 @@ function MessagePlayer({ path }) {
     });
 
     wavesurfer.current.load(path);
-    wavesurfer.current.on('loading', (X, evt) => {});
+    wavesurfer.current.on('loading', percentage => {
+      console.log('percentage', percentage);
+    });
     wavesurfer.current.on('ready', () => {
       setPlayerReady(true);
     });

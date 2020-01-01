@@ -67,7 +67,9 @@ const SignInForm = ({ history, refetch }) => {
     history.push(routes.LANDING);
   };
 
-  const isInvalid = password === '' || login === '';
+  const isInvalid =
+    !(password === '' && login === '') &&
+    (password === '' || login === '');
   const classes = useStyles();
   return (
     <Container component="main" maxWidth="xs">
@@ -119,9 +121,9 @@ const SignInForm = ({ history, refetch }) => {
             <Grid item xs />
             <Grid item>
               Don't have an account?{' '}
-              <Link to="/signup">
-                <MuiLink variant="body2">Sign Up</MuiLink>
-              </Link>
+              <MuiLink to="/signup" component={Link} variant="body2">
+                Sign Up
+              </MuiLink>
             </Grid>
           </Grid>
         </form>

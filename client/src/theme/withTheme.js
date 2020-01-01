@@ -2,7 +2,7 @@ import React from 'react';
 import { ThemeProvider } from '@material-ui/styles';
 
 const withTheme = theme => Component => props => {
-  console.log(theme);
+  // console.log(theme);
   return (
     <ThemeProvider theme={theme}>
       <Component {...props} />
