@@ -68,6 +68,7 @@ const Autoplay = () => {
             edge="end"
             onChange={handleToggle('wifi')}
             checked={checked.indexOf('wifi') !== -1}
+            color="primary"
           />
         </ListItemSecondaryAction>
       </ListItem>
