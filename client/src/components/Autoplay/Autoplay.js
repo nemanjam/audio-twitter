@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -30,21 +30,32 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Autoplay = () => {
+const Autoplay = ({ setMainAutoplay }) => {
   const classes = useStyles();
-  const [checked, setChecked] = React.useState(['wifi']);
+  const [autoplay, setAutoplay] = React.useState('none');
 
-  const handleToggle = value => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
+  useEffect(() => {
+    if (setMainAutoplay) setMainAutoplay(autoplay);
+  }, [autoplay]);
 
-    if (currentIndex === -1) {
-      newChecked.push(value);
+  const toggleAutoplay = value => {
+    if (autoplay === 'none') {
+      setAutoplay(value);
+    } else if (value === autoplay) {
+      setAutoplay('none');
+    } else if (value === 'existing') {
+      if (autoplay === 'existing') {
+        setAutoplay('incoming');
+      } else {
+        setAutoplay('existing');
+      }
     } else {
-      newChecked.splice(currentIndex, 1);
+      if (autoplay === 'incoming') {
+        setAutoplay('existing');
+      } else {
+        setAutoplay('incoming');
+      }
     }
-
-    setChecked(newChecked);
   };
 
   return (
@@ -52,7 +63,7 @@ const Autoplay = () => {
       subheader={
         <ListSubheader className={classes.subHeader}>
           <Typography variant="body1" className={classes.title}>
-            Settings
+            Autoplay: {autoplay}
           </Typography>
         </ListSubheader>
       }
@@ -62,26 +73,27 @@ const Autoplay = () => {
         <ListItemIcon>
           <VolumeUpIcon />
         </ListItemIcon>
-        <ListItemText primary="Autoplay" />
+        <ListItemText primary="Autoplay existing" />
         <ListItemSecondaryAction>
           <Switch
             edge="end"
-            onChange={handleToggle('wifi')}
-            checked={checked.indexOf('wifi') !== -1}
+            onChange={() => toggleAutoplay('existing')}
+            checked={autoplay === 'existing'}
             color="primary"
           />
         </ListItemSecondaryAction>
       </ListItem>
       <ListItem>
         <ListItemIcon>
-          <FastForwardIcon />
+          <VolumeUpIcon />
         </ListItemIcon>
-        <ListItemText primary="Speed up" />
+        <ListItemText primary="Autoplay incoming" />
         <ListItemSecondaryAction>
           <Switch
             edge="end"
-            onChange={handleToggle('bluetooth')}
-            checked={checked.indexOf('bluetooth') !== -1}
+            onChange={() => toggleAutoplay('incoming')}
+            checked={autoplay === 'incoming'}
+            color="primary"
           />
         </ListItemSecondaryAction>
       </ListItem>

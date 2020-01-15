@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
@@ -18,6 +18,8 @@ const useStyles = makeStyles(theme => ({
 
 const Landing = ({ session }) => {
   const classes = useStyles();
+  const [mainAutoplay, setMainAutoplay] = useState('none');
+
   return (
     <>
       <Grid
@@ -37,7 +39,7 @@ const Landing = ({ session }) => {
           direction="column"
         >
           <Grid item>
-            <Autoplay />
+            <Autoplay setMainAutoplay={setMainAutoplay} />
           </Grid>
           <Grid item>
             <WhoToFollow />
