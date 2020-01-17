@@ -11,14 +11,19 @@ export default {
   Mutation: {
     updateAutoplay: (
       _root,
-      { direction, index },
+      { direction, index, duration },
       { cache, getCacheKey },
     ) => {
       //   const previous = cache.readQuery({ query: GET_AUTOPLAY });
       //   console.log('previous', previous);
       //to je fora, mora autoplay, vidis format cache objekta sa readQuery
       const data = {
-        autoplay: { direction, index, __typename: 'Autoplay' },
+        autoplay: {
+          direction,
+          index,
+          duration,
+          __typename: 'Autoplay',
+        },
       };
       cache.writeData({ data });
     },

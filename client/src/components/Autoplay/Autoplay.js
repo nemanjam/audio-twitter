@@ -7,10 +7,8 @@ import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import Switch from '@material-ui/core/Switch';
-import WifiIcon from '@material-ui/icons/Wifi';
-import BluetoothIcon from '@material-ui/icons/Bluetooth';
 import VolumeUpIcon from '@material-ui/icons/VolumeUp';
-import FastForwardIcon from '@material-ui/icons/FastForward';
+import Slider from '@material-ui/core/Slider';
 import { Typography } from '@material-ui/core';
 import { useMutation } from '@apollo/react-hooks';
 import { UPDATE_AUTOPLAY } from '../../graphql/mutations';
@@ -30,18 +28,46 @@ const useStyles = makeStyles(theme => ({
   title: {
     fontWeight: 500,
   },
+  slider: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+  },
 }));
+
+const marks = [
+  {
+    value: 5,
+    label: '5s',
+  },
+  {
+    value: 10,
+    label: '10s',
+  },
+  {
+    value: 15,
+    label: '15s',
+  },
+  {
+    value: 20,
+    label: '20s',
+  },
+];
 
 const Autoplay = ({ setMainAutoplay }) => {
   const classes = useStyles();
   const [autoplay, setAutoplay] = React.useState('none');
+  const [sliderValue, setSliderValue] = React.useState(5);
   const [updateAutoplay] = useMutation(UPDATE_AUTOPLAY, {
-    variables: { direction: autoplay, index: 0 },
+    variables: {
+      direction: autoplay,
+      index: 0,
+      duration: sliderValue,
+    },
   });
 
   useEffect(() => {
     updateAutoplay();
-  }, [autoplay]);
+  }, [autoplay, sliderValue]);
 
   const toggleAutoplay = value => {
     if (autoplay === 'none') {
@@ -61,6 +87,10 @@ const Autoplay = ({ setMainAutoplay }) => {
         setAutoplay('incoming');
       }
     }
+  };
+
+  const handleSliderChange = (event, newValue) => {
+    setSliderValue(newValue);
   };
 
   return (
@@ -101,6 +131,19 @@ const Autoplay = ({ setMainAutoplay }) => {
             color="primary"
           />
         </ListItemSecondaryAction>
+      </ListItem>
+      <ListItem className={classes.slider}>
+        <Typography gutterBottom>
+          Play first {sliderValue} seconds
+        </Typography>
+        <Slider
+          marks={marks}
+          step={null}
+          value={sliderValue}
+          onChange={handleSliderChange}
+          min={5}
+          max={20}
+        />
       </ListItem>
     </List>
   );

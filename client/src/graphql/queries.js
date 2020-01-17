@@ -49,6 +49,7 @@ export const GET_AUTOPLAY = gql`
     autoplay @client {
       direction
       index
+      duration
     }
   }
 `;

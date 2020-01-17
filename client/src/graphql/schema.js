@@ -4,6 +4,7 @@ export default gql`
   type Autoplay {
     direction: String!
     index: Int!
+    duration: Int!
   }
 
   type Query {
@@ -11,6 +12,10 @@ export default gql`
   }
 
   type Mutation {
-    updateAutoplay(direction: String, index: Int!): Autoplay
+    updateAutoplay(
+      direction: String!
+      index: Int!
+      duration: Int!
+    ): Autoplay
   }
 `;

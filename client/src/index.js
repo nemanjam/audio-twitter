@@ -91,6 +91,7 @@ const data = {
     __typename: 'Autoplay',
     direction: 'none',
     index: 0,
+    duration: 5,
   },
 };
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import WaveSurfer from 'wavesurfer.js';
 import uuidv4 from 'uuid/v4';
+import { useMutation } from '@apollo/react-hooks';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
@@ -18,6 +19,8 @@ import PauseIcon from '@material-ui/icons/Pause';
 import Grid from '@material-ui/core/Grid';
 
 import ListItem from '@material-ui/core/ListItem';
+
+import { UPDATE_AUTOPLAY } from '../../graphql/mutations';
 
 const faces = [
   'http://i.pravatar.cc/300?img=5',
@@ -60,16 +63,50 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function MessagePlayer({ path, index, autoplayIndex, direction }) {
+function MessagePlayer({
+  path,
+  index,
+  autoplayIndex,
+  direction,
+  duration,
+}) {
   const wavesurfer = useRef(null);
 
   const [playerReady, setPlayerReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const wavesurferId = `wavesurfer--${uuidv4()}`;
+  const newIndex = useRef(0);
+
+  if (direction === 'existing') {
+    newIndex.current = index + 1;
+  }
+  if (direction === 'incoming') {
+    newIndex.current = index - 1;
+  }
+
+  const [updateAutoplay] = useMutation(UPDATE_AUTOPLAY, {
+    variables: { direction, index: newIndex.current, duration },
+  });
 
   useEffect(() => {
-    console.log('promeni', direction);
-  }, [autoplayIndex, direction]);
+    if (!wavesurfer.current) return;
+
+    if (direction !== 'none' && autoplayIndex === index) {
+      wavesurfer.current.play();
+      setTimeout(() => {
+        wavesurfer.current.stop();
+        updateAutoplay();
+      }, duration * 1000);
+    } else {
+      wavesurfer.current.stop();
+    }
+
+    wavesurfer.current.on('finish', () => {
+      if (direction !== 'none') {
+        updateAutoplay();
+      }
+    });
+  }, [autoplayIndex, direction, duration]);
 
   useEffect(() => {
     wavesurfer.current = WaveSurfer.create({

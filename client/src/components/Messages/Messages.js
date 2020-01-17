@@ -138,11 +138,9 @@ const MessageList = ({ messages, subscribeToMore }) => {
 
   const {
     data: {
-      autoplay: { direction, index },
+      autoplay: { direction, index, duration },
     },
   } = useQuery(GET_AUTOPLAY);
-
-  console.log('query', direction, index);
 
   const domain = 'http://localhost:8000/uploads/';
   return (
@@ -156,6 +154,7 @@ const MessageList = ({ messages, subscribeToMore }) => {
         return (
           <Grid item className={classes.item} key={message.id}>
             <MessagePlayer
+              duration={duration}
               direction={direction}
               autoplayIndex={index}
               index={i}
