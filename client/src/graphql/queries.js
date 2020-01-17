@@ -43,3 +43,12 @@ export const GET_PAGINATED_MESSAGES_WITH_USERS = gql`
     }
   }
 `;
+
+export const GET_AUTOPLAY = gql`
+  query {
+    autoplay @client {
+      direction
+      index
+    }
+  }
+`;

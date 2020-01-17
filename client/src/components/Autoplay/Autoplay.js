@@ -12,6 +12,8 @@ import BluetoothIcon from '@material-ui/icons/Bluetooth';
 import VolumeUpIcon from '@material-ui/icons/VolumeUp';
 import FastForwardIcon from '@material-ui/icons/FastForward';
 import { Typography } from '@material-ui/core';
+import { useMutation } from '@apollo/react-hooks';
+import { UPDATE_AUTOPLAY } from '../../graphql/mutations';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -33,9 +35,12 @@ const useStyles = makeStyles(theme => ({
 const Autoplay = ({ setMainAutoplay }) => {
   const classes = useStyles();
   const [autoplay, setAutoplay] = React.useState('none');
+  const [updateAutoplay] = useMutation(UPDATE_AUTOPLAY, {
+    variables: { direction: autoplay, index: 0 },
+  });
 
   useEffect(() => {
-    if (setMainAutoplay) setMainAutoplay(autoplay);
+    updateAutoplay();
   }, [autoplay]);
 
   const toggleAutoplay = value => {

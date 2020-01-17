@@ -10,7 +10,10 @@ import MessageDelete from '../MessageDelete/MessageDelete';
 import Loading from '../Loading/Loading';
 import withSession from '../../session/withSession';
 
-import { GET_PAGINATED_MESSAGES_WITH_USERS } from '../../graphql/queries';
+import {
+  GET_PAGINATED_MESSAGES_WITH_USERS,
+  GET_AUTOPLAY,
+} from '../../graphql/queries';
 import { MESSAGE_CREATED } from '../../graphql/subscriptions';
 
 const Messages = ({ limit }) => {
@@ -34,7 +37,7 @@ const Messages = ({ limit }) => {
   if (loading || !messages) {
     return <Loading />;
   }
-
+  //console.log(messages);
   const { edges, pageInfo } = messages;
 
   return (
@@ -133,6 +136,14 @@ const MessageList = ({ messages, subscribeToMore }) => {
     subscribeToMoreMessage();
   }, [subscribeToMoreMessage]);
 
+  const {
+    data: {
+      autoplay: { direction, index },
+    },
+  } = useQuery(GET_AUTOPLAY);
+
+  console.log('query', direction, index);
+
   const domain = 'http://localhost:8000/uploads/';
   return (
     <Grid
@@ -141,10 +152,15 @@ const MessageList = ({ messages, subscribeToMore }) => {
       spacing={2}
       className={classes.root}
     >
-      {messages.map(message => {
+      {messages.map((message, i) => {
         return (
           <Grid item className={classes.item} key={message.id}>
-            <MessagePlayer path={`${domain}${message.file.path}`} />
+            <MessagePlayer
+              direction={direction}
+              autoplayIndex={index}
+              index={i}
+              path={`${domain}${message.file.path}`}
+            />
           </Grid>
         );
       })}

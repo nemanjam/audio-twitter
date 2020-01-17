@@ -60,12 +60,16 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function MessagePlayer({ path }) {
+function MessagePlayer({ path, index, autoplayIndex, direction }) {
   const wavesurfer = useRef(null);
 
   const [playerReady, setPlayerReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const wavesurferId = `wavesurfer--${uuidv4()}`;
+
+  useEffect(() => {
+    console.log('promeni', direction);
+  }, [autoplayIndex, direction]);
 
   useEffect(() => {
     wavesurfer.current = WaveSurfer.create({

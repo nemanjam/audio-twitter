@@ -12,6 +12,8 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 
 import App from './App';
 import { signOut } from './components/SignOutButton/SignOutButton';
+import typeDefs from './graphql/schema';
+import resolvers from './graphql/resolvers';
 
 const httpLink = createUploadLink({
   uri: 'http://localhost:8000/graphql',
@@ -80,7 +82,20 @@ const cache = new InMemoryCache();
 const client = new ApolloClient({
   link,
   cache,
+  resolvers,
+  typeDefs,
 });
+
+const data = {
+  autoplay: {
+    __typename: 'Autoplay',
+    direction: 'none',
+    index: 0,
+  },
+};
+
+cache.writeData({ data });
+client.onResetStore(() => cache.writeData({ data }));
 
 ReactDOM.render(
   <ApolloProvider client={client}>

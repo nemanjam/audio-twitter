@@ -37,3 +37,9 @@ export const SIGN_UP = gql`
     }
   }
 `;
+
+export const UPDATE_AUTOPLAY = gql`
+  mutation($direction: String, $index: Int!) {
+    updateAutoplay(direction: $direction, index: $index) @client
+  }
+`;
