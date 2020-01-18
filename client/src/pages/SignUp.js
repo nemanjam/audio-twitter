@@ -2,17 +2,48 @@ import React, { useState } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { useMutation } from '@apollo/react-hooks';
 
+import Avatar from '@material-ui/core/Avatar';
+import Button from '@material-ui/core/Button';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import TextField from '@material-ui/core/TextField';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import { default as MuiLink } from '@material-ui/core/Link';
+import Grid from '@material-ui/core/Grid';
+import Box from '@material-ui/core/Box';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
+
 import * as routes from '../constants/routes';
 import ErrorMessage from '../components/Error/Error';
 
 import { SIGN_UP } from '../graphql/mutations';
 
 const SignUp = ({ history, refetch }) => (
-  <div>
-    <h1>SignUp</h1>
-    <SignUpForm history={history} refetch={refetch} />
-  </div>
+  <SignUpForm history={history} refetch={refetch} />
 );
+
+const useStyles = makeStyles(theme => ({
+  paper: {
+    marginTop: theme.spacing(2),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main,
+  },
+  form: {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(3),
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+  },
+}));
 
 const SignUpForm = ({ history, refetch }) => {
   const [username, setUsername] = useState('');
@@ -40,6 +71,8 @@ const SignUpForm = ({ history, refetch }) => {
       variables: { username, email, password },
     });
 
+    console.log(data);
+
     setUsername('');
     setEmail('');
     setPassword('');
@@ -55,43 +88,83 @@ const SignUpForm = ({ history, refetch }) => {
     password === '' ||
     email === '' ||
     username === '';
-
+  const classes = useStyles();
   return (
-    <form onSubmit={event => onSubmit(event)}>
-      <input
-        name="username"
-        value={username}
-        onChange={onChange}
-        type="text"
-        placeholder="Full Name"
-      />
-      <input
-        name="email"
-        value={email}
-        onChange={onChange}
-        type="text"
-        placeholder="Email Address"
-      />
-      <input
-        name="password"
-        value={password}
-        onChange={onChange}
-        type="password"
-        placeholder="Password"
-      />
-      <input
-        name="passwordConfirmation"
-        value={passwordConfirmation}
-        onChange={onChange}
-        type="password"
-        placeholder="Confirm Password"
-      />
-      <button disabled={isInvalid || loading} type="submit">
-        Sign Up
-      </button>
-
-      {error && <ErrorMessage error={error} />}
-    </form>
+    <Container component="main" maxWidth="xs">
+      <div className={classes.paper}>
+        <Avatar className={classes.avatar}>
+          <LockOutlinedIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5">
+          Sign up
+        </Typography>
+        <form
+          className={classes.form}
+          onSubmit={event => onSubmit(event)}
+          noValidate
+        >
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                name="username"
+                value={username}
+                onChange={onChange}
+                label="Full Name"
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                value={email}
+                onChange={onChange}
+                label="Email Address"
+                name="email"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                name="password"
+                label="Password"
+                type="password"
+                value={password}
+                onChange={onChange}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                name="passwordConfirmation"
+                label="Confirm Password"
+                type="password"
+                value={passwordConfirmation}
+                onChange={onChange}
+              />
+            </Grid>
+          </Grid>
+          {error && <ErrorMessage error={error} />}
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+            disabled={isInvalid || loading}
+          >
+            Sign Up
+          </Button>
+          <Grid container justify="flex-end">
+            <Grid item>
+              Already have an account?{' '}
+              <MuiLink to="/signin" component={Link} variant="body2">
+                Sign in
+              </MuiLink>
+            </Grid>
+          </Grid>
+        </form>
+      </div>
+    </Container>
   );
 };
 
