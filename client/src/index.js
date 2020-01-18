@@ -14,9 +14,11 @@ import App from './App';
 import { signOut } from './components/SignOutButton/SignOutButton';
 import typeDefs from './graphql/schema';
 import resolvers from './graphql/resolvers';
+import { customFetch } from './utils/customFetch';
 
 const httpLink = createUploadLink({
   uri: 'http://localhost:8000/graphql',
+  fetch: customFetch,
 });
 
 // const httpLink = new HttpLink({

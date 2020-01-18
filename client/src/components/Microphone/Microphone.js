@@ -28,6 +28,8 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Grid from '@material-ui/core/Grid';
 import { green, red, blue } from '@material-ui/core/colors';
 import Fab from '@material-ui/core/Fab';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import LinearProgress from '@material-ui/core/LinearProgress';
 
 import ErrorMessage from '../Error/Error';
 import { CREATE_MESSAGE } from '../../graphql/mutations';
@@ -55,6 +57,14 @@ const useStyles = makeStyles(theme => ({
     right: theme.spacing(2),
     zIndex: 2,
   },
+  progress: {
+    display: 'block',
+    margin: theme.spacing(2),
+    width: '100%',
+  },
+  circularProgress: {
+    marginBottom: theme.spacing(1),
+  },
 }));
 
 export default function Microphone() {
@@ -66,7 +76,32 @@ export default function Microphone() {
   const [isPlaying, setIsPlaying] = useState(false);
   const wavesurfer = useRef(null);
 
+  const [completed, setCompleted] = React.useState(0);
+  const [secondsRemaining, setSecondsRemaining] = React.useState(0);
+
   const [createMessage, { error }] = useMutation(CREATE_MESSAGE);
+
+  useEffect(() => {
+    if (!record) {
+      setSecondsRemaining(0);
+      return;
+    }
+
+    const progressFn = () => {
+      setSecondsRemaining(oldSecondsRemaining => {
+        if (oldSecondsRemaining === 100) {
+          setRecord(false);
+          return 0;
+        }
+        return oldSecondsRemaining + 5; //0 to 100, for 20 sec
+      });
+    };
+
+    const timer = setInterval(progressFn, 1000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, [record]);
 
   useEffect(() => {
     if (!open || (open && !tempFile)) return;
@@ -124,16 +159,31 @@ export default function Microphone() {
   };
 
   const handleDone = async () => {
+    let abort;
     if (tempFile) {
       try {
         const file = await BlobURLToFile(tempFile);
         await createMessage({
           variables: { file },
+          context: {
+            fetchOptions: {
+              useUpload: true,
+              onProgress: e => {
+                setCompleted(Math.floor(e.loaded / e.total));
+              },
+              onAbortPossible: abortHandler => {
+                abort = abortHandler;
+              },
+            },
+          },
         });
         setTempFile(null);
         setRecord(false);
         setOpen(false);
-      } catch (error) {}
+        setCompleted(0);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
@@ -141,6 +191,7 @@ export default function Microphone() {
     setRecord(false);
     setTempFile(null);
     setOpen(false);
+    setSecondsRemaining(0);
   };
 
   const startRecording = () => {
@@ -183,7 +234,16 @@ export default function Microphone() {
           style: { backgroundColor: 'rgba(255, 255, 255, 1)' },
         }}
       >
-        <DialogTitle className={classes.flex}>Record</DialogTitle>
+        <DialogTitle className={classes.flex}>
+          {completed === 0 && record && (
+            <span>
+              {`Recording, ${20 -
+                Math.floor(secondsRemaining / 5)} seconds left`}
+            </span>
+          )}
+          {completed === 0 && !record && <span>Record</span>}
+          {completed > 0 && <span>{`Uploading ${completed}%`}</span>}
+        </DialogTitle>
         <DialogContent>
           {tempFile ? (
             <div className={classes.wavesurfer} id="wavesurfer-id" />
@@ -200,6 +260,20 @@ export default function Microphone() {
         </DialogContent>
         <DialogActions>
           <Grid container>
+            {record && (
+              <Grid
+                item
+                container
+                justify="center"
+                xs={12}
+                className={classes.circularProgress}
+              >
+                <CircularProgress
+                  variant="static"
+                  value={secondsRemaining}
+                />
+              </Grid>
+            )}
             {tempFile && (
               <Grid item container justify="center" xs={12}>
                 {!isPlaying ? (
@@ -255,6 +329,14 @@ export default function Microphone() {
                 />
               </IconButton>
             </Grid>
+            {completed > 0 && (
+              <div className={classes.progress}>
+                <LinearProgress
+                  variant="determinate"
+                  value={completed}
+                />
+              </div>
+            )}
           </Grid>
         </DialogActions>
       </Dialog>

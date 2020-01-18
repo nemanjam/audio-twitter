@@ -63,6 +63,14 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+const usePrevious = value => {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+};
+
 function MessagePlayer({
   path,
   index,
@@ -87,6 +95,8 @@ function MessagePlayer({
   const [updateAutoplay] = useMutation(UPDATE_AUTOPLAY, {
     variables: { direction, index: newIndex.current, duration },
   });
+
+  const prevDuration = usePrevious(duration);
 
   useEffect(() => {
     if (!wavesurfer.current) return;
