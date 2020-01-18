@@ -93,7 +93,12 @@ function MessagePlayer({
   const prevDuration = usePrevious(duration);
 
   useEffect(() => {
-    if (!wavesurfer.current || !playerReady) return;
+    if (
+      !wavesurfer.current ||
+      !playerReady ||
+      prevDuration !== duration
+    )
+      return;
 
     if (play) {
       wavesurfer.current.play();
@@ -110,7 +115,7 @@ function MessagePlayer({
         updateAutoplay();
       }
     });
-  }, [play, playerReady]);
+  }, [play, playerReady, duration]);
 
   useEffect(() => {
     wavesurfer.current = WaveSurfer.create({
