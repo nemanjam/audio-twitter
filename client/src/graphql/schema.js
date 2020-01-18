@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 export default gql`
   type Autoplay {
     direction: String!
-    index: Int!
+    createdAt: Date!
     duration: Int!
   }
 
@@ -14,7 +14,7 @@ export default gql`
   type Mutation {
     updateAutoplay(
       direction: String!
-      index: Int!
+      createdAt: Date!
       duration: Int!
     ): Autoplay
   }

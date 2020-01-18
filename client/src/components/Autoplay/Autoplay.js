@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import moment from 'moment';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -60,7 +61,7 @@ const Autoplay = ({ setMainAutoplay }) => {
   const [updateAutoplay] = useMutation(UPDATE_AUTOPLAY, {
     variables: {
       direction: autoplay,
-      index: 0,
+      createdAt: moment().toISOString(),
       duration: sliderValue,
     },
   });

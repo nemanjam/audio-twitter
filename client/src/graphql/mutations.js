@@ -39,10 +39,10 @@ export const SIGN_UP = gql`
 `;
 
 export const UPDATE_AUTOPLAY = gql`
-  mutation($direction: String!, $index: Int!, $duration: Int!) {
+  mutation($direction: String!, $createdAt: Date!, $duration: Int!) {
     updateAutoplay(
       direction: $direction
-      index: $index
+      createdAt: $createdAt
       duration: $duration
     ) @client
   }

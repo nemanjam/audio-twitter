@@ -73,10 +73,11 @@ const usePrevious = value => {
 
 function MessagePlayer({
   path,
-  index,
+  createdAt,
   autoplayIndex,
   direction,
   duration,
+  play,
 }) {
   const wavesurfer = useRef(null);
 
@@ -85,23 +86,16 @@ function MessagePlayer({
   const wavesurferId = `wavesurfer--${uuidv4()}`;
   const newIndex = useRef(0);
 
-  if (direction === 'existing') {
-    newIndex.current = index + 1;
-  }
-  if (direction === 'incoming') {
-    newIndex.current = index - 1;
-  }
-
   const [updateAutoplay] = useMutation(UPDATE_AUTOPLAY, {
-    variables: { direction, index: newIndex.current, duration },
+    variables: { direction, createdAt, duration },
   });
 
   const prevDuration = usePrevious(duration);
 
   useEffect(() => {
-    if (!wavesurfer.current) return;
+    if (!wavesurfer.current || !playerReady) return;
 
-    if (direction !== 'none' && autoplayIndex === index) {
+    if (play) {
       wavesurfer.current.play();
       setTimeout(() => {
         wavesurfer.current.stop();
@@ -112,11 +106,11 @@ function MessagePlayer({
     }
 
     wavesurfer.current.on('finish', () => {
-      if (direction !== 'none') {
+      if (play) {
         updateAutoplay();
       }
     });
-  }, [autoplayIndex, direction, duration]);
+  }, [play, playerReady]);
 
   useEffect(() => {
     wavesurfer.current = WaveSurfer.create({

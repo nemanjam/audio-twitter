@@ -48,7 +48,7 @@ export const GET_AUTOPLAY = gql`
   query {
     autoplay @client {
       direction
-      index
+      createdAt
       duration
     }
   }

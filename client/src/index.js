@@ -9,6 +9,7 @@ import { createUploadLink } from 'apollo-upload-client';
 import { WebSocketLink } from 'apollo-link-ws';
 import { onError } from 'apollo-link-error';
 import { InMemoryCache } from 'apollo-cache-inmemory';
+import moment from 'moment';
 
 import App from './App';
 import { signOut } from './components/SignOutButton/SignOutButton';
@@ -92,7 +93,7 @@ const data = {
   autoplay: {
     __typename: 'Autoplay',
     direction: 'none',
-    index: 0,
+    createdAt: moment().toISOString(),
     duration: 5,
   },
 };

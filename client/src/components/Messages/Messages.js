@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback, Fragment } from 'react';
 import { useQuery } from '@apollo/react-hooks';
+import moment from 'moment';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
@@ -138,9 +139,26 @@ const MessageList = ({ messages, subscribeToMore }) => {
 
   const {
     data: {
-      autoplay: { direction, index, duration },
+      autoplay: { direction, createdAt, duration },
     },
   } = useQuery(GET_AUTOPLAY);
+
+  const shouldPlay = message => {
+    if (direction === 'existing') {
+      const firstMessage = messages.find(m =>
+        moment(m.createdAt).isBefore(createdAt),
+      );
+      const result = firstMessage && message.id === firstMessage.id;
+      return result;
+    }
+    if (direction === 'incoming') {
+      const firstMessage = messages.find(m =>
+        moment(m.createdAt).isAfter(createdAt),
+      );
+      const result = firstMessage && message.id === firstMessage.id;
+      return result;
+    }
+  };
 
   const domain = 'http://localhost:8000/uploads/';
   return (
@@ -156,8 +174,8 @@ const MessageList = ({ messages, subscribeToMore }) => {
             <MessagePlayer
               duration={duration}
               direction={direction}
-              autoplayIndex={index}
-              index={i}
+              createdAt={message.createdAt}
+              play={shouldPlay(message)}
               path={`${domain}${message.file.path}`}
             />
           </Grid>

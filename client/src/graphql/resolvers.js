@@ -11,7 +11,7 @@ export default {
   Mutation: {
     updateAutoplay: (
       _root,
-      { direction, index, duration },
+      { direction, createdAt, duration },
       { cache, getCacheKey },
     ) => {
       //   const previous = cache.readQuery({ query: GET_AUTOPLAY });
@@ -20,7 +20,7 @@ export default {
       const data = {
         autoplay: {
           direction,
-          index,
+          createdAt,
           duration,
           __typename: 'Autoplay',
         },
