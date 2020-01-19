@@ -18,7 +18,7 @@ export default {
       return await models.User.find();
     },
     user: async (parent, { username }, { models }) => {
-      return await models.User.find({ username });
+      return await models.User.findOne({ username });
     },
     me: async (parent, args, { models, me }) => {
       if (!me) {
@@ -112,12 +112,12 @@ export default {
       });
     },
     avatar: async (user, args, { models }) => {
-      return await models.File.find({
+      return await models.File.findOne({
         avatarId: user.avatarId,
       });
     },
     cover: async (user, args, { models }) => {
-      return await models.File.find({
+      return await models.File.findOne({
         coverId: user.coverId,
       });
     },

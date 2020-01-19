@@ -7,6 +7,7 @@ const linkSchema = gql`
   scalar Date
 
   type File {
+    id: ID!
     path: String!
     filename: String!
     mimetype: String!

@@ -37,7 +37,7 @@ const App = ({ session, refetch }) => (
         layoutProps={{ session }}
       />
       <RouteWithLayout
-        path={routes.ACCOUNT}
+        path={'/:username'}
         component={AccountPage}
         layout={Layout}
         layoutProps={{ session }}

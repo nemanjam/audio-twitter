@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useQuery, useMutation } from '@apollo/react-hooks';
+
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
@@ -21,6 +23,9 @@ import WhoToFollow from '../components/WhoToFollow/WhoToFollow';
 import Messages from '../components/Messages/Messages';
 
 import withAuthorization from '../session/withAuthorization';
+import withSession from '../session/withSession';
+import { GET_USER } from '../graphql/queries';
+import Loading from '../components/Loading/Loading';
 
 const useStyles = makeStyles(theme => ({
   card: { width: '100%' },
@@ -62,7 +67,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const AccountPage = () => {
+const AccountPage = ({ match, session }) => {
   const classes = useStyles();
 
   const [open, setOpen] = useState(false);
@@ -70,6 +75,17 @@ const AccountPage = () => {
   const [cover, setCover] = useState(null);
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
+
+  const { data, error, loading } = useQuery(GET_USER, {
+    variables: { username: match?.params?.username },
+  });
+
+  if (loading) return <Loading />;
+
+  const { user } = data;
+
+  const isMyProfile =
+    session?.me?.username === match?.params?.username;
 
   const handleInput = event => {
     const { name, value } = event.target;
@@ -87,6 +103,8 @@ const AccountPage = () => {
 
   const handleOpen = () => {
     setOpen(true);
+    setName(user.name);
+    setBio(user.bio);
   };
 
   const handleClose = () => {
@@ -141,13 +159,19 @@ const AccountPage = () => {
             </CardMedia>
             <CardContent className={classes.content}>
               <div className={classes.editProfile}>
-                <Button
-                  color="primary"
-                  variant="outlined"
-                  onClick={handleOpen}
-                >
-                  Edit profile
-                </Button>
+                {isMyProfile ? (
+                  <Button
+                    color="primary"
+                    variant="outlined"
+                    onClick={handleOpen}
+                  >
+                    Edit profile
+                  </Button>
+                ) : (
+                  <Button color="primary" variant="outlined">
+                    Follow
+                  </Button>
+                )}
               </div>
               <Typography
                 className={classes.username}
@@ -312,6 +336,7 @@ const AccountPage = () => {
   );
 };
 
-export default withAuthorization(session => session && session.me)(
-  AccountPage,
-);
+// export default withAuthorization(session => session && session.me)(
+//   AccountPage,
+// );
+export default withSession(AccountPage);
