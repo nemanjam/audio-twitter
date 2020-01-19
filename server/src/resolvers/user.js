@@ -3,6 +3,7 @@ import { combineResolvers } from 'graphql-resolvers';
 import { AuthenticationError, UserInputError } from 'apollo-server';
 
 import { isAdmin, isAuthenticated } from './authorization';
+import { processFile } from '../utils/upload';
 
 const createToken = async (user, secret, expiresIn) => {
   const { id, email, username, role } = user;
@@ -16,8 +17,8 @@ export default {
     users: async (parent, args, { models }) => {
       return await models.User.find();
     },
-    user: async (parent, { id }, { models }) => {
-      return await models.User.findById(id);
+    user: async (parent, { username }, { models }) => {
+      return await models.User.find({ username });
     },
     me: async (parent, args, { models, me }) => {
       if (!me) {
@@ -67,10 +68,23 @@ export default {
 
     updateUser: combineResolvers(
       isAuthenticated,
-      async (parent, { username }, { models, me }) => {
+      async (
+        parent,
+        { name, bio, avatar, cover },
+        { models, me },
+      ) => {
+        const avatarSaved = await processFile(avatar);
+        const coverSaved = await processFile(cover);
         return await models.User.findByIdAndUpdate(
           me.id,
-          { username },
+          {
+            $set: {
+              name,
+              bio,
+              avatarId: avatarSaved.id,
+              coverId: coverSaved.id,
+            },
+          },
           { new: true },
         );
       },
@@ -95,6 +109,16 @@ export default {
     messages: async (user, args, { models }) => {
       return await models.Message.find({
         userId: user.id,
+      });
+    },
+    avatar: async (user, args, { models }) => {
+      return await models.File.find({
+        avatarId: user.avatarId,
+      });
+    },
+    cover: async (user, args, { models }) => {
+      return await models.File.find({
+        coverId: user.coverId,
       });
     },
   },

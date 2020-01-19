@@ -24,6 +24,14 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
   },
+  name: {
+    type: String,
+  },
+  bio: {
+    type: String,
+  },
+  avatarId: { type: mongoose.Schema.Types.ObjectId, ref: 'File' },
+  coverId: { type: mongoose.Schema.Types.ObjectId, ref: 'File' },
 });
 
 userSchema.statics.findByLogin = async function(login) {

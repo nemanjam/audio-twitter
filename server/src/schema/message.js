@@ -28,12 +28,6 @@ export default gql`
     file: File!
   }
 
-  type File {
-    path: String!
-    filename: String!
-    mimetype: String!
-  }
-
   extend type Subscription {
     messageCreated: MessageCreated!
   }

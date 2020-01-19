@@ -44,6 +44,44 @@ export const GET_PAGINATED_MESSAGES_WITH_USERS = gql`
   }
 `;
 
+export const GET_USERS = gql`
+  query {
+    users {
+      id
+      username
+      name
+      bio
+      avatar {
+        id
+        path
+      }
+      cover {
+        id
+        path
+      }
+    }
+  }
+`;
+
+export const GET_USER = gql`
+  query($username: String!) {
+    user(username: $username) {
+      id
+      username
+      name
+      bio
+      avatar {
+        id
+        path
+      }
+      cover {
+        id
+        path
+      }
+    }
+  }
+`;
+
 export const GET_AUTOPLAY = gql`
   query {
     autoplay @client {

@@ -2,7 +2,7 @@ import { combineResolvers } from 'graphql-resolvers';
 
 import pubsub, { EVENTS } from '../subscription';
 import { isAuthenticated, isMessageOwner } from './authorization';
-import { processMessage } from '../utils/upload';
+import { processFile } from '../utils/upload';
 
 // to base64, da klijent aplikacija ne bi radila sa datumom nego sa stringom
 const toCursorHash = string => Buffer.from(string).toString('base64');
@@ -58,7 +58,13 @@ export default {
       isAuthenticated,
       // obican resolver
       async (parent, { file }, { models, me }) => {
-        const message = await processMessage(me.id, file);
+        const fileSaved = await processFile(file);
+
+        // mora create a ne constructor za timestamps
+        const message = await models.Message.create({
+          fileId: fileSaved.id,
+          userId: me.id,
+        });
         pubsub.publish(EVENTS.MESSAGE.CREATED, {
           messageCreated: { message },
         });
@@ -88,12 +94,8 @@ export default {
       // loaders iz contexta koji je prosledjen
       return await loaders.user.load(message.userId);
     },
-    file: async (message, args, ctx) => {
-      return {
-        path: message.path,
-        filename: message.filename,
-        mimetype: message.mimetype,
-      };
+    file: async (message, args, { loaders }) => {
+      return await loaders.file.load(message.fileId);
     },
   },
 

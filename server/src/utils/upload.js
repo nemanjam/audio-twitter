@@ -2,32 +2,37 @@ import { resolve } from 'path';
 import { createWriteStream, unlinkSync } from 'fs';
 import { sync } from 'mkdirp';
 import uuidv4 from 'uuid/v4';
-import Message from '../models/message';
+import File from '../models/file';
 
-const uploadDir = resolve(__dirname, '../../uploads');
+const uploadAudioDir = resolve(__dirname, '../../uploads/audio');
+const uploadImagesDir = resolve(__dirname, '../../uploads/images');
 
 // Ensure upload directory exists.
-sync(uploadDir);
+sync(uploadAudioDir);
+sync(uploadImagesDir);
 
 const storeDB = args => {
-  const { userId, text, filename, mimetype, path } = args;
+  const { filename, mimetype, path } = args;
 
   try {
-    let message = new Message({
-      userId,
+    const file = new File({
       filename,
       mimetype,
       path,
     });
-    return message.save();
+    return file.save();
   } catch (err) {
     return err;
   }
 };
 
-const storeFS = ({ stream, filename }) => {
+const storeFS = ({ stream, filename, mimetype }) => {
   const id = uuidv4();
-  const path = `${uploadDir}/${id}-${filename}`;
+  let path;
+  if (mimetype.includes('audio'))
+    path = `${uploadAudioDir}/${id}-${filename}`;
+  else path = `${uploadImagesDir}/${id}-${filename}`;
+
   const webPath = `${id}-${filename}`;
 
   return new Promise((resolve, reject) =>
@@ -42,11 +47,11 @@ const storeFS = ({ stream, filename }) => {
   );
 };
 
-export const processMessage = async (userId, file) => {
+export const processFile = async file => {
   const fileData = await file;
   // console.log(fileData);
   const { createReadStream, filename, mimetype } = fileData;
   const stream = createReadStream();
-  const { webPath } = await storeFS({ stream, filename });
-  return storeDB({ userId, filename, mimetype, path: webPath });
+  const { webPath } = await storeFS({ stream, filename, mimetype });
+  return storeDB({ filename, mimetype, path: webPath });
 };

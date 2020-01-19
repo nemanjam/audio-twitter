@@ -2,19 +2,16 @@ import mongoose from 'mongoose';
 
 const messageSchema = new mongoose.Schema(
   {
-    filename: {
-      type: String,
-      required: [true, 'The filename is necessary'],
+    fileId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'File',
+      required: true,
     },
-    mimetype: {
-      type: String,
-      required: [true, 'The mimetype is necessary'],
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
     },
-    path: {
-      type: String,
-      required: [true, 'The path is necessary'],
-    },
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   },
   {
     timestamps: true,

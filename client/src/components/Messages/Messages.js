@@ -160,7 +160,7 @@ const MessageList = ({ messages, subscribeToMore }) => {
     }
   };
 
-  const domain = 'http://localhost:8000/uploads/';
+  const domain = 'http://localhost:8000/uploads/audio/';
   return (
     <Grid
       container

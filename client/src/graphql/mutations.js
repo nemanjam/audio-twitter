@@ -16,6 +16,35 @@ export const CREATE_MESSAGE = gql`
   }
 `;
 
+export const UPDATE_USER = gql`
+  mutation(
+    $name: String
+    $bio: String
+    $avatar: Upload!
+    $cover: Upload!
+  ) {
+    updateUser(
+      name: $name
+      bio: $bio
+      avatar: $avatar
+      cover: $cover
+    ) {
+      id
+      username
+      name
+      bio
+      avatar {
+        id
+        path
+      }
+      cover {
+        id
+        path
+      }
+    }
+  }
+`;
+
 export const DELETE_MESSAGE = gql`
   mutation($id: ID!) {
     deleteMessage(id: $id)

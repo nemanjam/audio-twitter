@@ -6,6 +6,12 @@ import messageSchema from './message';
 const linkSchema = gql`
   scalar Date
 
+  type File {
+    path: String!
+    filename: String!
+    mimetype: String!
+  }
+
   type Query {
     _: Boolean
   }
