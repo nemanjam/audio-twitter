@@ -73,19 +73,28 @@ export default {
         { name, bio, avatar, cover },
         { models, me },
       ) => {
-        const avatarSaved = await processFile(avatar);
-        const coverSaved = await processFile(cover);
+        const avatarSaved = avatar
+          ? await processFile(avatar)
+          : undefined;
+        const coverSaved = cover
+          ? await processFile(cover)
+          : undefined;
+
+        const user = {
+          name,
+          bio,
+          avatarId: avatarSaved && avatarSaved.id,
+          coverId: coverSaved && coverSaved.id,
+        };
+
+        for (let prop in user) if (!user[prop]) delete user[prop];
+
         return await models.User.findByIdAndUpdate(
           me.id,
           {
-            $set: {
-              name,
-              bio,
-              avatarId: avatarSaved.id,
-              coverId: coverSaved.id,
-            },
+            $set: user,
           },
-          { new: true },
+          { new: true, useFindAndModify: false },
         );
       },
     ),
@@ -112,14 +121,10 @@ export default {
       });
     },
     avatar: async (user, args, { models }) => {
-      return await models.File.findOne({
-        avatarId: user.avatarId,
-      });
+      return await models.File.findById(user.avatarId);
     },
     cover: async (user, args, { models }) => {
-      return await models.File.findOne({
-        coverId: user.coverId,
-      });
+      return await models.File.findById(user.coverId);
     },
   },
 };

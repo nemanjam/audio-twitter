@@ -25,6 +25,7 @@ import Messages from '../components/Messages/Messages';
 import withAuthorization from '../session/withAuthorization';
 import withSession from '../session/withSession';
 import { GET_USER } from '../graphql/queries';
+import { UPDATE_USER } from '../graphql/mutations';
 import Loading from '../components/Loading/Loading';
 
 const useStyles = makeStyles(theme => ({
@@ -76,14 +77,16 @@ const AccountPage = ({ match, session }) => {
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
 
-  const { data, error, loading } = useQuery(GET_USER, {
+  const { data, error, loading, refetch } = useQuery(GET_USER, {
     variables: { username: match?.params?.username },
   });
+
+  const [updateUser] = useMutation(UPDATE_USER);
 
   if (loading) return <Loading />;
 
   const { user } = data;
-
+  console.log(user);
   const isMyProfile =
     session?.me?.username === match?.params?.username;
 
@@ -108,6 +111,24 @@ const AccountPage = ({ match, session }) => {
   };
 
   const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleSave = async () => {
+    const variables = {
+      avatar,
+      cover,
+      name,
+      bio,
+    };
+
+    for (let prop in variables)
+      if (!variables[prop]) delete variables[prop];
+
+    const { data } = await updateUser({ variables });
+    console.log(data);
+    refetch();
+
     setOpen(false);
   };
 
@@ -149,11 +170,10 @@ const AccountPage = ({ match, session }) => {
           <Card className={classes.card} elevation={0} square>
             <CardMedia
               className={classes.media}
-              image="https://images.unsplash.com/photo-1470549638415-0a0755be0619"
-              title="Contemplative Reptile"
+              image={`http://localhost:8000/uploads/images/${user.cover.path}`}
             >
               <Avatar
-                src="https://i.pinimg.com/originals/0a/dd/87/0add874e1ea0676c4365b2dd7ddd32e3.jpg"
+                src={`http://localhost:8000/uploads/images/${user.avatar.path}`}
                 className={classes.large}
               />
             </CardMedia>
@@ -178,7 +198,7 @@ const AccountPage = ({ match, session }) => {
                 variant="h6"
                 component="p"
               >
-                Username
+                {user.name}
               </Typography>
               <Typography
                 variant="body2"
@@ -186,11 +206,10 @@ const AccountPage = ({ match, session }) => {
                 component="p"
                 gutterBottom
               >
-                @screen_name
+                @{user.username}
               </Typography>
               <Typography variant="body1" component="p">
-                Real knowledge is to know the extent of one's
-                ignorance. - Confucius.
+                {user.bio}
               </Typography>
 
               <Grid
@@ -326,7 +345,7 @@ const AccountPage = ({ match, session }) => {
             <Button onClick={handleClose} color="primary">
               Cancel
             </Button>
-            <Button onClick={handleClose} color="primary">
+            <Button onClick={handleSave} color="primary">
               Save
             </Button>
           </DialogActions>

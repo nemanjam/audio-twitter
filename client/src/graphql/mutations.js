@@ -20,8 +20,8 @@ export const UPDATE_USER = gql`
   mutation(
     $name: String
     $bio: String
-    $avatar: Upload!
-    $cover: Upload!
+    $avatar: Upload
+    $cover: Upload
   ) {
     updateUser(
       name: $name

@@ -37,16 +37,17 @@ const App = ({ session, refetch }) => (
         layoutProps={{ session }}
       />
       <RouteWithLayout
-        path={'/:username'}
-        component={AccountPage}
-        layout={Layout}
-        layoutProps={{ session }}
-      />
-      <RouteWithLayout
         path={routes.ADMIN}
         component={AdminPage}
         layout={Layout}
         layoutProps={{ session }}
+      />
+      <RouteWithLayout
+        path={'/:username'}
+        component={AccountPage}
+        layout={Layout}
+        layoutProps={{ session }}
+        exact
       />
     </Switch>
   </BrowserRouter>
