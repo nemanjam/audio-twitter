@@ -37,7 +37,7 @@ const Navigation = ({ session }) => {
             className={classes.title}
             noWrap
           >
-            Album layout
+            Audio Twitter
           </Typography>
 
           <Button
@@ -65,7 +65,7 @@ const Navigation = ({ session }) => {
               Admin
             </Button>
           )}
-          <div className={classes.flex} />
+          <div className={classes.flex}> {Math.random()}</div>
           {session && session.me ? (
             <>
               <SignOutButton />

@@ -6,6 +6,7 @@ import SignUpPage from './pages/SignUp';
 import SignInPage from './pages/SignIn';
 import AccountPage from './pages/Account';
 import AdminPage from './pages/Admin';
+import NotFoundPage from './pages/NotFound';
 import RouteWithLayout from './pages/RouteWithLayout';
 import Layout from './pages/Layout';
 import withSession from './session/withSession';
@@ -41,6 +42,13 @@ const App = ({ session, refetch }) => (
         component={AdminPage}
         layout={Layout}
         layoutProps={{ session }}
+      />
+      <RouteWithLayout
+        path="/notfound"
+        component={NotFoundPage}
+        layout={Layout}
+        layoutProps={{ session }}
+        exact
       />
       <RouteWithLayout
         path={'/:username'}

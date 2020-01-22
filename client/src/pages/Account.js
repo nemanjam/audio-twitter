@@ -68,7 +68,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const AccountPage = ({ match, session }) => {
+const AccountPage = ({ match, session, history }) => {
   const classes = useStyles();
 
   const [open, setOpen] = useState(false);
@@ -80,10 +80,10 @@ const AccountPage = ({ match, session }) => {
   const { data, error, loading, refetch } = useQuery(GET_USER, {
     variables: { username: match?.params?.username },
   });
-
   const [updateUser] = useMutation(UPDATE_USER);
 
   if (loading) return <Loading />;
+  if (!data) history.push('/notfound');
 
   const { user } = data;
   console.log(user);
