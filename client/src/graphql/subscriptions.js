@@ -9,8 +9,14 @@ export const MESSAGE_CREATED = gql`
         user {
           id
           username
+          name
+          avatar {
+            id
+            path
+          }
         }
         file {
+          id
           path
         }
       }

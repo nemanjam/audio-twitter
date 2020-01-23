@@ -16,22 +16,33 @@ export default {
     // kursor je vazan za vrednost podatka, a ne index elementa kao u offset/limmit paginaciji
     // kad se izbrise iz izvadjenih offset postaje nevalidan, a kursor ostaje uvek isti
     // createdAt za cursor
-    messages: async (parent, { cursor, limit = 100 }, { models }) => {
-      const cursorOptions = cursor
-        ? {
-            createdAt: {
-              $lt: fromCursorHash(cursor),
-            },
-          }
-        : {}; // za prvi upit ne treba cursor
-      const messages = await models.Message.find(
-        cursorOptions,
-        null,
-        {
-          sort: { createdAt: -1 }, //-1 smer sortiranja, cursor mora da bude sortiran
-          limit: limit + 1,
-        },
-      );
+    messages: async (
+      parent,
+      { cursor, limit = 100, username },
+      { models },
+    ) => {
+      const user = username
+        ? await models.User.findOne({
+            username,
+          })
+        : null;
+
+      const options = {
+        // za prvi upit ne treba cursor
+        ...(cursor && {
+          createdAt: {
+            $lt: fromCursorHash(cursor),
+          },
+        }),
+        ...(username && {
+          userId: user.id,
+        }),
+      };
+
+      const messages = await models.Message.find(options, null, {
+        sort: { createdAt: -1 }, //-1 smer sortiranja, cursor mora da bude sortiran
+        limit: limit + 1,
+      });
 
       const hasNextPage = messages.length > limit;
       const edges = hasNextPage ? messages.slice(0, -1) : messages;

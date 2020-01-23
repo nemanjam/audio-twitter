@@ -11,10 +11,12 @@ export const GET_ALL_MESSAGES_WITH_USERS = gql`
           username
           name
           avatar {
+            id
             path
           }
         }
         file {
+          id
           path
         }
       }
@@ -26,8 +28,8 @@ export const GET_ALL_MESSAGES_WITH_USERS = gql`
 `;
 
 export const GET_PAGINATED_MESSAGES_WITH_USERS = gql`
-  query($cursor: String, $limit: Int!) {
-    messages(cursor: $cursor, limit: $limit)
+  query($cursor: String, $limit: Int!, $username: String) {
+    messages(cursor: $cursor, limit: $limit, username: $username)
       @connection(key: "MessagesConnection") {
       edges {
         id
@@ -37,10 +39,12 @@ export const GET_PAGINATED_MESSAGES_WITH_USERS = gql`
           username
           name
           avatar {
+            id
             path
           }
         }
         file {
+          id
           path
         }
       }

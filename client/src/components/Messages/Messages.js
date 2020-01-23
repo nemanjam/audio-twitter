@@ -21,13 +21,22 @@ import {
 } from '../../graphql/queries';
 import { MESSAGE_CREATED } from '../../graphql/subscriptions';
 
-const Messages = ({ limit }) => {
-  const { data, loading, fetchMore, subscribeToMore } = useQuery(
-    GET_PAGINATED_MESSAGES_WITH_USERS,
-    {
-      variables: { limit },
-    },
-  );
+const Messages = ({ limit, username }) => {
+  const {
+    data,
+    loading,
+    error,
+    fetchMore,
+    subscribeToMore,
+  } = useQuery(GET_PAGINATED_MESSAGES_WITH_USERS, {
+    variables: { limit, username },
+  });
+
+  if (loading) {
+    return <Loading />;
+  }
+  // logujes error ako ne radi
+  console.log(data, error, username);
 
   if (!data) {
     return (
@@ -39,9 +48,6 @@ const Messages = ({ limit }) => {
 
   const { messages } = data;
 
-  if (loading || !messages) {
-    return <Loading />;
-  }
   //console.log(messages);
   const { edges, pageInfo } = messages;
 
@@ -59,6 +65,7 @@ const Messages = ({ limit }) => {
               limit={limit}
               pageInfo={pageInfo}
               fetchMore={fetchMore}
+              username={username}
             >
               More
             </MoreMessagesButton>
@@ -74,6 +81,7 @@ const MoreMessagesButton = ({
   pageInfo,
   fetchMore,
   children,
+  username,
 }) => (
   <Button
     color="primary"
@@ -83,6 +91,7 @@ const MoreMessagesButton = ({
         variables: {
           cursor: pageInfo.endCursor,
           limit,
+          username,
         },
         updateQuery: (previousResult, { fetchMoreResult }) => {
           if (!fetchMoreResult) {

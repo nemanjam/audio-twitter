@@ -86,7 +86,7 @@ const AccountPage = ({ match, session, history }) => {
   if (!data) history.push('/notfound');
 
   const { user } = data;
-  console.log(user);
+
   const isMyProfile =
     session?.me?.username === match?.params?.username;
 
@@ -270,7 +270,7 @@ const AccountPage = ({ match, session, history }) => {
           </Card>
         </Grid>
         <Grid item>
-          <Messages limit={2} />
+          <Messages limit={2} username={user.username} />
         </Grid>
         <Dialog
           open={open}
