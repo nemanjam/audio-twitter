@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import WaveSurfer from 'wavesurfer.js';
 import uuidv4 from 'uuid/v4';
 import { useMutation } from '@apollo/react-hooks';
+import moment from 'moment';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
@@ -74,10 +75,12 @@ const usePrevious = value => {
 function MessagePlayer({
   path,
   createdAt,
-  autoplayIndex,
   direction,
   duration,
   play,
+  username,
+  name,
+  avatar,
 }) {
   const wavesurfer = useRef(null);
 
@@ -175,7 +178,7 @@ function MessagePlayer({
       <ListItem className={classes.root}>
         <Grid container>
           <Grid item className={classes.avatarItem}>
-            <Avatar className={classes.avatar} src={faces[0]} />
+            <Avatar className={classes.avatar} src={avatar} />
           </Grid>
           <Grid item container className={classes.flex}>
             <Grid item>
@@ -185,7 +188,15 @@ function MessagePlayer({
                 className={classes.bold}
                 display="inline"
               >
-                Username
+                {name}
+              </Typography>
+              <Typography display="inline"> · </Typography>
+              <Typography
+                variant="body1"
+                color="textSecondary"
+                display="inline"
+              >
+                {`@${username}`}
               </Typography>
               <Typography display="inline"> · </Typography>
               <Typography
@@ -193,7 +204,7 @@ function MessagePlayer({
                 color="textSecondary"
                 display="inline"
               >
-                11h
+                {moment(createdAt).fromNow()}
               </Typography>
             </Grid>
             <Grid container direction="column">

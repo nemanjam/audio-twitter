@@ -10,6 +10,10 @@ import MessagePlayer from '../MessagePlayer/MessagePlayer';
 import MessageDelete from '../MessageDelete/MessageDelete';
 import Loading from '../Loading/Loading';
 import withSession from '../../session/withSession';
+import {
+  UPLOADS_AUDIO_FOLDER,
+  UPLOADS_IMAGES_FOLDER,
+} from '../../constants/paths';
 
 import {
   GET_PAGINATED_MESSAGES_WITH_USERS,
@@ -160,7 +164,6 @@ const MessageList = ({ messages, subscribeToMore }) => {
     }
   };
 
-  const domain = 'http://localhost:8000/uploads/audio/';
   return (
     <Grid
       container
@@ -176,7 +179,10 @@ const MessageList = ({ messages, subscribeToMore }) => {
               direction={direction}
               createdAt={message.createdAt}
               play={shouldPlay(message)}
-              path={`${domain}${message.file.path}`}
+              path={`${UPLOADS_AUDIO_FOLDER}${message.file.path}`}
+              avatar={`${UPLOADS_IMAGES_FOLDER}${message.user.avatar.path}`}
+              username={message.user.username}
+              name={message.user.name}
             />
           </Grid>
         );

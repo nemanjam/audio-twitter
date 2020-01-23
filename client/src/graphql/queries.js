@@ -9,6 +9,10 @@ export const GET_ALL_MESSAGES_WITH_USERS = gql`
         user {
           id
           username
+          name
+          avatar {
+            path
+          }
         }
         file {
           path
@@ -31,6 +35,10 @@ export const GET_PAGINATED_MESSAGES_WITH_USERS = gql`
         user {
           id
           username
+          name
+          avatar {
+            path
+          }
         }
         file {
           path

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 import AppBar from '@material-ui/core/AppBar';
@@ -26,6 +26,12 @@ const useStyles = makeStyles(theme => ({
 
 const Navigation = ({ session }) => {
   const classes = useStyles();
+  const [random, setRandom] = useState(0);
+
+  useEffect(() => {
+    setRandom(Math.random());
+  }, []);
+
   return (
     <>
       <AppBar position="fixed">
@@ -65,7 +71,7 @@ const Navigation = ({ session }) => {
               Admin
             </Button>
           )}
-          <div className={classes.flex}> {Math.random()}</div>
+          <div className={classes.flex}>{random}</div>
           {session && session.me ? (
             <>
               <SignOutButton />
