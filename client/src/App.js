@@ -44,14 +44,14 @@ const App = ({ session, refetch }) => (
         layoutProps={{ session }}
       />
       <RouteWithLayout
-        path="/notfound"
+        path={routes.NOTFOUND}
         component={NotFoundPage}
         layout={Layout}
         layoutProps={{ session }}
         exact
       />
       <RouteWithLayout
-        path={'/:username'}
+        path={routes.USERNAME}
         component={AccountPage}
         layout={Layout}
         layoutProps={{ session }}

@@ -36,7 +36,7 @@ const Messages = ({ limit, username }) => {
     return <Loading />;
   }
   // logujes error ako ne radi
-  console.log(data, error, username);
+  // console.log(data, error, username);
 
   if (!data) {
     return (

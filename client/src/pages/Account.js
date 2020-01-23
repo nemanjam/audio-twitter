@@ -27,6 +27,8 @@ import withSession from '../session/withSession';
 import { GET_USER } from '../graphql/queries';
 import { UPDATE_USER } from '../graphql/mutations';
 import Loading from '../components/Loading/Loading';
+import { UPLOADS_IMAGES_FOLDER } from '../constants/paths';
+import * as routes from '../constants/routes';
 
 const useStyles = makeStyles(theme => ({
   card: { width: '100%' },
@@ -83,7 +85,11 @@ const AccountPage = ({ match, session, history }) => {
   const [updateUser] = useMutation(UPDATE_USER);
 
   if (loading) return <Loading />;
-  if (!data) history.push('/notfound');
+
+  if (!data?.user) {
+    history.push(routes.NOTFOUND);
+    return null;
+  }
 
   const { user } = data;
 
@@ -126,7 +132,7 @@ const AccountPage = ({ match, session, history }) => {
       if (!variables[prop]) delete variables[prop];
 
     const { data } = await updateUser({ variables });
-    console.log(data);
+    // console.log(data);
     refetch();
 
     setOpen(false);
@@ -170,10 +176,10 @@ const AccountPage = ({ match, session, history }) => {
           <Card className={classes.card} elevation={0} square>
             <CardMedia
               className={classes.media}
-              image={`http://localhost:8000/uploads/images/${user.cover.path}`}
+              image={`${UPLOADS_IMAGES_FOLDER}${user.cover.path}`}
             >
               <Avatar
-                src={`http://localhost:8000/uploads/images/${user.avatar.path}`}
+                src={`${UPLOADS_IMAGES_FOLDER}${user.avatar.path}`}
                 className={classes.large}
               />
             </CardMedia>
