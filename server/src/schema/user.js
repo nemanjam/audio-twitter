@@ -22,6 +22,8 @@ export default gql`
       cover: Upload
     ): User!
     deleteUser(id: ID!): Boolean!
+    followUser(username: String!): Boolean!
+    unfollowUser(username: String!): Boolean!
   }
 
   type Token {
@@ -38,5 +40,10 @@ export default gql`
     bio: String
     avatar: File
     cover: File
+    followers: [User!]
+    following: [User!]
+    followersCount: Int
+    followingCount: Int
+    messagesCount: Int
   }
 `;

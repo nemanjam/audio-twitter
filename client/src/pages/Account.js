@@ -85,6 +85,7 @@ const AccountPage = ({ match, session, history }) => {
   const [updateUser] = useMutation(UPDATE_USER);
 
   if (loading) return <Loading />;
+  console.log(error, data);
 
   if (!data?.user) {
     history.push(routes.NOTFOUND);
@@ -229,7 +230,7 @@ const AccountPage = ({ match, session, history }) => {
                     color="primary"
                     component="h5"
                   >
-                    23
+                    {user.messagesCount}
                   </Typography>
                   <Typography
                     variant="body1"
@@ -245,7 +246,7 @@ const AccountPage = ({ match, session, history }) => {
                     color="primary"
                     component="h5"
                   >
-                    23
+                    {user.followersCount}
                   </Typography>
                   <Typography
                     variant="body1"
@@ -261,7 +262,7 @@ const AccountPage = ({ match, session, history }) => {
                     color="primary"
                     component="h5"
                   >
-                    23
+                    {user.followingCount}
                   </Typography>
                   <Typography
                     variant="body1"

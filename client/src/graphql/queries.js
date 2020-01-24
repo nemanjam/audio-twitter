@@ -82,6 +82,27 @@ export const GET_USER = gql`
       username
       name
       bio
+      followersCount
+      followingCount
+      messagesCount
+      followers {
+        id
+        username
+        name
+        avatar {
+          id
+          path
+        }
+      }
+      following {
+        id
+        username
+        name
+        avatar {
+          id
+          path
+        }
+      }
       avatar {
         id
         path

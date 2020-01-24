@@ -112,6 +112,43 @@ export default {
         }
       },
     ),
+
+    followUser: combineResolvers(
+      isAuthenticated,
+      async (parent, { username }, { models, me }) => {
+        const followedUser = await models.User.findOneAndUpdate(
+          { username },
+          { $push: { followersIds: me.id } },
+        );
+
+        if (!followedUser) return false;
+        const followingUser = await models.User.findOneAndUpdate(
+          { _id: me.id },
+          { $push: { followingIds: followedUser.id } },
+        );
+
+        return !!followingUser;
+      },
+    ),
+
+    unfollowUser: combineResolvers(
+      isAuthenticated,
+      async (parent, { username }, { models, me }) => {
+        const followedUser = await models.User.findOneAndUpdate(
+          { username },
+          { $pull: { followersIds: me.id } },
+        );
+
+        if (!followedUser) return false;
+
+        const followingUser = await models.User.findOneAndUpdate(
+          { _id: me.id },
+          { $pull: { followingIds: followedUser.id } },
+        );
+
+        return !!followingUser;
+      },
+    ),
   },
 
   User: {
@@ -125,6 +162,34 @@ export default {
     },
     cover: async (user, args, { models }) => {
       return await models.File.findById(user.coverId);
+    },
+    followers: async (user, args, { models }) => {
+      return await models.User.find({
+        followingIds: { $in: [user.id] },
+      });
+    },
+    following: async (user, args, { models }) => {
+      return await models.User.find({
+        followersIds: { $in: [user.id] },
+      });
+    },
+    followersCount: async (user, args, { models }) => {
+      const followers = await models.User.find({
+        followingIds: { $in: [user.id] },
+      });
+      return followers.length;
+    },
+    followingCount: async (user, args, { models }) => {
+      const following = await models.User.find({
+        followersIds: { $in: [user.id] },
+      });
+      return following.length;
+    },
+    messagesCount: async (user, args, { models }) => {
+      const messages = await models.Message.find({
+        userId: user.id,
+      });
+      return messages.length;
     },
   },
 };

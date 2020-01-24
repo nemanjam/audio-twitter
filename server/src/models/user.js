@@ -32,6 +32,12 @@ const userSchema = new mongoose.Schema({
   },
   avatarId: { type: mongoose.Schema.Types.ObjectId, ref: 'File' },
   coverId: { type: mongoose.Schema.Types.ObjectId, ref: 'File' },
+  followersIds: [
+    { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  ],
+  followingIds: [
+    { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  ],
 });
 
 userSchema.statics.findByLogin = async function(login) {
@@ -46,7 +52,12 @@ userSchema.statics.findByLogin = async function(login) {
   return user;
 };
 
-userSchema.pre('remove', function(next) {
+userSchema.pre('remove', async function(next) {
+  await this.model('User').update(
+    {},
+    { $pull: { followersIds: this._id, followingIds: this._id } },
+    { multi: true },
+  );
   this.model('Message').deleteMany({ userId: this._id }, next);
 });
 
