@@ -34,6 +34,7 @@
     "dataloader": "^1.4.0",
     "dotenv": "^6.1.0",
     "express": "^4.16.4",
+    "faker": "^4.1.0",
     "graphql": "^14.0.2",
     "graphql-iso-date": "^3.6.1",
     "graphql-resolvers": "^0.3.2",
