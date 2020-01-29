@@ -23,7 +23,7 @@ export const createUsersWithMessages = async date => {
       email: `email${index}@email.com`,
       password: '123456789',
       name: faker.name.findName(),
-      bio: faker.lorem.sentence(),
+      bio: faker.lorem.sentences(3),
       avatarId: avatar1.id,
       coverId: cover1.id,
     });
@@ -46,15 +46,17 @@ export const createUsersWithMessages = async date => {
   );
 
   const users = await models.User.find();
+  const followersIdsArr = users.map(user => user.id).slice(1);
 
   // all users follow user0
-  users.map((user, i) => {
-    if (i === 0) return;
-    users[0].followersIds.push(users[i].id);
-    users[i].followingIds.push(users[0].id);
-  });
-
-  await Promise.all(users.map(user => user.save()));
+  await models.User.updateMany(
+    { _id: { $ne: users[0].id } },
+    { $push: { followingIds: users[0].id } },
+  );
+  await models.User.updateOne(
+    { _id: users[0].id },
+    { $push: { followersIds: followersIdsArr } },
+  );
 
   // 30 messages, every user 3 messages
   const messagesPromises = [...Array(30).keys()].map((index, i) => {
@@ -81,3 +83,4 @@ export const createUsersWithMessages = async date => {
     }),
   );
 };
+//
