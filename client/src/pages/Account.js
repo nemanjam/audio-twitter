@@ -25,7 +25,11 @@ import Messages from '../components/Messages/Messages';
 import withAuthorization from '../session/withAuthorization';
 import withSession from '../session/withSession';
 import { GET_USER } from '../graphql/queries';
-import { UPDATE_USER } from '../graphql/mutations';
+import {
+  UPDATE_USER,
+  FOLLOW_USER,
+  UNFOLLOW_USER,
+} from '../graphql/mutations';
 import Loading from '../components/Loading/Loading';
 import { UPLOADS_IMAGES_FOLDER } from '../constants/paths';
 import * as routes from '../constants/routes';
@@ -83,9 +87,11 @@ const AccountPage = ({ match, session, history }) => {
     variables: { username: match?.params?.username },
   });
   const [updateUser] = useMutation(UPDATE_USER);
+  const [followUser] = useMutation(FOLLOW_USER);
+  const [unfollowUser] = useMutation(UNFOLLOW_USER);
 
   if (loading) return <Loading />;
-  console.log(error, data);
+  console.log(error, data, session);
 
   if (!data?.user) {
     history.push(routes.NOTFOUND);
@@ -96,6 +102,22 @@ const AccountPage = ({ match, session, history }) => {
 
   const isMyProfile =
     session?.me?.username === match?.params?.username;
+
+  const amIFollowing = !!user.followers.find(
+    user => user.username === session.me?.username,
+  );
+  const amIFollowed = !!user.following.find(
+    user => user.username === session.me?.username,
+  );
+
+  const handleFollow = async () => {
+    await followUser({ variables: { username: user.username } });
+    refetch();
+  };
+  const handleUnfollow = async () => {
+    await unfollowUser({ variables: { username: user.username } });
+    refetch();
+  };
 
   const handleInput = event => {
     const { name, value } = event.target;
@@ -195,18 +217,45 @@ const AccountPage = ({ match, session, history }) => {
                     Edit profile
                   </Button>
                 ) : (
-                  <Button color="primary" variant="outlined">
-                    Follow
-                  </Button>
+                  <>
+                    {amIFollowing ? (
+                      <Button
+                        onClick={handleUnfollow}
+                        color="primary"
+                        variant="contained"
+                      >
+                        Unfollow
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={handleFollow}
+                        color="primary"
+                        variant="outlined"
+                      >
+                        Follow
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
               <Typography
                 className={classes.username}
                 variant="h6"
-                component="p"
+                component="span"
               >
                 {user.name}
               </Typography>
+              {amIFollowed && (
+                <Typography
+                  variant="body2"
+                  color="textSecondary"
+                  component="span"
+                  gutterBottom
+                >
+                  {' '}
+                  follows you
+                </Typography>
+              )}
               <Typography
                 variant="body2"
                 color="textSecondary"

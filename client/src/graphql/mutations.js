@@ -67,6 +67,18 @@ export const SIGN_UP = gql`
   }
 `;
 
+export const FOLLOW_USER = gql`
+  mutation($username: String!) {
+    followUser(username: $username)
+  }
+`;
+
+export const UNFOLLOW_USER = gql`
+  mutation($username: String!) {
+    unfollowUser(username: $username)
+  }
+`;
+
 export const UPDATE_AUTOPLAY = gql`
   mutation($direction: String!, $createdAt: Date!, $duration: Int!) {
     updateAutoplay(
