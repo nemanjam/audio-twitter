@@ -3,6 +3,7 @@ import WaveSurfer from 'wavesurfer.js';
 import uuidv4 from 'uuid/v4';
 import { useMutation } from '@apollo/react-hooks';
 import moment from 'moment';
+import { Link as RouterLink } from 'react-router-dom';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
@@ -20,8 +21,12 @@ import PauseIcon from '@material-ui/icons/Pause';
 import Grid from '@material-ui/core/Grid';
 
 import ListItem from '@material-ui/core/ListItem';
+import Link from '@material-ui/core/Link';
 
-import { UPDATE_AUTOPLAY } from '../../graphql/mutations';
+import {
+  UPDATE_AUTOPLAY,
+  UNFOLLOW_USER,
+} from '../../graphql/mutations';
 
 const faces = [
   'http://i.pravatar.cc/300?img=5',
@@ -178,7 +183,9 @@ function MessagePlayer({
       <ListItem className={classes.root}>
         <Grid container>
           <Grid item className={classes.avatarItem}>
-            <Avatar className={classes.avatar} src={avatar} />
+            <Link component={RouterLink} to={`/${username}`}>
+              <Avatar className={classes.avatar} src={avatar} />
+            </Link>
           </Grid>
           <Grid item container className={classes.flex}>
             <Grid item>
@@ -188,7 +195,13 @@ function MessagePlayer({
                 className={classes.bold}
                 display="inline"
               >
-                {name}
+                <Link
+                  component={RouterLink}
+                  to={`/${username}`}
+                  color="inherit"
+                >
+                  {name}
+                </Link>
               </Typography>
               <Typography display="inline"> · </Typography>
               <Typography

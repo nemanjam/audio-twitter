@@ -72,6 +72,9 @@ const useStyles = makeStyles(theme => ({
     display: 'inline-block',
     marginLeft: theme.spacing(2),
   },
+  followsYou: {
+    marginLeft: theme.spacing(1),
+  },
 }));
 
 const AccountPage = ({ match, session, history }) => {
@@ -241,7 +244,7 @@ const AccountPage = ({ match, session, history }) => {
               <Typography
                 className={classes.username}
                 variant="h6"
-                component="span"
+                display="inline"
               >
                 {user.name}
               </Typography>
@@ -249,10 +252,10 @@ const AccountPage = ({ match, session, history }) => {
                 <Typography
                   variant="body2"
                   color="textSecondary"
-                  component="span"
+                  display="inline"
                   gutterBottom
+                  className={classes.followsYou}
                 >
-                  {' '}
                   follows you
                 </Typography>
               )}
