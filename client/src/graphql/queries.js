@@ -57,8 +57,8 @@ export const GET_PAGINATED_MESSAGES_WITH_USERS = gql`
 `;
 
 export const GET_USERS = gql`
-  query {
-    users {
+  query($limit: Int) {
+    users(limit: $limit) {
       id
       username
       name
@@ -70,6 +70,24 @@ export const GET_USERS = gql`
       cover {
         id
         path
+      }
+      followers {
+        id
+        username
+        name
+        avatar {
+          id
+          path
+        }
+      }
+      following {
+        id
+        username
+        name
+        avatar {
+          id
+          path
+        }
       }
     }
   }

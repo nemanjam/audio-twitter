@@ -9,16 +9,26 @@ const useStyles = makeStyles(theme => ({
     color: '#fff',
     marginTop: theme.spacing(8),
   },
+  flex: {
+    display: 'flex',
+    justifyContent: 'center',
+  },
 }));
 
 function Loading() {
   const classes = useStyles();
 
   return (
-    <Backdrop className={classes.backdrop} open={true}>
-      <CircularProgress color="inherit" />
-    </Backdrop>
+    <div className={classes.flex}>
+      <CircularProgress />
+    </div>
   );
 }
 
 export default Loading;
+
+/*
+    <Backdrop className={classes.backdrop} open={true}>
+      <CircularProgress color="inherit" />
+    </Backdrop>
+*/

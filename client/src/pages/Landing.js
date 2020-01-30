@@ -42,7 +42,7 @@ const Landing = ({ session }) => {
             <Autoplay setMainAutoplay={setMainAutoplay} />
           </Grid>
           <Grid item>
-            <WhoToFollow />
+            <WhoToFollow session={session} />
           </Grid>
         </Grid>
         <Grid item md={8} sm={6} xs={12} className={classes.item}>

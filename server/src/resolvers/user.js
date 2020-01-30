@@ -14,8 +14,10 @@ const createToken = async (user, secret, expiresIn) => {
 
 export default {
   Query: {
-    users: async (parent, args, { models }) => {
-      return await models.User.find();
+    users: async (parent, { limit = 10 }, { models, me }) => {
+      return await models.User.find({ _id: { $ne: me.id } }, null, {
+        limit,
+      });
     },
     user: async (parent, { username }, { models }) => {
       return await models.User.findOne({ username });

@@ -185,7 +185,7 @@ const AccountPage = ({ match, session, history }) => {
           <Autoplay />
         </Grid>
         <Grid item>
-          <WhoToFollow />
+          <WhoToFollow session={session} accountRefetch={refetch} />
         </Grid>
       </Grid>
       <Grid
