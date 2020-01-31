@@ -48,9 +48,9 @@ const WhoToFollow = ({ session, accountRefetch }) => {
   const [followUser] = useMutation(FOLLOW_USER);
   const [unfollowUser] = useMutation(UNFOLLOW_USER);
 
+  console.log(data, error);
   if (loading) return <CircularProgress color="inherit" />;
   const { users } = data;
-  console.log(data);
 
   const amIFollowing = user =>
     !!user.followers.find(
@@ -100,10 +100,9 @@ const WhoToFollow = ({ session, accountRefetch }) => {
                   <Link
                     component={RouterLink}
                     to={`/${user.username}`}
+                    color="textPrimary"
                   >
-                    <Typography color="textPrimary">
-                      {user.name}
-                    </Typography>
+                    {user.name}
                   </Link>
                 }
                 secondary={

@@ -26,11 +26,16 @@ const Messages = ({ limit, username }) => {
     data,
     loading,
     error,
+    refetch,
     fetchMore,
     subscribeToMore,
   } = useQuery(GET_PAGINATED_MESSAGES_WITH_USERS, {
     variables: { limit, username },
   });
+
+  useEffect(() => {
+    refetch();
+  }, [username]);
 
   if (loading) {
     return <Loading />;

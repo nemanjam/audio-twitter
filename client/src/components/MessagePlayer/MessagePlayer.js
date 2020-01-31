@@ -11,8 +11,8 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import StopIcon from '@material-ui/icons/Stop';
-import ChatBubbleIcon from '@material-ui/icons/ChatBubble';
-import ShareIcon from '@material-ui/icons/Share';
+import ReplyIcon from '@material-ui/icons/Reply';
+import RepeatIcon from '@material-ui/icons/Repeat';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import { green, red, blue } from '@material-ui/core/colors';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -266,7 +266,7 @@ function MessagePlayer({
                   </Grid>
                   <Grid item>
                     <IconButton>
-                      <ShareIcon
+                      <RepeatIcon
                         style={{ color: red[500] }}
                         className={classes.icon}
                       />
@@ -274,7 +274,7 @@ function MessagePlayer({
                   </Grid>
                   <Grid item>
                     <IconButton>
-                      <ChatBubbleIcon
+                      <ReplyIcon
                         style={{ color: green[500] }}
                         className={classes.icon}
                       />

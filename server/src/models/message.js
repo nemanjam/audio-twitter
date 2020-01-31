@@ -12,6 +12,10 @@ const messageSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
+    likesIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    repostsIds: [
+      { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    ],
   },
   {
     timestamps: true,
