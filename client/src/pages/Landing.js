@@ -46,7 +46,7 @@ const Landing = ({ session }) => {
           </Grid>
         </Grid>
         <Grid item md={8} sm={6} xs={12} className={classes.item}>
-          <Messages limit={2} />
+          <Messages limit={2} session={session} />
         </Grid>
       </Grid>
       {session && session.me && <Microphone />}

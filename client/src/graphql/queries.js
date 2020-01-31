@@ -6,6 +6,8 @@ export const GET_ALL_MESSAGES_WITH_USERS = gql`
       edges {
         id
         createdAt
+        likesCount
+        isLiked
         user {
           id
           username
@@ -34,6 +36,8 @@ export const GET_PAGINATED_MESSAGES_WITH_USERS = gql`
       edges {
         id
         createdAt
+        likesCount
+        isLiked
         user {
           id
           username

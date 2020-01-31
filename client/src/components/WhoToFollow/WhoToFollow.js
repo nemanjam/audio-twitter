@@ -48,7 +48,7 @@ const WhoToFollow = ({ session, accountRefetch }) => {
   const [followUser] = useMutation(FOLLOW_USER);
   const [unfollowUser] = useMutation(UNFOLLOW_USER);
 
-  console.log(data, error);
+  // console.log(data, error);
   if (loading) return <CircularProgress color="inherit" />;
   const { users } = data;
 

@@ -79,6 +79,30 @@ export const UNFOLLOW_USER = gql`
   }
 `;
 
+export const LIKE_MESSAGE = gql`
+  mutation($messageId: ID!) {
+    likeMessage(messageId: $messageId)
+  }
+`;
+
+export const UNLIKE_MESSAGE = gql`
+  mutation($messageId: ID!) {
+    unlikeMessage(messageId: $messageId)
+  }
+`;
+
+export const REPOST_MESSAGE = gql`
+  mutation($messageId: ID!) {
+    repostMessage(messageId: $messageId)
+  }
+`;
+
+export const UNREPOST_MESSAGE = gql`
+  mutation($messageId: ID!) {
+    unrepostMessage(messageId: $messageId)
+  }
+`;
+
 export const UPDATE_AUTOPLAY = gql`
   mutation($direction: String!, $createdAt: Date!, $duration: Int!) {
     updateAutoplay(

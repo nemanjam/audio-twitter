@@ -25,8 +25,14 @@ import Link from '@material-ui/core/Link';
 
 import {
   UPDATE_AUTOPLAY,
-  UNFOLLOW_USER,
+  LIKE_MESSAGE,
+  UNLIKE_MESSAGE,
 } from '../../graphql/mutations';
+
+import {
+  UPLOADS_AUDIO_FOLDER,
+  UPLOADS_IMAGES_FOLDER,
+} from '../../constants/paths';
 
 const faces = [
   'http://i.pravatar.cc/300?img=5',
@@ -78,15 +84,17 @@ const usePrevious = value => {
 };
 
 function MessagePlayer({
-  path,
-  createdAt,
   direction,
   duration,
   play,
-  username,
-  name,
-  avatar,
+  session,
+  message,
 }) {
+  const { createdAt, user, file, id } = message;
+  const { username, name } = user;
+  const path = `${UPLOADS_AUDIO_FOLDER}${file.path}`;
+  const avatar = `${UPLOADS_IMAGES_FOLDER}${user.avatar.path}`;
+
   const wavesurfer = useRef(null);
 
   const [playerReady, setPlayerReady] = useState(false);
@@ -98,6 +106,22 @@ function MessagePlayer({
     variables: { direction, createdAt, duration },
   });
 
+  const [likeMessage] = useMutation(LIKE_MESSAGE, {
+    variables: { messageId: id },
+  });
+  const [unlikeMessage] = useMutation(UNLIKE_MESSAGE, {
+    variables: { messageId: id },
+  });
+
+  const handleLike = async () => {
+    if (message.isLiked) {
+      const unliked = await unlikeMessage();
+    } else {
+      const liked = await likeMessage();
+    }
+  };
+
+  console.log(message);
   const prevDuration = usePrevious(duration);
 
   useEffect(() => {
@@ -257,9 +281,11 @@ function MessagePlayer({
                   justify="space-between"
                 >
                   <Grid item>
-                    <IconButton>
+                    <IconButton onClick={handleLike}>
                       <FavoriteIcon
-                        style={{ color: blue[500] }}
+                        color={
+                          message.isLiked ? 'primary' : 'inherit'
+                        }
                         className={classes.icon}
                       />
                     </IconButton>

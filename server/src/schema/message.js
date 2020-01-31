@@ -13,6 +13,10 @@ export default gql`
   extend type Mutation {
     createMessage(file: Upload!): Message!
     deleteMessage(id: ID!): Boolean!
+    likeMessage(messageId: ID!): Boolean!
+    unlikeMessage(messageId: ID!): Boolean!
+    repostMessage(messageId: ID!): Boolean!
+    unrepostMessage(messageId: ID!): Boolean!
   }
 
   type MessageConnection {
@@ -30,6 +34,8 @@ export default gql`
     createdAt: Date!
     user: User!
     file: File!
+    likesCount: Int!
+    isLiked: Boolean!
   }
 
   extend type Subscription {

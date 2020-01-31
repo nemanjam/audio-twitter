@@ -94,7 +94,7 @@ const AccountPage = ({ match, session, history }) => {
   const [unfollowUser] = useMutation(UNFOLLOW_USER);
 
   if (loading) return <Loading />;
-  console.log(error, data, session);
+  // console.log(error, data, session);
 
   if (!data?.user) {
     history.push(routes.NOTFOUND);
@@ -329,7 +329,11 @@ const AccountPage = ({ match, session, history }) => {
           </Card>
         </Grid>
         <Grid item>
-          <Messages limit={2} username={user.username} />
+          <Messages
+            limit={2}
+            username={user.username}
+            session={session}
+          />
         </Grid>
         <Dialog
           open={open}

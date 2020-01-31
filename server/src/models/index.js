@@ -9,6 +9,7 @@ const connectDb = () => {
     mongoose.connect(process.env.TEST_DATABASE_URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      useFindAndModify: false,
     });
     mongoose.set('useCreateIndex', true);
     return mongoose.connection;
@@ -18,6 +19,7 @@ const connectDb = () => {
     mongoose.connect(process.env.DATABASE_URL, {
       useUnifiedTopology: true,
       useNewUrlParser: true,
+      useFindAndModify: false,
     });
     mongoose.set('useCreateIndex', true);
     return mongoose.connection;

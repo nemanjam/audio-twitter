@@ -98,6 +98,47 @@ export default {
         }
       },
     ),
+
+    likeMessage: combineResolvers(
+      isAuthenticated,
+      async (parent, { messageId }, { models, me }) => {
+        const likedMessage = await models.Message.findOneAndUpdate(
+          { _id: messageId },
+          { $push: { likesIds: me.id } },
+        );
+        return !!likedMessage;
+      },
+    ),
+    unlikeMessage: combineResolvers(
+      isAuthenticated,
+      async (parent, { messageId }, { models, me }) => {
+        const unlikedMessage = await models.Message.findOneAndUpdate(
+          { _id: messageId },
+          { $pull: { likesIds: me.id } },
+        );
+        return !!unlikedMessage;
+      },
+    ),
+    repostMessage: combineResolvers(
+      isAuthenticated,
+      async (parent, { messageId }, { models, me }) => {
+        const repostedMessage = await models.Message.findOneAndUpdate(
+          { _id: messageId },
+          { $push: { repostsIds: me.id } },
+        );
+        return !!repostedMessage;
+      },
+    ),
+    unrepostMessage: combineResolvers(
+      isAuthenticated,
+      async (parent, { messageId }, { models, me }) => {
+        const unrepostedMessage = await models.Message.findOneAndUpdate(
+          { _id: messageId },
+          { $pull: { repostsIds: me.id } },
+        );
+        return !!unrepostedMessage;
+      },
+    ),
   },
 
   Message: {
@@ -107,6 +148,14 @@ export default {
     },
     file: async (message, args, { loaders }) => {
       return await loaders.file.load(message.fileId);
+    },
+    likesCount: async (message, args, { models }) => {
+      const likedMessage = await models.Message.findById(message.id);
+      return likedMessage.likesIds?.length || 0;
+    },
+    isLiked: async (message, args, { models, me }) => {
+      const likedMessage = await models.Message.findById(message.id);
+      return likedMessage.likesIds?.includes(me.id) || false;
     },
   },
 

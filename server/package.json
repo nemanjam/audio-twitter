@@ -18,13 +18,14 @@
   "devDependencies": {
     "@babel/core": "^7.1.6",
     "@babel/node": "^7.0.0",
+    "@babel/plugin-proposal-optional-chaining": "^7.8.3",
     "@babel/preset-env": "^7.1.6",
     "@babel/register": "^7.0.0",
     "axios": "^0.18.1",
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
-    "nodemon": "^1.18.7",
-    "morgan": "^1.9.1"
+    "morgan": "^1.9.1",
+    "nodemon": "^1.18.7"
   },
   "dependencies": {
     "apollo-server": "^2.9.15",

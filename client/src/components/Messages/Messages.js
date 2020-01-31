@@ -10,10 +10,6 @@ import MessagePlayer from '../MessagePlayer/MessagePlayer';
 import MessageDelete from '../MessageDelete/MessageDelete';
 import Loading from '../Loading/Loading';
 import withSession from '../../session/withSession';
-import {
-  UPLOADS_AUDIO_FOLDER,
-  UPLOADS_IMAGES_FOLDER,
-} from '../../constants/paths';
 
 import {
   GET_PAGINATED_MESSAGES_WITH_USERS,
@@ -21,7 +17,7 @@ import {
 } from '../../graphql/queries';
 import { MESSAGE_CREATED } from '../../graphql/subscriptions';
 
-const Messages = ({ limit, username }) => {
+const Messages = ({ limit, username, session }) => {
   const {
     data,
     loading,
@@ -61,6 +57,7 @@ const Messages = ({ limit, username }) => {
       <MessageList
         messages={edges}
         subscribeToMore={subscribeToMore}
+        session={session}
       />
 
       {pageInfo.hasNextPage && (
@@ -125,7 +122,7 @@ const useStyles = makeStyles(theme => ({
   item: { flex: 1 },
 }));
 
-const MessageList = ({ messages, subscribeToMore }) => {
+const MessageList = ({ messages, subscribeToMore, session }) => {
   const classes = useStyles();
   const subscribeToMoreMessage = useCallback(() => {
     subscribeToMore({
@@ -191,12 +188,9 @@ const MessageList = ({ messages, subscribeToMore }) => {
             <MessagePlayer
               duration={duration}
               direction={direction}
-              createdAt={message.createdAt}
               play={shouldPlay(message)}
-              path={`${UPLOADS_AUDIO_FOLDER}${message.file.path}`}
-              avatar={`${UPLOADS_IMAGES_FOLDER}${message.user.avatar.path}`}
-              username={message.user.username}
-              name={message.user.name}
+              session={session}
+              message={message}
             />
           </Grid>
         );

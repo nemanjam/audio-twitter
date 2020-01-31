@@ -13,6 +13,7 @@ const messageSchema = new mongoose.Schema(
       required: true,
     },
     likesIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    //mora i createdAt retweeta
     repostsIds: [
       { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     ],
