@@ -29,6 +29,8 @@ import {
   UNLIKE_MESSAGE,
 } from '../../graphql/mutations';
 
+import { GET_PAGINATED_MESSAGES_WITH_USERS } from '../../graphql/queries';
+
 import {
   UPLOADS_AUDIO_FOLDER,
   UPLOADS_IMAGES_FOLDER,
@@ -108,9 +110,72 @@ function MessagePlayer({
 
   const [likeMessage] = useMutation(LIKE_MESSAGE, {
     variables: { messageId: id },
+    update: (cache, { data }) => {
+      const oldData = cache.readQuery({
+        query: GET_PAGINATED_MESSAGES_WITH_USERS,
+      });
+      const message = oldData.messages.edges.find(m => m.id === id);
+      message.isLiked = data.likeMessage;
+      message.likesCount++;
+
+      const index = oldData.messages.edges.findIndex(
+        m => m.id === id,
+      );
+
+      const newData = {
+        messages: {
+          ...oldData.messages,
+          edges: [
+            ...oldData.messages.edges.slice(0, index),
+            message,
+            ...oldData.messages.edges.slice(index + 1),
+          ],
+          pageInfo: {
+            ...oldData.messages.pageInfo,
+          },
+        },
+      };
+
+      cache.writeQuery({
+        query: GET_PAGINATED_MESSAGES_WITH_USERS,
+        data: newData,
+      });
+    },
   });
+
   const [unlikeMessage] = useMutation(UNLIKE_MESSAGE, {
     variables: { messageId: id },
+    update: (cache, { data }) => {
+      const oldData = cache.readQuery({
+        query: GET_PAGINATED_MESSAGES_WITH_USERS,
+      });
+      const message = oldData.messages.edges.find(m => m.id === id);
+      message.isLiked = !data.unlikeMessage;
+      message.likesCount--;
+
+      const index = oldData.messages.edges.findIndex(
+        m => m.id === id,
+      );
+
+      const newData = {
+        messages: {
+          ...oldData.messages,
+          edges: [
+            ...oldData.messages.edges.slice(0, index),
+            message,
+            ...oldData.messages.edges.slice(index + 1),
+          ],
+          pageInfo: {
+            ...oldData.messages.pageInfo,
+          },
+        },
+      };
+      console.log(newData);
+      cache.writeQuery({
+        query: GET_PAGINATED_MESSAGES_WITH_USERS,
+        data: newData,
+      });
+    },
   });
 
   const handleLike = async () => {
@@ -121,7 +186,7 @@ function MessagePlayer({
     }
   };
 
-  console.log(message);
+  //console.log(message);
   const prevDuration = usePrevious(duration);
 
   useEffect(() => {
@@ -289,6 +354,15 @@ function MessagePlayer({
                         className={classes.icon}
                       />
                     </IconButton>
+                    {message.likesCount > 0 && (
+                      <Typography
+                        display="inline"
+                        variant="body2"
+                        color="textSecondary"
+                      >
+                        {message.likesCount}
+                      </Typography>
+                    )}
                   </Grid>
                   <Grid item>
                     <IconButton>
