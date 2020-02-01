@@ -14,8 +14,14 @@ const messageSchema = new mongoose.Schema(
     },
     likesIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     //mora i createdAt retweeta
-    repostsIds: [
-      { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    reposts: [
+      {
+        reposterId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+        },
+        createdAt: { type: Date, default: Date.now },
+      },
     ],
   },
   {

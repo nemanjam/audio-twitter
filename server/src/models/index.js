@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+//mongoose.set('debug', true);
 
 import User from './user';
 import Message from './message';

@@ -124,7 +124,8 @@ export default {
       async (parent, { messageId }, { models, me }) => {
         const repostedMessage = await models.Message.findOneAndUpdate(
           { _id: messageId },
-          { $push: { repostsIds: me.id } },
+          { $push: { reposts: { reposterId: me.id } } },
+          { new: true },
         );
         return !!repostedMessage;
       },
@@ -134,7 +135,7 @@ export default {
       async (parent, { messageId }, { models, me }) => {
         const unrepostedMessage = await models.Message.findOneAndUpdate(
           { _id: messageId },
-          { $pull: { repostsIds: me.id } },
+          { $pull: { reposts: { reposterId: me.id } } },
         );
         return !!unrepostedMessage;
       },
@@ -154,8 +155,21 @@ export default {
       return likedMessage.likesIds?.length || 0;
     },
     isLiked: async (message, args, { models, me }) => {
+      if (!me) return false;
       const likedMessage = await models.Message.findById(message.id);
       return likedMessage.likesIds?.includes(me.id) || false;
+    },
+    repostsCount: async (message, args, { models }) => {
+      const rpMessage = await models.Message.findById(message.id);
+      return rpMessage.reposts?.length || 0;
+    },
+    isReposted: async (message, args, { models, me }) => {
+      if (!me) return false;
+      const rpMessage = await models.Message.findById(message.id);
+      const repost = rpMessage.reposts?.find(r =>
+        r.reposterId.equals(me.id),
+      );
+      return !!repost;
     },
   },
 

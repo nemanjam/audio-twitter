@@ -11,11 +11,12 @@ const createToken = async (user, secret, expiresIn) => {
     expiresIn,
   });
 };
+// who to follow filter koje vec ne pratis
 
 export default {
   Query: {
     users: async (parent, { limit = 10 }, { models, me }) => {
-      const filter = me ? { _id: { $ne: me.id } } : {};
+      const filter = me ? { _id: { $ne: me.id } } : {}; //this $ne filter is not working for ids
       return await models.User.find(filter, null, {
         limit,
       });

@@ -36,6 +36,8 @@ export default gql`
     file: File!
     likesCount: Int!
     isLiked: Boolean!
+    repostsCount: Int!
+    isReposted: Boolean!
   }
 
   extend type Subscription {

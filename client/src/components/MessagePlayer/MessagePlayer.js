@@ -27,6 +27,8 @@ import {
   UPDATE_AUTOPLAY,
   LIKE_MESSAGE,
   UNLIKE_MESSAGE,
+  REPOST_MESSAGE,
+  UNREPOST_MESSAGE,
 } from '../../graphql/mutations';
 
 import { GET_PAGINATED_MESSAGES_WITH_USERS } from '../../graphql/queries';
@@ -170,7 +172,6 @@ function MessagePlayer({
           },
         },
       };
-      console.log(newData);
       cache.writeQuery({
         query: GET_PAGINATED_MESSAGES_WITH_USERS,
         data: newData,
@@ -186,7 +187,84 @@ function MessagePlayer({
     }
   };
 
-  //console.log(message);
+  const [repostMessage] = useMutation(REPOST_MESSAGE, {
+    variables: { messageId: id },
+    update: (cache, { data }) => {
+      const oldData = cache.readQuery({
+        query: GET_PAGINATED_MESSAGES_WITH_USERS,
+      });
+      const message = oldData.messages.edges.find(m => m.id === id);
+      message.isReposted = data.repostMessage;
+      message.repostsCount++;
+
+      const index = oldData.messages.edges.findIndex(
+        m => m.id === id,
+      );
+
+      const newData = {
+        messages: {
+          ...oldData.messages,
+          edges: [
+            ...oldData.messages.edges.slice(0, index),
+            message,
+            ...oldData.messages.edges.slice(index + 1),
+          ],
+          pageInfo: {
+            ...oldData.messages.pageInfo,
+          },
+        },
+      };
+
+      cache.writeQuery({
+        query: GET_PAGINATED_MESSAGES_WITH_USERS,
+        data: newData,
+      });
+    },
+  });
+  const [unrepostMessage] = useMutation(UNREPOST_MESSAGE, {
+    variables: { messageId: id },
+    update: (cache, { data }) => {
+      const oldData = cache.readQuery({
+        query: GET_PAGINATED_MESSAGES_WITH_USERS,
+      });
+      const message = oldData.messages.edges.find(m => m.id === id);
+      message.isReposted = !data.unrepostMessage;
+      message.repostsCount--;
+
+      const index = oldData.messages.edges.findIndex(
+        m => m.id === id,
+      );
+
+      const newData = {
+        messages: {
+          ...oldData.messages,
+          edges: [
+            ...oldData.messages.edges.slice(0, index),
+            message,
+            ...oldData.messages.edges.slice(index + 1),
+          ],
+          pageInfo: {
+            ...oldData.messages.pageInfo,
+          },
+        },
+      };
+
+      cache.writeQuery({
+        query: GET_PAGINATED_MESSAGES_WITH_USERS,
+        data: newData,
+      });
+    },
+  });
+
+  const handleRepost = async () => {
+    if (message.isReposted) {
+      const unreposted = await unrepostMessage();
+    } else {
+      const reposted = await repostMessage();
+    }
+  };
+
+  console.log(message);
   const prevDuration = usePrevious(duration);
 
   useEffect(() => {
@@ -348,8 +426,8 @@ function MessagePlayer({
                   <Grid item>
                     <IconButton onClick={handleLike}>
                       <FavoriteIcon
-                        color={
-                          message.isLiked ? 'primary' : 'inherit'
+                        style={
+                          message.isLiked ? { color: red[500] } : {}
                         }
                         className={classes.icon}
                       />
@@ -365,12 +443,25 @@ function MessagePlayer({
                     )}
                   </Grid>
                   <Grid item>
-                    <IconButton>
+                    <IconButton onClick={handleRepost}>
                       <RepeatIcon
-                        style={{ color: red[500] }}
+                        style={
+                          message.isReposted
+                            ? { color: green[500] }
+                            : {}
+                        }
                         className={classes.icon}
                       />
                     </IconButton>
+                    {message.repostsCount > 0 && (
+                      <Typography
+                        display="inline"
+                        variant="body2"
+                        color="textSecondary"
+                      >
+                        {message.repostsCount}
+                      </Typography>
+                    )}
                   </Grid>
                   <Grid item>
                     <IconButton>
