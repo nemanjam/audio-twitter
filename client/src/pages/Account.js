@@ -107,10 +107,10 @@ const AccountPage = ({ match, session, history }) => {
     session?.me?.username === match?.params?.username;
 
   const amIFollowing = !!user.followers.find(
-    user => user.username === session.me?.username,
+    user => user.username === session?.me?.username,
   );
   const amIFollowed = !!user.following.find(
-    user => user.username === session.me?.username,
+    user => user.username === session?.me?.username,
   );
 
   const handleFollow = async () => {

@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { combineResolvers } from 'graphql-resolvers';
 
 import pubsub, { EVENTS } from '../subscription';
@@ -30,22 +31,65 @@ export default {
       const options = {
         // za prvi upit ne treba cursor
         ...(cursor && {
-          createdAt: {
+          newCreatedAt: {
             $lt: fromCursorHash(cursor),
           },
         }),
         ...(username && {
-          userId: user.id,
+          userId: mongoose.Types.ObjectId(user.id),
         }),
       };
 
-      const messages = await models.Message.find(options, null, {
+      /*
+      const messages1 = await models.Message.find(options, null, {
         sort: { createdAt: -1 }, //-1 smer sortiranja, cursor mora da bude sortiran
         limit: limit + 1,
       });
+      */
+
+      //console.log(options);
+
+      const aMessages = await models.Message.aggregate([
+        { $match: options },
+        {
+          $addFields: {
+            newReposts: {
+              $concatArrays: [
+                [{ createdAt: '$createdAt', original: true }],
+                '$reposts',
+              ],
+            },
+          },
+        },
+        {
+          $unwind: '$newReposts', //pomnozi polje
+        },
+        {
+          $addFields: {
+            newCreatedAt: '$newReposts.createdAt',
+            original: '$newReposts.original',
+          },
+        },
+        {
+          $sort: {
+            newCreatedAt: -1,
+          },
+        },
+        {
+          $limit: limit + 1,
+        },
+      ]);
+      console.log(aMessages);
+
+      //const messages1 = aMessages.map(m => new models.Message(m));//da ne kreira nove datume
+      const messages = aMessages.map(m => {
+        m.id = m._id.toString();
+        return m;
+      });
 
       const hasNextPage = messages.length > limit;
-      const edges = hasNextPage ? messages.slice(0, -1) : messages;
+      const edges = hasNextPage ? messages.slice(0, -1) : messages; //-1 exclude zadnji
+      //console.log(edges[edges.length - 1].createdAt.toString());
 
       return {
         edges,
