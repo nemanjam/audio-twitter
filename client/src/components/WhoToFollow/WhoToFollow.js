@@ -54,7 +54,7 @@ const WhoToFollow = ({ session, accountRefetch }) => {
 
   const amIFollowing = user =>
     !!user.followers.find(
-      user => user.username === session.me?.username,
+      user => user.username === session?.me?.username,
     );
   const amIFollowed = user =>
     !!user.following.find(

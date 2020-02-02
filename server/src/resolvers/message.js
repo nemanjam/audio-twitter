@@ -32,7 +32,7 @@ export default {
         // za prvi upit ne treba cursor
         ...(cursor && {
           newCreatedAt: {
-            $lt: fromCursorHash(cursor),
+            $lt: new Date(fromCursorHash(cursor)), //MORA NEW DATE()
           },
         }),
         ...(username && {
@@ -40,17 +40,14 @@ export default {
         }),
       };
 
-      /*
-      const messages1 = await models.Message.find(options, null, {
-        sort: { createdAt: -1 }, //-1 smer sortiranja, cursor mora da bude sortiran
-        limit: limit + 1,
-      });
-      */
+      // const messages1 = await models.Message.find(options, null, {
+      //   sort: { createdAt: -1 }, //-1 smer sortiranja, cursor mora da bude sortiran
+      //   limit: limit + 1,
+      // });
 
       //console.log(options);
 
       const aMessages = await models.Message.aggregate([
-        { $match: options },
         {
           $addFields: {
             newReposts: {
@@ -70,6 +67,7 @@ export default {
             original: '$newReposts.original',
           },
         },
+        { $match: options },
         {
           $sort: {
             newCreatedAt: -1,
@@ -79,24 +77,22 @@ export default {
           $limit: limit + 1,
         },
       ]);
-      console.log(aMessages);
 
-      //const messages1 = aMessages.map(m => new models.Message(m));//da ne kreira nove datume
       const messages = aMessages.map(m => {
         m.id = m._id.toString();
         return m;
       });
+      //console.log(messages);
 
       const hasNextPage = messages.length > limit;
       const edges = hasNextPage ? messages.slice(0, -1) : messages; //-1 exclude zadnji
-      //console.log(edges[edges.length - 1].createdAt.toString());
 
       return {
         edges,
         pageInfo: {
           hasNextPage,
           endCursor: toCursorHash(
-            edges[edges.length - 1].createdAt.toString(),
+            edges[edges.length - 1].newCreatedAt.toString(),
           ),
         },
       };
