@@ -167,6 +167,9 @@ export default {
           { $push: { reposts: { reposterId: me.id } } },
           { new: true },
         );
+        pubsub.publish(EVENTS.MESSAGE.CREATED, {
+          messageCreated: { message: repostedMessage },
+        });
         return !!repostedMessage;
       },
     ),
