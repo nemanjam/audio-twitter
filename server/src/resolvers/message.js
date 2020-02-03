@@ -67,7 +67,7 @@ export default {
           ],
         }),
         // timeline, see messages only from following and me
-        ...(me &&
+        ...(meUser &&
           !username && {
             $or: [
               {
@@ -100,6 +100,8 @@ export default {
               },
             ],
           }),
+        //timeline for non loged user, all tweets
+        ...(!meUser && !username && {}),
       };
 
       console.log(JSON.stringify(match, null, 2));
