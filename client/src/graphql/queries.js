@@ -101,6 +101,29 @@ export const GET_USERS = gql`
   }
 `;
 
+export const GET_WHO_TO_FOLLOW = gql`
+  query($limit: Int) {
+    whoToFollow(limit: $limit) {
+      id
+      username
+      name
+      avatar {
+        id
+        path
+      }
+      followers {
+        id
+        username
+        name
+        avatar {
+          id
+          path
+        }
+      }
+    }
+  }
+`;
+
 export const GET_USER = gql`
   query($username: String!) {
     user(username: $username) {

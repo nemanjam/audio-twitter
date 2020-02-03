@@ -184,7 +184,7 @@ const MessageList = ({ messages, subscribeToMore, session }) => {
     >
       {messages.map((message, i) => {
         return (
-          <Grid item className={classes.item} key={message.id}>
+          <Grid item className={classes.item} key={i}>
             <MessagePlayer
               duration={duration}
               direction={direction}

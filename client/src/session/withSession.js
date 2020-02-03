@@ -7,7 +7,7 @@ const withSession = Component => props => {
   const { data, error, refetch } = useQuery(GET_ME);
   if (error) {
     localStorage.removeItem('token');
-    return <Redirect to="/" />;
+    // return <Redirect to="/" />;
   }
 
   return <Component {...props} session={data} refetch={refetch} />;

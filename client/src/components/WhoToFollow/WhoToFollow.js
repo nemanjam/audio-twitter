@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 
@@ -15,7 +15,7 @@ import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Link from '@material-ui/core/Link';
 
-import { GET_USERS } from '../../graphql/queries';
+import { GET_WHO_TO_FOLLOW } from '../../graphql/queries';
 import { FOLLOW_USER, UNFOLLOW_USER } from '../../graphql/mutations';
 import { UPLOADS_IMAGES_FOLDER } from '../../constants/paths';
 
@@ -41,16 +41,23 @@ const useStyles = makeStyles(theme => ({
 const WhoToFollow = ({ session, accountRefetch }) => {
   const classes = useStyles();
 
-  const { data, error, loading, refetch } = useQuery(GET_USERS, {
-    variables: { limit: 3 },
-  });
+  const { data, error, loading, refetch } = useQuery(
+    GET_WHO_TO_FOLLOW,
+    {
+      variables: { limit: 3 },
+    },
+  );
+
+  useEffect(() => {
+    refetch();
+  }, [session?.me]);
 
   const [followUser] = useMutation(FOLLOW_USER);
   const [unfollowUser] = useMutation(UNFOLLOW_USER);
 
   // console.log(data, error);
   if (loading) return <CircularProgress color="inherit" />;
-  const { users } = data;
+  const { whoToFollow } = data;
 
   const amIFollowing = user =>
     !!user.followers.find(
@@ -58,18 +65,18 @@ const WhoToFollow = ({ session, accountRefetch }) => {
     );
   const amIFollowed = user =>
     !!user.following.find(
-      user => user.username === session.me?.username,
+      user => user.username === session?.me?.username,
     );
 
   const handleFollow = async user => {
     await followUser({ variables: { username: user.username } });
-    refetch();
     if (accountRefetch) accountRefetch();
+    refetch();
   };
   const handleUnfollow = async user => {
     await unfollowUser({ variables: { username: user.username } });
-    refetch();
     if (accountRefetch) accountRefetch();
+    refetch();
   };
 
   return (
@@ -83,7 +90,7 @@ const WhoToFollow = ({ session, accountRefetch }) => {
       }
       className={classes.root}
     >
-      {users.map((user, index) => {
+      {whoToFollow.map((user, index) => {
         return (
           <Fragment key={index}>
             <ListItem alignItems="center">

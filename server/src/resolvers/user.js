@@ -16,6 +16,19 @@ const createToken = async (user, secret, expiresIn) => {
 export default {
   Query: {
     // who to follow filter koje vec ne pratis
+    whoToFollow: async (parent, { limit = 10 }, { models, me }) => {
+      const filter = me
+        ? {
+            _id: {
+              $ne: mongoose.Types.ObjectId(me.id),
+            },
+            // followersIds: { $ne: mongoose.Types.ObjectId(me.id) },
+          }
+        : {};
+      return await models.User.find(filter, null, {
+        limit,
+      });
+    },
     users: async (parent, { limit = 10 }, { models, me }) => {
       const filter = me
         ? { _id: { $ne: mongoose.Types.ObjectId(me.id) } }
