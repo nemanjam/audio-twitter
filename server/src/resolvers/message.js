@@ -23,6 +23,7 @@ export default {
       { cursor, limit = 100, username },
       { models, me },
     ) => {
+      const ObjectId = mongoose.Types.ObjectId;
       const user = username
         ? await models.User.findOne({
             username,
@@ -31,9 +32,8 @@ export default {
 
       //me je user sa clienta, iz tokena
       const meUser = me ? await models.User.findById(me.id) : null;
-      //console.log(me, meUser);
+      //console.log(meUser);
 
-      const ObjectId = mongoose.Types.ObjectId;
       const match = {
         // za prvi upit ne treba cursor
         ...(cursor && {
@@ -69,16 +69,40 @@ export default {
         // timeline, see messages only from following and me
         ...(me &&
           !username && {
-            userId: {
-              $in: [
-                meUser.followingIds.map(id => ObjectId(id)),
-                ObjectId(me.id),
-              ],
-            },
+            $or: [
+              {
+                userId: {
+                  $in: [
+                    ...meUser.followingIds.map(id => ObjectId(id)),
+                    ObjectId(me.id),
+                  ],
+                },
+              },
+              //rt-ovi onih koje pratim i moji
+              {
+                $and: [
+                  {
+                    reposts: {
+                      $elemMatch: {
+                        reposterId: {
+                          $in: [
+                            ...meUser.followingIds.map(id =>
+                              ObjectId(id),
+                            ),
+                            ObjectId(me.id),
+                          ],
+                        },
+                      },
+                    },
+                  },
+                  { original: { $ne: true } },
+                ],
+              },
+            ],
           }),
       };
 
-      //console.log(match);
+      console.log(JSON.stringify(match, null, 2));
 
       const aMessages = await models.Message.aggregate([
         {
@@ -115,7 +139,7 @@ export default {
         m.id = m._id.toString();
         return m;
       });
-      console.log(messages);
+      //console.log(messages);
 
       const hasNextPage = messages.length > limit;
       const edges = hasNextPage ? messages.slice(0, -1) : messages; //-1 exclude zadnji
