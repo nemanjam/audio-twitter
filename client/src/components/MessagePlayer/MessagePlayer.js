@@ -264,7 +264,7 @@ function MessagePlayer({
     }
   };
 
-  console.log(message);
+  // console.log(message);
   const prevDuration = usePrevious(duration);
 
   useEffect(() => {

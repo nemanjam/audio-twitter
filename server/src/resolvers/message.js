@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { combineResolvers } from 'graphql-resolvers';
+import { withFilter } from 'apollo-server';
 
 import pubsub, { EVENTS } from '../subscription';
 import { isAuthenticated, isMessageOwner } from './authorization';
@@ -20,7 +21,7 @@ export default {
     messages: async (
       parent,
       { cursor, limit = 100, username },
-      { models },
+      { models, me },
     ) => {
       const user = username
         ? await models.User.findOne({
@@ -28,24 +29,56 @@ export default {
           })
         : null;
 
-      const options = {
+      //me je user sa clienta, iz tokena
+      const meUser = me ? await models.User.findById(me.id) : null;
+      //console.log(me, meUser);
+
+      const ObjectId = mongoose.Types.ObjectId;
+      const match = {
         // za prvi upit ne treba cursor
         ...(cursor && {
           newCreatedAt: {
             $lt: new Date(fromCursorHash(cursor)), //MORA NEW DATE()
           },
         }),
+        // user page
         ...(username && {
-          userId: mongoose.Types.ObjectId(user.id),
+          $or: [
+            {
+              //njegovi originali
+              $and: [
+                {
+                  userId: ObjectId(user.id),
+                },
+                { original: true },
+              ],
+            },
+            //ili tudji koje je on rt
+            {
+              $and: [
+                {
+                  reposts: {
+                    $elemMatch: { reposterId: ObjectId(user.id) },
+                  },
+                },
+                { original: { $ne: true } },
+              ],
+            },
+          ],
         }),
+        // timeline, see messages only from following and me
+        ...(me &&
+          !username && {
+            userId: {
+              $in: [
+                meUser.followingIds.map(id => ObjectId(id)),
+                ObjectId(me.id),
+              ],
+            },
+          }),
       };
 
-      // const messages1 = await models.Message.find(options, null, {
-      //   sort: { createdAt: -1 }, //-1 smer sortiranja, cursor mora da bude sortiran
-      //   limit: limit + 1,
-      // });
-
-      //console.log(options);
+      //console.log(match);
 
       const aMessages = await models.Message.aggregate([
         {
@@ -67,7 +100,7 @@ export default {
             original: '$newReposts.original',
           },
         },
-        { $match: options },
+        { $match: match },
         {
           $sort: {
             newCreatedAt: -1,
@@ -82,7 +115,7 @@ export default {
         m.id = m._id.toString();
         return m;
       });
-      //console.log(messages);
+      console.log(messages);
 
       const hasNextPage = messages.length > limit;
       const edges = hasNextPage ? messages.slice(0, -1) : messages; //-1 exclude zadnji
@@ -218,7 +251,12 @@ export default {
 
   Subscription: {
     messageCreated: {
-      subscribe: () => pubsub.asyncIterator(EVENTS.MESSAGE.CREATED),
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(EVENTS.MESSAGE.CREATED),
+        async (payload, args) => {
+          return true;
+        },
+      ),
     },
   },
 };

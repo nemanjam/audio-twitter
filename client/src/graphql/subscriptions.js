@@ -6,6 +6,10 @@ export const MESSAGE_CREATED = gql`
       message {
         id
         createdAt
+        likesCount
+        isLiked
+        repostsCount
+        isReposted
         user {
           id
           username

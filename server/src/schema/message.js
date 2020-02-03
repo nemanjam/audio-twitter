@@ -41,7 +41,7 @@ export default gql`
   }
 
   extend type Subscription {
-    messageCreated: MessageCreated!
+    messageCreated(username: String): MessageCreated!
   }
 
   type MessageCreated {
