@@ -58,6 +58,7 @@ const Messages = ({ limit, username, session }) => {
         messages={edges}
         subscribeToMore={subscribeToMore}
         session={session}
+        username={username}
       />
 
       {pageInfo.hasNextPage && (
@@ -122,11 +123,17 @@ const useStyles = makeStyles(theme => ({
   item: { flex: 1 },
 }));
 
-const MessageList = ({ messages, subscribeToMore, session }) => {
+const MessageList = ({
+  messages,
+  subscribeToMore,
+  session,
+  username,
+}) => {
   const classes = useStyles();
   const subscribeToMoreMessage = useCallback(() => {
     subscribeToMore({
       document: MESSAGE_CREATED,
+      variables: { username },
       updateQuery: (previousResult, { subscriptionData }) => {
         if (!subscriptionData.data) {
           return previousResult;

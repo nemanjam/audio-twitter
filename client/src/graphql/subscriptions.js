@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 export const MESSAGE_CREATED = gql`
-  subscription {
-    messageCreated {
+  subscription($username: String) {
+    messageCreated(username: $username) {
       message {
         id
         createdAt

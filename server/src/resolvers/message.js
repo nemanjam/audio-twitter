@@ -104,7 +104,7 @@ export default {
         ...(!meUser && !username && {}),
       };
 
-      console.log(JSON.stringify(match, null, 2));
+      // console.log(JSON.stringify(match, null, 2));
 
       const aMessages = await models.Message.aggregate([
         {
@@ -279,8 +279,9 @@ export default {
     messageCreated: {
       subscribe: withFilter(
         () => pubsub.asyncIterator(EVENTS.MESSAGE.CREATED),
-        async (payload, args) => {
-          return true;
+        async (payload, { username }, { me }) => {
+          if (!username || username === me?.username) return true;
+          else return false;
         },
       ),
     },

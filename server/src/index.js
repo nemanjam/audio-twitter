@@ -51,6 +51,12 @@ const server = new ApolloServer({
   introspection: true,
   typeDefs: schema,
   resolvers,
+  subscriptions: {
+    onConnect: async (connectionParams, webSocket, context) => {
+      const me = await getMe(connectionParams);
+      return { me };
+    },
+  },
   formatError: error => {
     // remove the internal sequelize error message
     // leave only the important validation error
@@ -66,7 +72,9 @@ const server = new ApolloServer({
   context: async ({ req, connection }) => {
     // subskribcije
     if (connection) {
+      // console.log('connection ', connection);
       return {
+        me: connection.context.me,
         models,
         loaders: {
           // batching, samo unique keys usera, nema ponavljanja
