@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 
@@ -14,10 +14,15 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Link from '@material-ui/core/Link';
+import Fade from '@material-ui/core/Fade';
+import Paper from '@material-ui/core/Paper';
+import Popover from '@material-ui/core/Popover';
 
 import { GET_WHO_TO_FOLLOW } from '../../graphql/queries';
 import { FOLLOW_USER, UNFOLLOW_USER } from '../../graphql/mutations';
 import { UPLOADS_IMAGES_FOLDER } from '../../constants/paths';
+
+import UserCard from '../UserCard/UserCard';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -40,6 +45,9 @@ const useStyles = makeStyles(theme => ({
 
 const WhoToFollow = ({ session, accountRefetch }) => {
   const classes = useStyles();
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [overPopup, setOverPopup] = useState(false);
 
   const { data, error, loading, refetch } = useQuery(
     GET_WHO_TO_FOLLOW,
@@ -78,7 +86,22 @@ const WhoToFollow = ({ session, accountRefetch }) => {
     if (accountRefetch) accountRefetch();
     refetch();
   };
+  const handleMouseEnter = event => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleMouseLeave = event => {};
 
+  const handlePopUpMouseEnter = event => {
+    setOverPopup(true);
+  };
+  const handlePopUpMouseLeave = event => {
+    setOverPopup(false);
+    setTimeout(() => {
+      setAnchorEl(null);
+    }, 500);
+  };
+
+  const popOverOpen = Boolean(anchorEl);
   return (
     <List
       subheader={
@@ -104,13 +127,37 @@ const WhoToFollow = ({ session, accountRefetch }) => {
               </ListItemAvatar>
               <ListItemText
                 primary={
-                  <Link
-                    component={RouterLink}
-                    to={`/${user.username}`}
-                    color="textPrimary"
-                  >
-                    {user.name}
-                  </Link>
+                  <>
+                    <Link
+                      component={RouterLink}
+                      to={`/${user.username}`}
+                      color="textPrimary"
+                      onMouseEnter={handleMouseEnter}
+                      onMouseLeave={handleMouseLeave}
+                    >
+                      {user.name}
+                    </Link>
+                    <Popover
+                      open={popOverOpen}
+                      anchorEl={anchorEl}
+                      onClose={() => {
+                        setAnchorEl(null);
+                      }}
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'center',
+                      }}
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center',
+                      }}
+                    >
+                      <UserCard
+                        onMouseEnter={handlePopUpMouseEnter}
+                        onMouseLeave={handlePopUpMouseLeave}
+                      />
+                    </Popover>
+                  </>
                 }
                 secondary={
                   <Typography
