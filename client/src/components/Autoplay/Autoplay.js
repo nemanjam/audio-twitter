@@ -25,6 +25,7 @@ const useStyles = makeStyles(theme => ({
     paddingRight: theme.spacing(2),
     paddingTop: theme.spacing(1),
     paddingBottom: theme.spacing(1),
+    zIndex: 0,
   },
   title: {
     fontWeight: 500,

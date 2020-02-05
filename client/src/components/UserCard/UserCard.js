@@ -52,7 +52,7 @@ const UserCard = ({ ...rest }) => {
   const classes = useStyles();
 
   return (
-    <Card className={classes.root} elevation={0} square {...rest}>
+    <Card className={classes.root} elevation={6} square {...rest}>
       <CardMedia
         className={classes.media}
         image="https://images.unsplash.com/photo-1470549638415-0a0755be0619?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80"

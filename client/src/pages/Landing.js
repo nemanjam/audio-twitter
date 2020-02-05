@@ -10,7 +10,6 @@ import Microphone from '../components/Microphone/Microphone';
 import Messages from '../components/Messages/Messages';
 import Autoplay from '../components/Autoplay/Autoplay';
 import WhoToFollow from '../components/WhoToFollow/WhoToFollow';
-import UserCard from '../components/UserCard/UserCard';
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -44,9 +43,6 @@ const Landing = ({ session }) => {
           </Grid>
           <Grid item>
             <WhoToFollow session={session} />
-          </Grid>
-          <Grid item>
-            <UserCard />
           </Grid>
         </Grid>
         <Grid item md={8} sm={6} xs={12} className={classes.item}>
