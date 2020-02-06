@@ -50,6 +50,7 @@ const WhoToFollow = ({ session, accountRefetch }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [popUpEntered, setPopUpEntered] = useState(false);
   const [nameEntered, setNameEntered] = useState(false);
+  const [username, setUsername] = useState('');
 
   const { data, error, loading, refetch } = useQuery(
     GET_WHO_TO_FOLLOW,
@@ -98,9 +99,10 @@ const WhoToFollow = ({ session, accountRefetch }) => {
     if (accountRefetch) accountRefetch();
     refetch();
   };
-  const handleMouseEnter = event => {
+  const handleMouseEnter = (event, user) => {
     setAnchorEl(event.currentTarget);
     setNameEntered(true);
+    setUsername(user.username);
   };
   const handleMouseLeave = event => {
     setNameEntered(false);
@@ -127,6 +129,9 @@ const WhoToFollow = ({ session, accountRefetch }) => {
             <UserCard
               onMouseEnter={handlePopUpMouseEnter}
               onMouseLeave={handlePopUpMouseLeave}
+              username={username}
+              session={session}
+              accountRefetch={accountRefetch}
             />
           </Fade>
         )}
@@ -162,7 +167,7 @@ const WhoToFollow = ({ session, accountRefetch }) => {
                       component={RouterLink}
                       to={`/${user.username}`}
                       color="textPrimary"
-                      onMouseEnter={handleMouseEnter}
+                      onMouseEnter={e => handleMouseEnter(e, user)}
                       onMouseLeave={handleMouseLeave}
                     >
                       {user.name}

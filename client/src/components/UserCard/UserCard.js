@@ -1,4 +1,6 @@
 import React from 'react';
+import { useQuery, useMutation } from '@apollo/react-hooks';
+
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
@@ -8,6 +10,12 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
+import CircularProgress from '@material-ui/core/CircularProgress';
+
+import { GET_USER } from '../../graphql/queries';
+import { FOLLOW_USER, UNFOLLOW_USER } from '../../graphql/mutations';
+
+import { UPLOADS_IMAGES_FOLDER } from '../../constants/paths';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -48,33 +56,74 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const UserCard = ({ ...rest }) => {
+const UserCard = ({ accountRefetch, session, username, ...rest }) => {
   const classes = useStyles();
+
+  const { data, error, loading, refetch } = useQuery(GET_USER, {
+    variables: { username },
+  });
+
+  const [followUser] = useMutation(FOLLOW_USER);
+  const [unfollowUser] = useMutation(UNFOLLOW_USER);
+
+  const handleFollow = async user => {
+    await followUser({ variables: { username: user.username } });
+    if (accountRefetch) accountRefetch();
+    refetch();
+  };
+  const handleUnfollow = async user => {
+    await unfollowUser({ variables: { username: user.username } });
+    if (accountRefetch) accountRefetch();
+    refetch();
+  };
+
+  const amIFollowing = user =>
+    !!user.followers.find(
+      user => user.username === session?.me?.username,
+    );
+
+  if (loading) return <CircularProgress color="inherit" />;
+  const { user } = data;
 
   return (
     <Card className={classes.root} elevation={6} square {...rest}>
       <CardMedia
         className={classes.media}
-        image="https://images.unsplash.com/photo-1470549638415-0a0755be0619?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80"
-        title="Contemplative Reptile"
+        image={`${UPLOADS_IMAGES_FOLDER}${user.cover.path}`}
       >
         <Avatar
           className={classes.avatar}
-          src="https://images.unsplash.com/photo-1456379771252-03388b5adf1a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
+          src={`${UPLOADS_IMAGES_FOLDER}${user.avatar.path}`}
         />
       </CardMedia>
       <CardContent>
         <div className={classes.follow}>
-          <Button variant="outlined" size="small" color="primary">
-            Follow
-          </Button>
+          {amIFollowing(user) ? (
+            <Button
+              onClick={() => handleUnfollow(user)}
+              variant="contained"
+              color="primary"
+              size="small"
+            >
+              Unfollow
+            </Button>
+          ) : (
+            <Button
+              onClick={() => handleFollow(user)}
+              variant="outlined"
+              color="primary"
+              size="small"
+            >
+              Follow
+            </Button>
+          )}
         </div>
         <div className={classes.nameDiv}>
           <Typography variant="body1" className={classes.name}>
-            Maria Garcia
+            {user.name}
           </Typography>
           <Typography variant="body2" color="textSecondary">
-            @marymary
+            @{user.username}
           </Typography>
         </div>
         <Typography
@@ -82,14 +131,14 @@ const UserCard = ({ ...rest }) => {
           color="textSecondary"
           gutterBottom
         >
-          Lizards are a widespread group of squamate reptiles...
+          {`${user.bio.substring(0, 54)}...`}
         </Typography>
         <div className={classes.followers}>
           <Typography
             variant="body1"
             className={classes.followersNumber}
           >
-            123
+            {user.followersCount}
           </Typography>
           <Typography
             variant="body2"
@@ -102,7 +151,7 @@ const UserCard = ({ ...rest }) => {
             variant="body1"
             className={classes.followersNumber}
           >
-            234
+            {user.followingCount}
           </Typography>
           <Typography variant="body2" color="textSecondary">
             Following
