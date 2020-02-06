@@ -17,13 +17,13 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Layout = ({ children, session }) => {
+const Layout = ({ children, session, match }) => {
   const classes = useStyles();
 
   return (
     <Fragment>
       <CssBaseline />
-      <Navigation session={session} />
+      <Navigation match={match} session={session} />
       <Container className={classes.container}>{children}</Container>
     </Fragment>
   );

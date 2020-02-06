@@ -13,7 +13,7 @@ const RouteWithLayout = ({
       {...rest}
       render={matchProps => {
         return (
-          <Layout {...layoutProps}>
+          <Layout {...matchProps} {...layoutProps}>
             <Component {...matchProps} {...componentProps} />
           </Layout>
         );

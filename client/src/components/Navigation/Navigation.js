@@ -20,6 +20,7 @@ import SignOutButton from '../SignOutButton/SignOutButton';
 
 const StyledLink = styled(Link)({
   minHeight: 64,
+  minWidth: 'auto',
 });
 
 const TabPanel = props => {
@@ -72,14 +73,18 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const Navigation = ({ session, page }) => {
+const Navigation = ({ session, match }) => {
   const classes = useStyles();
   const [random, setRandom] = useState(0);
 
-  const pages = ['', 'profile', 'notifications', 'admin'];
-
-  let active = pages.indexOf(page);
-  active === -1 ? (active = 0) : (active = active);
+  const getActiveTabIndex = match => {
+    if (match?.params?.username) return 1;
+    if (match?.url === '/') return 0;
+    if (match?.url === '/notifications') return 2;
+    if (match?.url === '/admin') return 3;
+    return 0;
+  };
+  console.log(match);
 
   useEffect(() => {
     setRandom(Math.random());
@@ -99,40 +104,14 @@ const Navigation = ({ session, page }) => {
             Audio Twitter
           </Typography>
 
-          <Button
-            color="inherit"
-            component={Link}
-            to={routes.LANDING}
-          >
-            Landing
-          </Button>
-          {session && session.me && (
-            <Button
-              color="inherit"
-              component={Link}
-              to={session.me.username}
-            >
-              Account
-            </Button>
-          )}
-          {session && session.me && session.me.role === 'ADMIN' && (
-            <Button
-              color="inherit"
-              component={Link}
-              to={routes.ADMIN}
-            >
-              Admin
-            </Button>
-          )}
-
           <Tabs
-            value={active}
+            value={getActiveTabIndex(match)}
             textColor="primary"
             classes={{ indicator: classes.indicator }}
           >
             <Tab
               component={StyledLink}
-              to={`/${pages[0]}`}
+              to={routes.LANDING}
               label={
                 <div className={classes.label}>
                   <HomeIcon />
@@ -145,51 +124,55 @@ const Navigation = ({ session, page }) => {
                 </div>
               }
             />
-            <Tab
-              component={StyledLink}
-              to={`/${pages[1]}`}
-              label={
-                <div className={classes.label}>
-                  <AccountCircleIcon />
-                  <Typography
-                    className={classes.typographyLabel}
-                    display="inline"
-                  >
-                    Profile
-                  </Typography>
-                </div>
-              }
-            />
-            <Tab
-              component={StyledLink}
-              to={`/${pages[2]}`}
-              label={
-                <div className={classes.label}>
-                  <NotificationsIcon />
-                  <Typography
-                    className={classes.typographyLabel}
-                    display="inline"
-                  >
-                    Notifications
-                  </Typography>
-                </div>
-              }
-            />
-            <Tab
-              component={StyledLink}
-              to={`/${pages[3]}`}
-              label={
-                <div className={classes.label}>
-                  <SettingsIcon />
-                  <Typography
-                    className={classes.typographyLabel}
-                    display="inline"
-                  >
-                    Admin
-                  </Typography>
-                </div>
-              }
-            />
+            {session?.me && [
+              <Tab
+                component={StyledLink}
+                to={`/${session?.me?.username}`}
+                label={
+                  <div className={classes.label}>
+                    <AccountCircleIcon />
+                    <Typography
+                      className={classes.typographyLabel}
+                      display="inline"
+                    >
+                      Profile
+                    </Typography>
+                  </div>
+                }
+              />,
+              <Tab
+                component={StyledLink}
+                to={routes.NOTIFICATIONS}
+                label={
+                  <div className={classes.label}>
+                    <NotificationsIcon />
+                    <Typography
+                      className={classes.typographyLabel}
+                      display="inline"
+                    >
+                      Notifications
+                    </Typography>
+                  </div>
+                }
+              />,
+            ]}
+            {session?.me?.role === 'ADMIN' && (
+              <Tab
+                component={StyledLink}
+                to={routes.ADMIN}
+                label={
+                  <div className={classes.label}>
+                    <SettingsIcon />
+                    <Typography
+                      className={classes.typographyLabel}
+                      display="inline"
+                    >
+                      Admin
+                    </Typography>
+                  </div>
+                }
+              />
+            )}
           </Tabs>
 
           <div className={classes.flex}></div>
