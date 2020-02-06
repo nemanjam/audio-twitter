@@ -17,6 +17,8 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 
 import Autoplay from '../components/Autoplay/Autoplay';
 import WhoToFollow from '../components/WhoToFollow/WhoToFollow';
@@ -33,6 +35,23 @@ import {
 import Loading from '../components/Loading/Loading';
 import { UPLOADS_IMAGES_FOLDER } from '../constants/paths';
 import * as routes from '../constants/routes';
+
+const TabPanel = props => {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <Typography
+      component="div"
+      role="tabpanel"
+      hidden={value !== index}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
+      {...other}
+    >
+      {value === index && <div>{children}</div>}
+    </Typography>
+  );
+};
 
 const useStyles = makeStyles(theme => ({
   card: { width: '100%' },
@@ -75,6 +94,15 @@ const useStyles = makeStyles(theme => ({
   followsYou: {
     marginLeft: theme.spacing(1),
   },
+  tabs: {
+    flex: 1,
+  },
+  cardActions: {
+    padding: 0,
+  },
+  tabsLabel: {
+    textTransform: 'none',
+  },
 }));
 
 const AccountPage = ({ match, session, history }) => {
@@ -85,6 +113,8 @@ const AccountPage = ({ match, session, history }) => {
   const [cover, setCover] = useState(null);
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
+
+  const [tab, setTab] = React.useState(0);
 
   const { data, error, loading, refetch } = useQuery(GET_USER, {
     variables: { username: match?.params?.username },
@@ -112,6 +142,10 @@ const AccountPage = ({ match, session, history }) => {
   const amIFollowed = !!user.following.find(
     user => user.username === session?.me?.username,
   );
+
+  const handleTabChange = (event, newTab) => {
+    setTab(newTab);
+  };
 
   const handleFollow = async () => {
     await followUser({ variables: { username: user.username } });
@@ -270,70 +304,95 @@ const AccountPage = ({ match, session, history }) => {
               <Typography variant="body1" component="p">
                 {user.bio}
               </Typography>
-
-              <Grid
-                container
-                className={classes.numbersSection}
-                justify="space-between"
-              >
-                <Grid item className={classes.numbers}>
-                  <Typography
-                    variant="h5"
-                    color="primary"
-                    component="h5"
-                  >
-                    {user.messagesCount}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    color="textSecondary"
-                    component="p"
-                  >
-                    Messages
-                  </Typography>
-                </Grid>
-                <Grid item className={classes.numbers}>
-                  <Typography
-                    variant="h5"
-                    color="primary"
-                    component="h5"
-                  >
-                    {user.followersCount}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    color="textSecondary"
-                    component="p"
-                  >
-                    Followers
-                  </Typography>
-                </Grid>
-                <Grid item className={classes.numbers}>
-                  <Typography
-                    variant="h5"
-                    color="primary"
-                    component="h5"
-                  >
-                    {user.followingCount}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    color="textSecondary"
-                    component="p"
-                  >
-                    Following
-                  </Typography>
-                </Grid>
-              </Grid>
             </CardContent>
+            <CardActions className={classes.cardActions}>
+              <Tabs
+                value={tab}
+                onChange={handleTabChange}
+                indicatorColor="primary"
+                textColor="primary"
+                variant="fullWidth"
+                className={classes.tabs}
+              >
+                <Tab
+                  label={
+                    <div className={classes.tabsLabel}>
+                      <Typography
+                        variant="h5"
+                        color="primary"
+                        component="h5"
+                      >
+                        {user.messagesCount}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        color="textSecondary"
+                        component="p"
+                      >
+                        Messages
+                      </Typography>
+                    </div>
+                  }
+                />
+                <Tab
+                  label={
+                    <div className={classes.tabsLabel}>
+                      <Typography
+                        variant="h5"
+                        color="primary"
+                        component="h5"
+                      >
+                        {user.followersCount}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        color="textSecondary"
+                        component="p"
+                      >
+                        Followers
+                      </Typography>
+                    </div>
+                  }
+                />
+                <Tab
+                  label={
+                    <div className={classes.tabsLabel}>
+                      <Typography
+                        variant="h5"
+                        color="primary"
+                        component="h5"
+                      >
+                        {user.followingCount}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        color="textSecondary"
+                        component="p"
+                      >
+                        Following
+                      </Typography>
+                    </div>
+                  }
+                />
+              </Tabs>
+            </CardActions>
           </Card>
         </Grid>
+
         <Grid item>
-          <Messages
-            limit={2}
-            username={user.username}
-            session={session}
-          />
+          <TabPanel value={tab} index={0}>
+            <Messages
+              limit={2}
+              username={user.username}
+              session={session}
+            />
+          </TabPanel>
+          <TabPanel value={tab} index={1}>
+            Item Two
+          </TabPanel>
+          <TabPanel value={tab} index={2}>
+            Item Three
+          </TabPanel>
         </Grid>
         <Dialog
           open={open}
