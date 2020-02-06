@@ -7,9 +7,37 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import CameraIcon from '@material-ui/icons/PhotoCamera';
 import Button from '@material-ui/core/Button';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import HomeIcon from '@material-ui/icons/Home';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import NotificationsIcon from '@material-ui/icons/Notifications';
+import SettingsIcon from '@material-ui/icons/Settings';
+import { styled } from '@material-ui/core/styles';
 
 import * as routes from '../../constants/routes';
 import SignOutButton from '../SignOutButton/SignOutButton';
+
+const StyledLink = styled(Link)({
+  minHeight: 64,
+});
+
+const TabPanel = props => {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <Typography
+      component="div"
+      role="tabpanel"
+      hidden={value !== index}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
+      {...other}
+    >
+      {value === index && <div>{children}</div>}
+    </Typography>
+  );
+};
 
 const useStyles = makeStyles(theme => ({
   icon: {
@@ -22,11 +50,36 @@ const useStyles = makeStyles(theme => ({
   flex: {
     flex: 1,
   },
+  label: {
+    color: 'white',
+    display: 'flex',
+    alignContent: 'center',
+    justifyContent: 'space-around',
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    lineHeight: 1.75,
+    letterSpacing: '0.02857em',
+  },
+  typographyLabel: {
+    fontSize: '0.875rem',
+    fontWeight: 500,
+    lineHeight: 1.75,
+    letterSpacing: '0.02857em',
+    marginLeft: theme.spacing(1),
+  },
+  indicator: {
+    backgroundColor: 'white',
+  },
 }));
 
-const Navigation = ({ session }) => {
+const Navigation = ({ session, page }) => {
   const classes = useStyles();
   const [random, setRandom] = useState(0);
+
+  const pages = ['', 'profile', 'notifications', 'admin'];
+
+  let active = pages.indexOf(page);
+  active === -1 ? (active = 0) : (active = active);
 
   useEffect(() => {
     setRandom(Math.random());
@@ -57,7 +110,7 @@ const Navigation = ({ session }) => {
             <Button
               color="inherit"
               component={Link}
-              to={routes.ACCOUNT}
+              to={session.me.username}
             >
               Account
             </Button>
@@ -71,7 +124,75 @@ const Navigation = ({ session }) => {
               Admin
             </Button>
           )}
-          <div className={classes.flex}>{random}</div>
+
+          <Tabs
+            value={active}
+            textColor="primary"
+            classes={{ indicator: classes.indicator }}
+          >
+            <Tab
+              component={StyledLink}
+              to={`/${pages[0]}`}
+              label={
+                <div className={classes.label}>
+                  <HomeIcon />
+                  <Typography
+                    className={classes.typographyLabel}
+                    display="inline"
+                  >
+                    Home
+                  </Typography>
+                </div>
+              }
+            />
+            <Tab
+              component={StyledLink}
+              to={`/${pages[1]}`}
+              label={
+                <div className={classes.label}>
+                  <AccountCircleIcon />
+                  <Typography
+                    className={classes.typographyLabel}
+                    display="inline"
+                  >
+                    Profile
+                  </Typography>
+                </div>
+              }
+            />
+            <Tab
+              component={StyledLink}
+              to={`/${pages[2]}`}
+              label={
+                <div className={classes.label}>
+                  <NotificationsIcon />
+                  <Typography
+                    className={classes.typographyLabel}
+                    display="inline"
+                  >
+                    Notifications
+                  </Typography>
+                </div>
+              }
+            />
+            <Tab
+              component={StyledLink}
+              to={`/${pages[3]}`}
+              label={
+                <div className={classes.label}>
+                  <SettingsIcon />
+                  <Typography
+                    className={classes.typographyLabel}
+                    display="inline"
+                  >
+                    Admin
+                  </Typography>
+                </div>
+              }
+            />
+          </Tabs>
+
+          <div className={classes.flex}></div>
           {session && session.me ? (
             <>
               <SignOutButton />
