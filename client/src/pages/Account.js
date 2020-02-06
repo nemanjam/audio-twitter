@@ -103,6 +103,9 @@ const useStyles = makeStyles(theme => ({
   tabsLabel: {
     textTransform: 'none',
   },
+  tabRoot: {
+    minWidth: 'auto',
+  },
 }));
 
 const AccountPage = ({ match, session, history }) => {
@@ -315,6 +318,7 @@ const AccountPage = ({ match, session, history }) => {
                 className={classes.tabs}
               >
                 <Tab
+                  className={classes.tabRoot}
                   label={
                     <div className={classes.tabsLabel}>
                       <Typography
@@ -335,6 +339,7 @@ const AccountPage = ({ match, session, history }) => {
                   }
                 />
                 <Tab
+                  className={classes.tabRoot}
                   label={
                     <div className={classes.tabsLabel}>
                       <Typography
@@ -355,6 +360,7 @@ const AccountPage = ({ match, session, history }) => {
                   }
                 />
                 <Tab
+                  className={classes.tabRoot}
                   label={
                     <div className={classes.tabsLabel}>
                       <Typography

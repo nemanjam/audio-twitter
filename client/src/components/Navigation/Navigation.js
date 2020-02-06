@@ -71,6 +71,9 @@ const useStyles = makeStyles(theme => ({
   indicator: {
     backgroundColor: 'white',
   },
+  tabs: {
+    maxWidth: 1000,
+  },
 }));
 
 const Navigation = ({ session, match }) => {
@@ -103,11 +106,11 @@ const Navigation = ({ session, match }) => {
           >
             Audio Twitter
           </Typography>
-
           <Tabs
             value={getActiveTabIndex(match)}
             textColor="primary"
             classes={{ indicator: classes.indicator }}
+            className={classes.tabs}
           >
             <Tab
               component={StyledLink}
@@ -174,7 +177,6 @@ const Navigation = ({ session, match }) => {
               />
             )}
           </Tabs>
-
           <div className={classes.flex}></div>
           {session && session.me ? (
             <>
