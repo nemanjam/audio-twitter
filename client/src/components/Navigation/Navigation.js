@@ -13,6 +13,7 @@ import HomeIcon from '@material-ui/icons/Home';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import SettingsIcon from '@material-ui/icons/Settings';
+import Badge from '@material-ui/core/Badge';
 import { styled } from '@material-ui/core/styles';
 
 import * as routes from '../../constants/routes';
@@ -52,7 +53,7 @@ const useStyles = makeStyles(theme => ({
     flex: 1,
   },
   label: {
-    color: 'white',
+    color: theme.palette.primary.contrastText,
     display: 'flex',
     alignContent: 'center',
     justifyContent: 'space-around',
@@ -69,7 +70,7 @@ const useStyles = makeStyles(theme => ({
     marginLeft: theme.spacing(1),
   },
   indicator: {
-    backgroundColor: 'white',
+    backgroundColor: theme.palette.primary.contrastText,
   },
   tabs: {
     maxWidth: 1000,
@@ -118,7 +119,13 @@ const Navigation = ({ session, match }) => {
               to={routes.LANDING}
               label={
                 <div className={classes.label}>
-                  <HomeIcon />
+                  <Badge
+                    className={classes.margin}
+                    badgeContent={10}
+                    color="secondary"
+                  >
+                    <HomeIcon />
+                  </Badge>
                   <Typography
                     className={classes.typographyLabel}
                     display="inline"

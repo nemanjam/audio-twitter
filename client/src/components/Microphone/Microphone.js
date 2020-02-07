@@ -30,6 +30,7 @@ import { green, red, blue } from '@material-ui/core/colors';
 import Fab from '@material-ui/core/Fab';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import { useTheme } from '@material-ui/styles';
 
 import ErrorMessage from '../Error/Error';
 import { CREATE_MESSAGE } from '../../graphql/mutations';
@@ -67,7 +68,8 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function Microphone() {
+const Microphone = () => {
+  const theme = useTheme();
   const [record, setRecord] = useState(false);
   const [open, setOpen] = React.useState(false);
   const [tempFile, setTempFile] = React.useState(null);
@@ -108,11 +110,11 @@ export default function Microphone() {
 
     wavesurfer.current = WaveSurfer.create({
       container: '#wavesurfer-id',
-      waveColor: 'grey',
-      progressColor: 'tomato',
+      waveColor: `${theme.palette.text.secondary}`,
+      progressColor: `${theme.palette.secondary.main}`,
+      cursorColor: `${theme.palette.text.primary}`,
       height: 140,
       cursorWidth: 1,
-      cursorColor: 'lightgrey',
       barWidth: 2,
       normalize: true,
       responsive: true,
@@ -226,14 +228,7 @@ export default function Microphone() {
           </Fab>
         </Grid>
       </Grid>
-      <Dialog
-        maxWidth="sm"
-        open={open}
-        onClose={handleCancel}
-        PaperProps={{
-          style: { backgroundColor: 'rgba(255, 255, 255, 1)' },
-        }}
-      >
+      <Dialog maxWidth="sm" open={open} onClose={handleCancel}>
         <DialogTitle className={classes.flex}>
           {completed === 0 && record && (
             <span>
@@ -253,8 +248,8 @@ export default function Microphone() {
               className={classes.reactmic}
               onStop={onStop}
               onData={onData}
-              strokeColor="grey"
-              backgroundColor="white"
+              strokeColor={theme.palette.text.primary}
+              backgroundColor={theme.palette.background.paper}
             />
           )}
         </DialogContent>
@@ -342,4 +337,6 @@ export default function Microphone() {
       </Dialog>
     </>
   );
-}
+};
+
+export default Microphone;

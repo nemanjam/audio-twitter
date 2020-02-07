@@ -16,10 +16,9 @@ import RepeatIcon from '@material-ui/icons/Repeat';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import { green, red, blue } from '@material-ui/core/colors';
 import CircularProgress from '@material-ui/core/CircularProgress';
-
+import { useTheme } from '@material-ui/styles';
 import PauseIcon from '@material-ui/icons/Pause';
 import Grid from '@material-ui/core/Grid';
-
 import ListItem from '@material-ui/core/ListItem';
 import Link from '@material-ui/core/Link';
 
@@ -94,6 +93,7 @@ function MessagePlayer({
   session,
   message,
 }) {
+  const theme = useTheme();
   const { createdAt, user, file, id } = message;
   const { username, name } = user;
   const path = `${UPLOADS_AUDIO_FOLDER}${file.path}`;
@@ -295,11 +295,11 @@ function MessagePlayer({
   useEffect(() => {
     wavesurfer.current = WaveSurfer.create({
       container: `#${wavesurferId}`,
-      waveColor: 'grey',
-      progressColor: 'tomato',
+      waveColor: `${theme.palette.text.secondary}`,
+      progressColor: `${theme.palette.secondary.main}`,
+      cursorColor: `${theme.palette.text.primary}`,
       height: 70,
       cursorWidth: 1,
-      cursorColor: 'lightgray',
       barWidth: 2,
       normalize: true,
       responsive: true,

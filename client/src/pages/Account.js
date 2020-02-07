@@ -62,7 +62,8 @@ const useStyles = makeStyles(theme => ({
   large: {
     width: 150,
     height: 150,
-    border: '3px solid #ffffff',
+    border: '3px solid',
+    borderColor: theme.palette.background.paper,
     bottom: 0,
     position: 'relative',
     left: 12,
