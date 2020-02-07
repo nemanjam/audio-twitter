@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useMutation } from '@apollo/react-hooks';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -14,10 +15,15 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import SettingsIcon from '@material-ui/icons/Settings';
 import Badge from '@material-ui/core/Badge';
+import Brightness4Icon from '@material-ui/icons/Brightness4';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import { styled } from '@material-ui/core/styles';
 
 import * as routes from '../../constants/routes';
 import SignOutButton from '../SignOutButton/SignOutButton';
+import { SET_THEME } from '../../graphql/mutations';
 
 const StyledLink = styled(Link)({
   minHeight: 64,
@@ -80,6 +86,28 @@ const useStyles = makeStyles(theme => ({
 const Navigation = ({ session, match }) => {
   const classes = useStyles();
   const [random, setRandom] = useState(0);
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const [setTheme] = useMutation(SET_THEME);
+
+  const handleMenuOpen = event => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleMenu = async (type, color) => {
+    await setTheme({
+      variables: {
+        type,
+        color,
+      },
+    });
+    setAnchorEl(null);
+  };
 
   const getActiveTabIndex = match => {
     if (!session?.me?.username) return 0;
@@ -188,6 +216,33 @@ const Navigation = ({ session, match }) => {
             )}
           </Tabs>
           <div className={classes.flex}></div>
+          <Button
+            color="inherit"
+            startIcon={<Brightness4Icon />}
+            onClick={handleMenuOpen}
+          >
+            Theme
+          </Button>
+          <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            <MenuItem onClick={e => handleMenu('light', 'green')}>
+              Light green
+            </MenuItem>
+            <MenuItem onClick={e => handleMenu('light', 'orange')}>
+              Light orange
+            </MenuItem>
+            <MenuItem onClick={e => handleMenu('dark', 'green')}>
+              Dark green
+            </MenuItem>
+            <MenuItem onClick={e => handleMenu('dark', 'orange')}>
+              Dark orange
+            </MenuItem>
+          </Menu>
           {session && session.me ? (
             <>
               <SignOutButton />

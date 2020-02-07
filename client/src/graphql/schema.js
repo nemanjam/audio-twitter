@@ -7,8 +7,14 @@ export default gql`
     duration: Int!
   }
 
+  type Theme {
+    type: String!
+    color: String!
+  }
+
   type Query {
     autoplay: Autoplay!
+    theme: Theme!
   }
 
   type Mutation {
@@ -17,5 +23,7 @@ export default gql`
       createdAt: Date!
       duration: Int!
     ): Autoplay
+
+    setTheme(type: String!, color: String!): Theme!
   }
 `;

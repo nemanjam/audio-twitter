@@ -4,7 +4,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
 
-import theme from '../theme/theme';
+import getThemeFn from '../theme/theme';
 import withTheme from '../theme/withTheme';
 
 import Navigation from '../components/Navigation/Navigation';
@@ -29,4 +29,4 @@ const Layout = ({ children, session, match }) => {
   );
 };
 
-export default withTheme(theme)(Layout);
+export default withTheme(getThemeFn)(Layout);

@@ -27,5 +27,15 @@ export default {
       };
       cache.writeData({ data });
     },
+    setTheme: (_root, { type, color }, { cache, getCacheKey }) => {
+      const data = {
+        theme: {
+          type,
+          color,
+          __typename: 'Theme',
+        },
+      };
+      cache.writeData({ data });
+    },
   },
 };

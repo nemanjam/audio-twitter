@@ -105,6 +105,11 @@ const data = {
     createdAt: moment().toISOString(),
     duration: 5,
   },
+  theme: {
+    __typename: 'Theme',
+    type: 'light',
+    color: 'green',
+  },
 };
 
 cache.writeData({ data });

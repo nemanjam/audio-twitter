@@ -112,3 +112,9 @@ export const UPDATE_AUTOPLAY = gql`
     ) @client
   }
 `;
+
+export const SET_THEME = gql`
+  mutation($type: String!, $color: String!) {
+    setTheme(type: $type, color: $color) @client
+  }
+`;

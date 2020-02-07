@@ -177,3 +177,12 @@ export const GET_AUTOPLAY = gql`
     }
   }
 `;
+
+export const GET_THEME = gql`
+  query {
+    theme @client {
+      type
+      color
+    }
+  }
+`;
