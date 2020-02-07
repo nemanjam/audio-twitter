@@ -177,7 +177,7 @@ const WhoToFollow = ({ session, accountRefetch }) => {
                     <Typography
                       component="span"
                       variant="body2"
-                      color="textPrimary"
+                      color="textSecondary"
                       display="block"
                     >
                       {`@${user.username}`}

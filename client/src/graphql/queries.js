@@ -83,6 +83,7 @@ export const GET_USERS = gql`
         id
         username
         name
+        bio
         avatar {
           id
           path
@@ -92,6 +93,7 @@ export const GET_USERS = gql`
         id
         username
         name
+        bio
         avatar {
           id
           path
@@ -138,6 +140,7 @@ export const GET_USER = gql`
         id
         username
         name
+        bio
         avatar {
           id
           path
@@ -147,6 +150,7 @@ export const GET_USER = gql`
         id
         username
         name
+        bio
         avatar {
           id
           path

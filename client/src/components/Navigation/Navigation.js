@@ -81,13 +81,14 @@ const Navigation = ({ session, match }) => {
   const [random, setRandom] = useState(0);
 
   const getActiveTabIndex = match => {
+    if (!session?.me?.username) return 0;
     if (match?.params?.username) return 1;
     if (match?.url === '/') return 0;
     if (match?.url === '/notifications') return 2;
     if (match?.url === '/admin') return 3;
     return 0;
   };
-  console.log(match);
+  //console.log(match);
 
   useEffect(() => {
     setRandom(Math.random());
@@ -129,6 +130,7 @@ const Navigation = ({ session, match }) => {
             />
             {session?.me && [
               <Tab
+                key={0}
                 component={StyledLink}
                 to={`/${session?.me?.username}`}
                 label={
@@ -144,6 +146,7 @@ const Navigation = ({ session, match }) => {
                 }
               />,
               <Tab
+                key={1}
                 component={StyledLink}
                 to={routes.NOTIFICATIONS}
                 label={

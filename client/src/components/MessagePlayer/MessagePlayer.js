@@ -11,7 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import StopIcon from '@material-ui/icons/Stop';
-import ReplyIcon from '@material-ui/icons/Reply';
+import DeleteIcon from '@material-ui/icons/Delete';
 import RepeatIcon from '@material-ui/icons/Repeat';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import { green, red, blue } from '@material-ui/core/colors';
@@ -465,10 +465,7 @@ function MessagePlayer({
                   </Grid>
                   <Grid item>
                     <IconButton>
-                      <ReplyIcon
-                        style={{ color: green[500] }}
-                        className={classes.icon}
-                      />
+                      <DeleteIcon className={classes.icon} />
                     </IconButton>
                   </Grid>
                 </Grid>

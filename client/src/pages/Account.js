@@ -23,6 +23,7 @@ import Tab from '@material-ui/core/Tab';
 import Autoplay from '../components/Autoplay/Autoplay';
 import WhoToFollow from '../components/WhoToFollow/WhoToFollow';
 import Messages from '../components/Messages/Messages';
+import UsersTab from '../components/UsersTab/UsersTab';
 
 import withAuthorization from '../session/withAuthorization';
 import withSession from '../session/withSession';
@@ -394,10 +395,10 @@ const AccountPage = ({ match, session, history }) => {
             />
           </TabPanel>
           <TabPanel value={tab} index={1}>
-            Item Two
+            <UsersTab users={user.followers} />
           </TabPanel>
           <TabPanel value={tab} index={2}>
-            Item Three
+            <UsersTab users={user.following} />
           </TabPanel>
         </Grid>
         <Dialog
