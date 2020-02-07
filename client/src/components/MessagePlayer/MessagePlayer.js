@@ -293,6 +293,8 @@ function MessagePlayer({
   }, [play, playerReady, duration]);
 
   useEffect(() => {
+    if (wavesurfer.current) wavesurfer.current.destroy();
+
     wavesurfer.current = WaveSurfer.create({
       container: `#${wavesurferId}`,
       waveColor: `${theme.palette.text.secondary}`,
@@ -315,7 +317,7 @@ function MessagePlayer({
     });
     wavesurfer.current.on('play', () => setIsPlaying(true));
     wavesurfer.current.on('pause', () => setIsPlaying(false));
-  }, []);
+  }, [theme]);
 
   const togglePlayback = () => {
     if (!isPlaying) {
