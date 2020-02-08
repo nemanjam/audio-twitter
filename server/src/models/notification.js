@@ -6,6 +6,10 @@ const notificationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    seen: {
+      type: Boolean,
+      default: false,
+    },
     ownerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

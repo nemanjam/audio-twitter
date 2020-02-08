@@ -70,11 +70,11 @@ export default {
         () => pubsub.asyncIterator(EVENTS.NOTIFICATION.CREATED),
         //me usera koji radi subskripciju, me usera koji radi like mutaciju je u messages resolveru
         async (payload, args, { me }) => {
-          //razliciti _id za ownerId i me.id, oba user0 wtf?
+          //razliciti _id za ownerId i me.id, oba user0 wtf?, bajat token
           const ownerId =
             payload?.notificationCreated?.notification?.ownerId;
           const owner = await models.User.findById(ownerId);
-          //console.log(payload, me, owner);
+          // console.log(payload, me, owner, meUser);
           //if message owner === loggedin user
           const condition = owner.username === me.username;
           //console.log(condition);
