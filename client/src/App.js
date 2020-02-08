@@ -7,6 +7,7 @@ import SignInPage from './pages/SignIn';
 import AccountPage from './pages/Account';
 import AdminPage from './pages/Admin';
 import NotFoundPage from './pages/NotFound';
+import NotificationsPage from './pages/Notifications';
 import RouteWithLayout from './pages/RouteWithLayout';
 import Layout from './pages/Layout';
 import withSession from './session/withSession';
@@ -40,6 +41,12 @@ const App = ({ session, refetch }) => (
       <RouteWithLayout
         path={routes.ADMIN}
         component={AdminPage}
+        layout={Layout}
+        layoutProps={{ session }}
+      />
+      <RouteWithLayout
+        path={routes.NOTIFICATIONS}
+        component={NotificationsPage}
         layout={Layout}
         layoutProps={{ session }}
       />
