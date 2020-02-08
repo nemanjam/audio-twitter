@@ -131,6 +131,7 @@ connectDb().then(async () => {
       models.User.deleteMany({}),
       models.Message.deleteMany({}),
       models.File.deleteMany({}),
+      models.Notification.deleteMany({}),
     ]);
 
     createUsersWithMessages(new Date());

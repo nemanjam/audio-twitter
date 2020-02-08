@@ -4,6 +4,7 @@ import { withFilter } from 'apollo-server';
 
 import pubsub, { EVENTS } from '../subscription';
 import { isAuthenticated } from './authorization';
+const ObjectId = mongoose.Types.ObjectId;
 
 const toCursorHash = string => Buffer.from(string).toString('base64');
 
@@ -15,7 +16,6 @@ export default {
     notifications: combineResolvers(
       isAuthenticated,
       async (parent, { cursor, limit = 100 }, { models, me }) => {
-        const ObjectId = mongoose.Types.ObjectId;
         const cursorOptions = cursor
           ? {
               createdAt: {
@@ -69,9 +69,12 @@ export default {
       subscribe: withFilter(
         () => pubsub.asyncIterator(EVENTS.NOTIFICATION.CREATED),
         async (payload, args, { me }) => {
-          console.log(payload);
-          if (payload?.notification.ownerId === me?.id) return true;
-          else return false;
+          console.log(payload, me);
+          const condition = payload?.notificationCreated?.notification?.ownerId.equals(
+            me?.id,
+          );
+          console.log(condition);
+          return condition;
         },
       ),
     },

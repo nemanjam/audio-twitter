@@ -206,11 +206,34 @@ export default {
           { $push: { likesIds: me.id } },
         );
 
-        const notification = await models.Notification.create({
-          ownerId: likedMessage.userId,
-          userId: me.id,
-          action: 'like',
-        });
+        // const notification = await models.Notification.create({
+        //   ownerId: likedMessage.userId,
+        //   userId: me.id,
+        //   action: 'like',
+        // });
+
+        const notification = await models.Notification.findOneAndUpdate(
+          {
+            //query
+            ownerId: likedMessage.userId,
+            userId: me.id,
+            action: 'like',
+          },
+          {
+            //update
+            ownerId: likedMessage.userId,
+            userId: me.id,
+            action: 'like',
+          },
+          {
+            //options
+            upsert: true,
+            new: true,
+            setDefaultsOnInsert: true,
+          },
+        );
+
+        console.log('likeMessage notification ');
 
         pubsub.publish(EVENTS.NOTIFICATION.CREATED, {
           notificationCreated: { notification },

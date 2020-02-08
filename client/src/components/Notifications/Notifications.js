@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect, useCallback } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import moment from 'moment';
@@ -18,6 +18,7 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 
 import Loading from '../Loading/Loading';
 import { GET_PAGINATED_NOTIFICATIONS } from '../../graphql/queries';
+import { NOTIFICATION_CREATED } from '../../graphql/subscriptions';
 import { UPLOADS_IMAGES_FOLDER } from '../../constants/paths';
 
 const useStyles = makeStyles(theme => ({
@@ -48,6 +49,44 @@ const Notifications = ({ session }) => {
     variables: { limit: 2 },
   });
 
+  const subscribeToMoreNotification = useCallback(() => {
+    subscribeToMore({
+      document: NOTIFICATION_CREATED,
+      variables: {},
+      updateQuery: (previousResult, { subscriptionData }) => {
+        if (!subscriptionData.data) {
+          return previousResult;
+        }
+        console.log(
+          'subscriptionData',
+          subscriptionData,
+          'previousResult',
+          previousResult,
+        );
+        const { notificationCreated } = subscriptionData.data;
+
+        return {
+          ...previousResult,
+          notifications: {
+            ...previousResult.notifications,
+            edges: [
+              notificationCreated.notification,
+              ...previousResult.notifications.edges,
+            ],
+          },
+        };
+      },
+    });
+  }, [subscribeToMore]);
+
+  useEffect(() => {
+    subscribeToMoreNotification();
+  }, [subscribeToMoreNotification]);
+
+  useEffect(() => {
+    refetch();
+  }, []);
+
   const getActionText = action => {
     if (action === 'like') {
       return 'liked your message';
@@ -60,7 +99,7 @@ const Notifications = ({ session }) => {
 
   const { edges, pageInfo } = data.notifications;
 
-  console.log(data, error);
+  //console.log(data, error);
 
   return (
     <List className={classes.root}>

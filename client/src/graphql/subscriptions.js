@@ -27,3 +27,24 @@ export const MESSAGE_CREATED = gql`
     }
   }
 `;
+
+export const NOTIFICATION_CREATED = gql`
+  subscription {
+    notificationCreated {
+      notification {
+        id
+        createdAt
+        action
+        user {
+          id
+          username
+          name
+          avatar {
+            id
+            path
+          }
+        }
+      }
+    }
+  }
+`;
