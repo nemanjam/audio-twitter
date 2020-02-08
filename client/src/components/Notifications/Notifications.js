@@ -57,12 +57,7 @@ const Notifications = ({ session }) => {
         if (!subscriptionData.data) {
           return previousResult;
         }
-        console.log(
-          'subscriptionData',
-          subscriptionData,
-          'previousResult',
-          previousResult,
-        );
+
         const { notificationCreated } = subscriptionData.data;
 
         return {

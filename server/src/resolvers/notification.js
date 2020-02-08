@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { models } from 'mongoose';
 import { combineResolvers } from 'graphql-resolvers';
 import { withFilter } from 'apollo-server';
 
@@ -68,12 +68,16 @@ export default {
     notificationCreated: {
       subscribe: withFilter(
         () => pubsub.asyncIterator(EVENTS.NOTIFICATION.CREATED),
+        //me usera koji radi subskripciju, me usera koji radi like mutaciju je u messages resolveru
         async (payload, args, { me }) => {
-          console.log(payload, me);
-          const condition = payload?.notificationCreated?.notification?.ownerId.equals(
-            me?.id,
-          );
-          console.log(condition);
+          //razliciti _id za ownerId i me.id, oba user0 wtf?
+          const ownerId =
+            payload?.notificationCreated?.notification?.ownerId;
+          const owner = await models.User.findById(ownerId);
+          //console.log(payload, me, owner);
+          //if message owner === loggedin user
+          const condition = owner.username === me.username;
+          //console.log(condition);
           return condition;
         },
       ),

@@ -206,12 +206,15 @@ export default {
           { $push: { likesIds: me.id } },
         );
 
-        // const notification = await models.Notification.create({
-        //   ownerId: likedMessage.userId,
-        //   userId: me.id,
-        //   action: 'like',
-        // });
+        //2 iste notifikacije ?
+        const notification = await models.Notification.create({
+          ownerId: likedMessage.userId,
+          userId: me.id,
+          action: 'like',
+        });
 
+        //GDE JE MESSAGE ID? USER MOZE SAMO JEDNU INTERAKCIJU SA DRUGIM USEROM
+        /*
         const notification = await models.Notification.findOneAndUpdate(
           {
             //query
@@ -232,7 +235,7 @@ export default {
             setDefaultsOnInsert: true,
           },
         );
-
+        */
         console.log('likeMessage notification ');
 
         pubsub.publish(EVENTS.NOTIFICATION.CREATED, {
