@@ -82,5 +82,43 @@ export const createUsersWithMessages = async date => {
       ]);
     }),
   );
+
+  // get one message from each user
+  //const messages = await models.Message.find({ distinct: 'userId' });
+
+  const messages = await models.Message.aggregate([
+    {
+      $group: {
+        _id: '$userId',
+        docs: {
+          $first: {
+            _id: '$_id',
+            userId: '$userId',
+            likesIds: '$likesIds',
+            reposts: '$reposts',
+          },
+        },
+      },
+    },
+  ]);
+
+  //console.log(messages.length);
+
+  messages.map(async m => {
+    //console.log(m.docs);
+
+    await models.Message.updateOne(
+      { _id: m.docs._id },
+      { $push: { likesIds: m.docs.userId } },
+    );
+
+    const notificationsLikes = await models.Notification.create({
+      action: 'like',
+      ownerId: m.docs.userId,
+      userId: m.docs.userId,
+    });
+  });
+  const notifications = await models.Notification.find();
+
+  //console.log(notifications);
 };
-//

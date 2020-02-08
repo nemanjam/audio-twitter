@@ -118,7 +118,9 @@ const Notifications = ({ session }) => {
                     }
                   />
                 </ListItem>
-                <Divider variant="inset" component="li" />
+                {index !== edges.length - 1 && (
+                  <Divider variant="inset" component="li" />
+                )}
               </Fragment>
             );
           })}
