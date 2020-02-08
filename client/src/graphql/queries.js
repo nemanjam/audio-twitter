@@ -64,6 +64,32 @@ export const GET_PAGINATED_MESSAGES_WITH_USERS = gql`
   }
 `;
 
+export const GET_PAGINATED_NOTIFICATIONS = gql`
+  query($cursor: String, $limit: Int!) {
+    notifications(cursor: $cursor, limit: $limit)
+      @connection(key: "NotificationsConnection") {
+      edges {
+        id
+        createdAt
+        action
+        user {
+          id
+          username
+          name
+          avatar {
+            id
+            path
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
 export const GET_USERS = gql`
   query($limit: Int) {
     users(limit: $limit) {

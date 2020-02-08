@@ -205,6 +205,17 @@ export default {
           { _id: messageId },
           { $push: { likesIds: me.id } },
         );
+
+        const notification = await models.Notification.create({
+          ownerId: likedMessage.userId,
+          userId: me.id,
+          action: 'like',
+        });
+
+        pubsub.publish(EVENTS.NOTIFICATION.CREATED, {
+          notificationCreated: { notification },
+        });
+
         return !!likedMessage;
       },
     ),
