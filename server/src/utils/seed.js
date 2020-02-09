@@ -115,6 +115,7 @@ export const createUsersWithMessages = async date => {
     const notificationsLikes = await models.Notification.create({
       action: 'like',
       ownerId: m.docs.userId,
+      messageId: m.docs._id,
       userId: m.docs.userId,
     });
   });

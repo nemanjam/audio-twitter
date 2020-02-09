@@ -15,6 +15,8 @@ import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
 import Badge from '@material-ui/core/Badge';
 import FavoriteIcon from '@material-ui/icons/Favorite';
+import RepeatIcon from '@material-ui/icons/Repeat';
+import PersonIcon from '@material-ui/icons/Person';
 
 import Loading from '../Loading/Loading';
 import { GET_PAGINATED_NOTIFICATIONS } from '../../graphql/queries';
@@ -46,7 +48,7 @@ const Notifications = ({ session }) => {
     fetchMore,
     subscribeToMore,
   } = useQuery(GET_PAGINATED_NOTIFICATIONS, {
-    variables: { limit: 2 },
+    variables: { limit: 10 },
   });
 
   const subscribeToMoreNotification = useCallback(() => {
@@ -83,8 +85,43 @@ const Notifications = ({ session }) => {
   }, []);
 
   const getActionText = action => {
-    if (action === 'like') {
-      return 'liked your message';
+    switch (action) {
+      case 'like':
+        return {
+          text: 'liked your message',
+          color: 'primary',
+          icon: <FavoriteIcon className={classes.icon} />,
+        };
+      case 'unlike':
+        return {
+          text: 'unliked your message',
+          color: 'secondary',
+          icon: <FavoriteIcon className={classes.icon} />,
+        };
+      case 'repost':
+        return {
+          text: 'reposted your message',
+          color: 'primary',
+          icon: <RepeatIcon className={classes.icon} />,
+        };
+      case 'unrepost':
+        return {
+          text: 'unreposted your message',
+          color: 'secondary',
+          icon: <RepeatIcon className={classes.icon} />,
+        };
+      case 'follow':
+        return {
+          text: 'followed you',
+          color: 'primary',
+          icon: <PersonIcon className={classes.icon} />,
+        };
+      case 'unfollow':
+        return {
+          text: 'unfollowed you',
+          color: 'secondary',
+          icon: <PersonIcon className={classes.icon} />,
+        };
     }
   };
 
@@ -111,9 +148,9 @@ const Notifications = ({ session }) => {
                   <ListItemAvatar>
                     <Badge
                       badgeContent={
-                        <FavoriteIcon className={classes.icon} />
+                        getActionText(notification.action).icon
                       }
-                      color="primary"
+                      color={getActionText(notification.action).color}
                     >
                       <Avatar
                         alt={notification.user.name}
@@ -137,7 +174,7 @@ const Notifications = ({ session }) => {
                           display="inline"
                           color="textSecondary"
                         >
-                          {getActionText(notification.action)}
+                          {getActionText(notification.action).text}
                         </Typography>
                       </>
                     }

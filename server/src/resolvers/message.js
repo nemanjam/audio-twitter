@@ -207,24 +207,25 @@ export default {
         );
 
         //2 iste notifikacije ?
-        const notification = await models.Notification.create({
+        /*const notification = await models.Notification.create({
           ownerId: likedMessage.userId,
           userId: me.id,
           action: 'like',
-        });
+        });*/
 
         //GDE JE MESSAGE ID? USER MOZE SAMO JEDNU INTERAKCIJU SA DRUGIM USEROM
-        /*
         const notification = await models.Notification.findOneAndUpdate(
           {
             //query
             ownerId: likedMessage.userId,
+            messageId: likedMessage._id,
             userId: me.id,
             action: 'like',
           },
           {
             //update
             ownerId: likedMessage.userId,
+            messageId: likedMessage._id,
             userId: me.id,
             action: 'like',
           },
@@ -235,8 +236,6 @@ export default {
             setDefaultsOnInsert: true,
           },
         );
-        */
-        console.log('likeMessage notification ');
 
         pubsub.publish(EVENTS.NOTIFICATION.CREATED, {
           notificationCreated: { notification },
@@ -252,6 +251,31 @@ export default {
           { _id: messageId },
           { $pull: { likesIds: me.id } },
         );
+
+        const notification = await models.Notification.findOneAndUpdate(
+          {
+            ownerId: unlikedMessage.userId,
+            messageId: unlikedMessage._id,
+            userId: me.id,
+            action: 'unlike',
+          },
+          {
+            ownerId: unlikedMessage.userId,
+            messageId: unlikedMessage._id,
+            userId: me.id,
+            action: 'unlike',
+          },
+          {
+            upsert: true,
+            new: true,
+            setDefaultsOnInsert: true,
+          },
+        );
+
+        pubsub.publish(EVENTS.NOTIFICATION.CREATED, {
+          notificationCreated: { notification },
+        });
+
         return !!unlikedMessage;
       },
     ),
@@ -263,9 +287,35 @@ export default {
           { $push: { reposts: { reposterId: me.id } } },
           { new: true },
         );
+
         pubsub.publish(EVENTS.MESSAGE.CREATED, {
           messageCreated: { message: repostedMessage },
         });
+
+        const notification = await models.Notification.findOneAndUpdate(
+          {
+            ownerId: repostedMessage.userId,
+            messageId: repostedMessage._id,
+            userId: me.id,
+            action: 'repost',
+          },
+          {
+            ownerId: repostedMessage.userId,
+            messageId: repostedMessage._id,
+            userId: me.id,
+            action: 'repost',
+          },
+          {
+            upsert: true,
+            new: true,
+            setDefaultsOnInsert: true,
+          },
+        );
+
+        pubsub.publish(EVENTS.NOTIFICATION.CREATED, {
+          notificationCreated: { notification },
+        });
+
         return !!repostedMessage;
       },
     ),

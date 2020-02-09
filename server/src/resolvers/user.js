@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { combineResolvers } from 'graphql-resolvers';
 import { AuthenticationError, UserInputError } from 'apollo-server';
 
+import pubsub, { EVENTS } from '../subscription';
 import { isAdmin, isAuthenticated } from './authorization';
 import { processFile } from '../utils/upload';
 
@@ -147,6 +148,30 @@ export default {
           { $push: { followingIds: followedUser.id } },
         );
 
+        const notification = await models.Notification.findOneAndUpdate(
+          {
+            ownerId: followedUser.id,
+            messageId: null,
+            userId: me.id,
+            action: 'follow',
+          },
+          {
+            ownerId: followedUser.id,
+            messageId: null,
+            userId: me.id,
+            action: 'follow',
+          },
+          {
+            upsert: true,
+            new: true,
+            setDefaultsOnInsert: true,
+          },
+        );
+
+        pubsub.publish(EVENTS.NOTIFICATION.CREATED, {
+          notificationCreated: { notification },
+        });
+
         return !!followingUser;
       },
     ),
@@ -154,17 +179,41 @@ export default {
     unfollowUser: combineResolvers(
       isAuthenticated,
       async (parent, { username }, { models, me }) => {
-        const followedUser = await models.User.findOneAndUpdate(
+        const unfollowedUser = await models.User.findOneAndUpdate(
           { username },
           { $pull: { followersIds: me.id } },
         );
 
-        if (!followedUser) return false;
+        if (!unfollowedUser) return false;
 
         const followingUser = await models.User.findOneAndUpdate(
           { _id: me.id },
-          { $pull: { followingIds: followedUser.id } },
+          { $pull: { followingIds: unfollowedUser.id } },
         );
+
+        const notification = await models.Notification.findOneAndUpdate(
+          {
+            ownerId: unfollowedUser.id,
+            messageId: null,
+            userId: me.id,
+            action: 'unfollow',
+          },
+          {
+            ownerId: unfollowedUser.id,
+            messageId: null,
+            userId: me.id,
+            action: 'unfollow',
+          },
+          {
+            upsert: true,
+            new: true,
+            setDefaultsOnInsert: true,
+          },
+        );
+
+        pubsub.publish(EVENTS.NOTIFICATION.CREATED, {
+          notificationCreated: { notification },
+        });
 
         return !!followingUser;
       },

@@ -10,6 +10,10 @@ const notificationSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    messageId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Message',
+    },
     ownerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
