@@ -118,3 +118,9 @@ export const SET_THEME = gql`
     setTheme(type: $type, color: $color) @client
   }
 `;
+
+export const SET_REFETCH_FOLLOWERS = gql`
+  mutation {
+    setRefetchFollowers @client
+  }
+`;

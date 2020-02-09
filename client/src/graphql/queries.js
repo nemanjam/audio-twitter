@@ -179,3 +179,11 @@ export const GET_THEME = gql`
     }
   }
 `;
+
+export const GET_REFETCH_FOLLOWERS = gql`
+  query {
+    refetchFollowers @client {
+      signal
+    }
+  }
+`;

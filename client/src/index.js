@@ -110,6 +110,10 @@ const data = {
     type: 'light',
     color: 'green',
   },
+  refetchFollowers: {
+    __typename: 'Int',
+    signal: 0,
+  },
 };
 
 cache.writeData({ data });

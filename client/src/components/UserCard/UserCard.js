@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -12,8 +12,15 @@ import Typography from '@material-ui/core/Typography';
 import Avatar from '@material-ui/core/Avatar';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-import { GET_USER } from '../../graphql/queries';
-import { FOLLOW_USER, UNFOLLOW_USER } from '../../graphql/mutations';
+import {
+  GET_USER,
+  GET_REFETCH_FOLLOWERS,
+} from '../../graphql/queries';
+import {
+  FOLLOW_USER,
+  UNFOLLOW_USER,
+  SET_REFETCH_FOLLOWERS,
+} from '../../graphql/mutations';
 
 import { UPLOADS_IMAGES_FOLDER } from '../../constants/paths';
 
@@ -63,18 +70,27 @@ const UserCard = ({ accountRefetch, session, username, ...rest }) => {
     variables: { username },
   });
 
+  const {
+    data: {
+      refetchFollowers: { signal },
+    },
+  } = useQuery(GET_REFETCH_FOLLOWERS);
+
+  useEffect(() => {
+    refetch();
+  }, [signal]);
+
   const [followUser] = useMutation(FOLLOW_USER);
   const [unfollowUser] = useMutation(UNFOLLOW_USER);
+  const [setRefetchFollowers] = useMutation(SET_REFETCH_FOLLOWERS);
 
   const handleFollow = async user => {
     await followUser({ variables: { username: user.username } });
-    if (accountRefetch) accountRefetch();
-    refetch();
+    setRefetchFollowers();
   };
   const handleUnfollow = async user => {
     await unfollowUser({ variables: { username: user.username } });
-    if (accountRefetch) accountRefetch();
-    refetch();
+    setRefetchFollowers();
   };
 
   if (loading) return <CircularProgress color="inherit" />;

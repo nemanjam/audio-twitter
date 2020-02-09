@@ -1,4 +1,5 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -12,9 +13,17 @@ import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import Link from '@material-ui/core/Link';
 
-import { GET_FRIENDS } from '../../graphql/queries';
-import { FOLLOW_USER, UNFOLLOW_USER } from '../../graphql/mutations';
+import {
+  GET_FRIENDS,
+  GET_REFETCH_FOLLOWERS,
+} from '../../graphql/queries';
+import {
+  FOLLOW_USER,
+  UNFOLLOW_USER,
+  SET_REFETCH_FOLLOWERS,
+} from '../../graphql/mutations';
 import { UPLOADS_IMAGES_FOLDER } from '../../constants/paths';
 
 const useStyles = makeStyles(theme => ({
@@ -31,30 +40,34 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const UsersTab = ({
-  username,
-  isFollowers,
-  isFollowing,
-  accountRefetch,
-}) => {
+const UsersTab = ({ username, isFollowers, isFollowing }) => {
   const classes = useStyles();
 
   const { data, error, loading, refetch } = useQuery(GET_FRIENDS, {
     variables: { username, isFollowers, isFollowing, limit: 10 },
   });
 
+  const {
+    data: {
+      refetchFollowers: { signal },
+    },
+  } = useQuery(GET_REFETCH_FOLLOWERS);
+
+  useEffect(() => {
+    refetch();
+  }, [signal]);
+
   const [followUser] = useMutation(FOLLOW_USER);
   const [unfollowUser] = useMutation(UNFOLLOW_USER);
+  const [setRefetchFollowers] = useMutation(SET_REFETCH_FOLLOWERS);
 
   const handleFollow = async user => {
     await followUser({ variables: { username: user.username } });
-    if (accountRefetch) accountRefetch();
-    refetch();
+    setRefetchFollowers();
   };
   const handleUnfollow = async user => {
     await unfollowUser({ variables: { username: user.username } });
-    if (accountRefetch) accountRefetch();
-    refetch();
+    setRefetchFollowers();
   };
 
   // console.log(data, error);
@@ -72,13 +85,26 @@ const UsersTab = ({
             <Fragment key={index}>
               <ListItem alignItems="flex-start">
                 <ListItemAvatar>
-                  <Avatar
-                    alt={user.name}
-                    src={`${UPLOADS_IMAGES_FOLDER}${user.avatar.path}`}
-                  />
+                  <Link
+                    component={RouterLink}
+                    to={`/${user.username}`}
+                  >
+                    <Avatar
+                      alt={user.name}
+                      src={`${UPLOADS_IMAGES_FOLDER}${user.avatar.path}`}
+                    />
+                  </Link>
                 </ListItemAvatar>
                 <ListItemText
-                  primary={user.name}
+                  primary={
+                    <Link
+                      color="textPrimary"
+                      component={RouterLink}
+                      to={`/${user.username}`}
+                    >
+                      {user.name}
+                    </Link>
+                  }
                   secondary={
                     <React.Fragment>
                       <Typography

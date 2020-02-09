@@ -15,6 +15,7 @@ export default gql`
   type Query {
     autoplay: Autoplay!
     theme: Theme!
+    refetchFollowers: Int!
   }
 
   type Mutation {
@@ -25,5 +26,6 @@ export default gql`
     ): Autoplay
 
     setTheme(type: String!, color: String!): Theme!
+    setRefetchFollowers: Int!
   }
 `;

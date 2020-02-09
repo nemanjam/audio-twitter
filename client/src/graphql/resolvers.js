@@ -37,5 +37,14 @@ export default {
       };
       cache.writeData({ data });
     },
+    setRefetchFollowers: (_root, args, { cache, getCacheKey }) => {
+      const data = {
+        refetchFollowers: {
+          signal: Math.floor(Math.random() * 1000),
+          __typename: 'Int',
+        },
+      };
+      cache.writeData({ data });
+    },
   },
 };

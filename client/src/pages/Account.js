@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -27,11 +27,12 @@ import UsersTab from '../components/UsersTab/UsersTab';
 
 import withAuthorization from '../session/withAuthorization';
 import withSession from '../session/withSession';
-import { GET_USER } from '../graphql/queries';
+import { GET_USER, GET_REFETCH_FOLLOWERS } from '../graphql/queries';
 import {
   UPDATE_USER,
   FOLLOW_USER,
   UNFOLLOW_USER,
+  SET_REFETCH_FOLLOWERS,
 } from '../graphql/mutations';
 import Loading from '../components/Loading/Loading';
 import { UPLOADS_IMAGES_FOLDER } from '../constants/paths';
@@ -124,9 +125,21 @@ const AccountPage = ({ match, session, history }) => {
   const { data, error, loading, refetch } = useQuery(GET_USER, {
     variables: { username: match?.params?.username },
   });
+
+  const {
+    data: {
+      refetchFollowers: { signal },
+    },
+  } = useQuery(GET_REFETCH_FOLLOWERS);
+
+  useEffect(() => {
+    refetch();
+  }, [signal]);
+
   const [updateUser] = useMutation(UPDATE_USER);
   const [followUser] = useMutation(FOLLOW_USER);
   const [unfollowUser] = useMutation(UNFOLLOW_USER);
+  const [setRefetchFollowers] = useMutation(SET_REFETCH_FOLLOWERS);
 
   if (loading) return <Loading />;
   // console.log(error, data, session);
@@ -147,11 +160,11 @@ const AccountPage = ({ match, session, history }) => {
 
   const handleFollow = async () => {
     await followUser({ variables: { username: user.username } });
-    refetch();
+    setRefetchFollowers();
   };
   const handleUnfollow = async () => {
     await unfollowUser({ variables: { username: user.username } });
-    refetch();
+    setRefetchFollowers();
   };
 
   const handleInput = event => {

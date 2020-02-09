@@ -18,8 +18,15 @@ import Fade from '@material-ui/core/Fade';
 import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
 
-import { GET_WHO_TO_FOLLOW } from '../../graphql/queries';
-import { FOLLOW_USER, UNFOLLOW_USER } from '../../graphql/mutations';
+import {
+  GET_WHO_TO_FOLLOW,
+  GET_REFETCH_FOLLOWERS,
+} from '../../graphql/queries';
+import {
+  FOLLOW_USER,
+  UNFOLLOW_USER,
+  SET_REFETCH_FOLLOWERS,
+} from '../../graphql/mutations';
 import { UPLOADS_IMAGES_FOLDER } from '../../constants/paths';
 
 import UserCard from '../UserCard/UserCard';
@@ -44,7 +51,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const WhoToFollow = ({ session, accountRefetch }) => {
+const WhoToFollow = ({ session }) => {
   const classes = useStyles();
 
   const [anchorEl, setAnchorEl] = useState(null);
@@ -58,6 +65,15 @@ const WhoToFollow = ({ session, accountRefetch }) => {
       variables: { limit: 3 },
     },
   );
+  const {
+    data: {
+      refetchFollowers: { signal },
+    },
+  } = useQuery(GET_REFETCH_FOLLOWERS);
+
+  useEffect(() => {
+    refetch();
+  }, [signal]);
 
   useEffect(() => {
     refetch();
@@ -75,6 +91,7 @@ const WhoToFollow = ({ session, accountRefetch }) => {
 
   const [followUser] = useMutation(FOLLOW_USER);
   const [unfollowUser] = useMutation(UNFOLLOW_USER);
+  const [setRefetchFollowers] = useMutation(SET_REFETCH_FOLLOWERS);
 
   // console.log(data, error);
   if (loading) return <CircularProgress color="inherit" />;
@@ -82,13 +99,11 @@ const WhoToFollow = ({ session, accountRefetch }) => {
 
   const handleFollow = async user => {
     await followUser({ variables: { username: user.username } });
-    if (accountRefetch) accountRefetch();
-    refetch();
+    setRefetchFollowers();
   };
   const handleUnfollow = async user => {
     await unfollowUser({ variables: { username: user.username } });
-    if (accountRefetch) accountRefetch();
-    refetch();
+    setRefetchFollowers();
   };
   const handleMouseEnter = (event, user) => {
     setAnchorEl(event.currentTarget);
@@ -122,7 +137,6 @@ const WhoToFollow = ({ session, accountRefetch }) => {
               onMouseLeave={handlePopUpMouseLeave}
               username={username}
               session={session}
-              accountRefetch={accountRefetch}
             />
           </Fade>
         )}
