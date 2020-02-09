@@ -14,6 +14,7 @@ import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { GET_FRIENDS } from '../../graphql/queries';
+import { FOLLOW_USER, UNFOLLOW_USER } from '../../graphql/mutations';
 import { UPLOADS_IMAGES_FOLDER } from '../../constants/paths';
 
 const useStyles = makeStyles(theme => ({
@@ -30,12 +31,31 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const UsersTab = ({ username, isFollowers, isFollowing }) => {
+const UsersTab = ({
+  username,
+  isFollowers,
+  isFollowing,
+  accountRefetch,
+}) => {
   const classes = useStyles();
 
   const { data, error, loading, refetch } = useQuery(GET_FRIENDS, {
     variables: { username, isFollowers, isFollowing, limit: 10 },
   });
+
+  const [followUser] = useMutation(FOLLOW_USER);
+  const [unfollowUser] = useMutation(UNFOLLOW_USER);
+
+  const handleFollow = async user => {
+    await followUser({ variables: { username: user.username } });
+    if (accountRefetch) accountRefetch();
+    refetch();
+  };
+  const handleUnfollow = async user => {
+    await unfollowUser({ variables: { username: user.username } });
+    if (accountRefetch) accountRefetch();
+    refetch();
+  };
 
   // console.log(data, error);
   if (loading) return <CircularProgress color="inherit" />;
@@ -82,13 +102,25 @@ const UsersTab = ({ username, isFollowers, isFollowing }) => {
                 <ListItemSecondaryAction
                   className={classes.secondaryAction}
                 >
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    size="small"
-                  >
-                    Follow
-                  </Button>
+                  {user.isFollowHim ? (
+                    <Button
+                      onClick={() => handleUnfollow(user)}
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                    >
+                      Unfollow
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => handleFollow(user)}
+                      variant="outlined"
+                      color="primary"
+                      size="small"
+                    >
+                      Follow
+                    </Button>
+                  )}
                 </ListItemSecondaryAction>
               </ListItem>
               {index !== users.length - 1 && (

@@ -279,6 +279,8 @@ export default {
       return messages.length;
     },
     isFollowHim: async (user, args, { models, me }) => {
+      if (!me) return false;
+
       const followers = await models.User.find({
         followingIds: { $in: [user.id] },
       });
@@ -288,6 +290,8 @@ export default {
       return amIFollowing;
     },
     isFollowsMe: async (user, args, { models, me }) => {
+      if (!me) return false;
+
       const following = await models.User.find({
         followersIds: { $in: [user.id] },
       });

@@ -389,10 +389,18 @@ const AccountPage = ({ match, session, history }) => {
             />
           </TabPanel>
           <TabPanel value={tab} index={1}>
-            <UsersTab username={user.username} isFollowers={true} />
+            <UsersTab
+              username={user.username}
+              isFollowers={true}
+              accountRefetch={refetch}
+            />
           </TabPanel>
           <TabPanel value={tab} index={2}>
-            <UsersTab username={user.username} isFollowing={true} />
+            <UsersTab
+              username={user.username}
+              isFollowing={true}
+              accountRefetch={refetch}
+            />
           </TabPanel>
         </Grid>
         <Dialog
