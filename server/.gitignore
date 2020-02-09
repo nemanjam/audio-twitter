@@ -3,4 +3,13 @@ logfile
 .env
 
 node_modules/
-uploads/
+
+uploads/*
+!uploads/audio
+uploads/audio/*
+!uploads/audio/test.mp3
+
+!uploads/images
+uploads/images/*
+!uploads/images/avatar.jpg
+!uploads/images/cover.jpg
