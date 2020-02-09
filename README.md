@@ -17,6 +17,7 @@ This is fullstack clone of Twitter with audio instead text messages. It is made 
   - Notifications feed
   - Profile page with user's messages feed, following and followers lists
   - Social network functionalities: follow/unfollow users, like/unlike messages, repost/unrepost messages
+  - Local state management with Apollo cache, without Redux
 
 - Authentication
 
@@ -41,6 +42,8 @@ This is fullstack clone of Twitter with audio instead text messages. It is made 
   - Subscriptions: messageCreated, notificationCreated
   - Relay cursor paginations: Messages, Notifications
   - Loaders: File, User
+  - Client Queries: autoplay, theme
+  - Client Mutations: updateAutoplay, setTheme
 
 - Database
   - Mongoose Models: User, Message, File, Notification
