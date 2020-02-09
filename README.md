@@ -18,6 +18,7 @@ This is fullstack clone of Twitter with audio instead text messages. It is made 
   - Profile page with user's messages feed, following and followers lists
   - Social network functionalities: follow/unfollow users, like/unlike messages, repost/unrepost messages
   - Local state management with Apollo cache, without Redux
+  - Edit avatar, cover, name and bio
 
 - Authentication
 
