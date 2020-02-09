@@ -141,13 +141,6 @@ const AccountPage = ({ match, session, history }) => {
   const isMyProfile =
     session?.me?.username === match?.params?.username;
 
-  const amIFollowing = !!user.followers.find(
-    user => user.username === session?.me?.username,
-  );
-  const amIFollowed = !!user.following.find(
-    user => user.username === session?.me?.username,
-  );
-
   const handleTabChange = (event, newTab) => {
     setTab(newTab);
   };
@@ -260,7 +253,7 @@ const AccountPage = ({ match, session, history }) => {
                   </Button>
                 ) : (
                   <>
-                    {amIFollowing ? (
+                    {user.isFollowHim ? (
                       <Button
                         onClick={handleUnfollow}
                         color="primary"
@@ -287,7 +280,7 @@ const AccountPage = ({ match, session, history }) => {
               >
                 {user.name}
               </Typography>
-              {amIFollowed && (
+              {user.isFollowsMe && (
                 <Typography
                   variant="body2"
                   color="textSecondary"
@@ -396,10 +389,10 @@ const AccountPage = ({ match, session, history }) => {
             />
           </TabPanel>
           <TabPanel value={tab} index={1}>
-            <UsersTab users={user.followers} />
+            <UsersTab username={user.username} isFollowers={true} />
           </TabPanel>
           <TabPanel value={tab} index={2}>
-            <UsersTab users={user.following} />
+            <UsersTab username={user.username} isFollowing={true} />
           </TabPanel>
         </Grid>
         <Dialog

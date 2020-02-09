@@ -90,13 +90,25 @@ export const GET_PAGINATED_NOTIFICATIONS = gql`
   }
 `;
 
-export const GET_USERS = gql`
-  query($limit: Int) {
-    users(limit: $limit) {
+export const GET_FRIENDS = gql`
+  query(
+    $username: String!
+    $isFollowers: Boolean
+    $isFollowing: Boolean
+    $limit: Int
+  ) {
+    friends(
+      username: $username
+      isFollowers: $isFollowers
+      isFollowing: $isFollowing
+      limit: $limit
+    ) {
       id
       username
       name
       bio
+      isFollowsMe
+      isFollowHim
       avatar {
         id
         path
@@ -104,26 +116,6 @@ export const GET_USERS = gql`
       cover {
         id
         path
-      }
-      followers {
-        id
-        username
-        name
-        bio
-        avatar {
-          id
-          path
-        }
-      }
-      following {
-        id
-        username
-        name
-        bio
-        avatar {
-          id
-          path
-        }
       }
     }
   }
@@ -135,18 +127,11 @@ export const GET_WHO_TO_FOLLOW = gql`
       id
       username
       name
+      isFollowsMe
+      isFollowHim
       avatar {
         id
         path
-      }
-      followers {
-        id
-        username
-        name
-        avatar {
-          id
-          path
-        }
       }
     }
   }
@@ -162,26 +147,8 @@ export const GET_USER = gql`
       followersCount
       followingCount
       messagesCount
-      followers {
-        id
-        username
-        name
-        bio
-        avatar {
-          id
-          path
-        }
-      }
-      following {
-        id
-        username
-        name
-        bio
-        avatar {
-          id
-          path
-        }
-      }
+      isFollowsMe
+      isFollowHim
       avatar {
         id
         path

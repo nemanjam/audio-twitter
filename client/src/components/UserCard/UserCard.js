@@ -77,11 +77,6 @@ const UserCard = ({ accountRefetch, session, username, ...rest }) => {
     refetch();
   };
 
-  const amIFollowing = user =>
-    !!user.followers.find(
-      user => user.username === session?.me?.username,
-    );
-
   if (loading) return <CircularProgress color="inherit" />;
   const { user } = data;
 
@@ -98,7 +93,7 @@ const UserCard = ({ accountRefetch, session, username, ...rest }) => {
       </CardMedia>
       <CardContent>
         <div className={classes.follow}>
-          {amIFollowing(user) ? (
+          {user.isFollowHim ? (
             <Button
               onClick={() => handleUnfollow(user)}
               variant="contained"

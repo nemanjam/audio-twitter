@@ -6,6 +6,7 @@ import { AuthenticationError, UserInputError } from 'apollo-server';
 import pubsub, { EVENTS } from '../subscription';
 import { isAdmin, isAuthenticated } from './authorization';
 import { processFile } from '../utils/upload';
+const ObjectId = mongoose.Types.ObjectId;
 
 const createToken = async (user, secret, expiresIn) => {
   const { id, email, username, role } = user;
@@ -21,7 +22,7 @@ export default {
       const filter = me
         ? {
             _id: {
-              $ne: mongoose.Types.ObjectId(me.id),
+              $ne: ObjectId(me.id),
             },
             // followersIds: { $ne: mongoose.Types.ObjectId(me.id) },
           }
@@ -30,10 +31,27 @@ export default {
         limit,
       });
     },
-    users: async (parent, { limit = 10 }, { models, me }) => {
-      const filter = me
-        ? { _id: { $ne: mongoose.Types.ObjectId(me.id) } }
-        : {};
+    friends: async (
+      parent,
+      { username, isFollowing, isFollowers, limit = 10 },
+      { models, me },
+    ) => {
+      const user = await models.User.findOne({ username });
+
+      const filter = {
+        // ...(me && {
+        //   _id: { $ne: ObjectId(me.id) },
+        // }),
+        ...(user &&
+          isFollowing && {
+            followersIds: { $in: [user.id] },
+          }),
+        ...(user &&
+          isFollowers && {
+            followingIds: { $in: [user.id] },
+          }),
+      };
+
       return await models.User.find(filter, null, {
         limit,
       });
@@ -259,6 +277,24 @@ export default {
         userId: user.id,
       });
       return messages.length;
+    },
+    isFollowHim: async (user, args, { models, me }) => {
+      const followers = await models.User.find({
+        followingIds: { $in: [user.id] },
+      });
+      const amIFollowing = !!followers.find(
+        user => user.username === me?.username,
+      );
+      return amIFollowing;
+    },
+    isFollowsMe: async (user, args, { models, me }) => {
+      const following = await models.User.find({
+        followersIds: { $in: [user.id] },
+      });
+      const amIFollowed = !!following.find(
+        user => user.username === me?.username,
+      );
+      return amIFollowed;
     },
   },
 };

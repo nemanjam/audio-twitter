@@ -135,68 +135,67 @@ const Notifications = ({ session }) => {
 
   return (
     <List className={classes.root}>
-      {!edges.length > 0 ? (
+      {edges.length === 0 && (
         <div className={classes.noNotifications}>
           There are no notifications yet ...
         </div>
-      ) : (
-        <>
-          {edges.map((notification, index) => {
-            return (
-              <Fragment key={index}>
-                <ListItem alignItems="flex-start">
-                  <ListItemAvatar>
-                    <Badge
-                      badgeContent={
-                        getActionText(notification.action).icon
-                      }
-                      color={getActionText(notification.action).color}
-                    >
-                      <Avatar
-                        alt={notification.user.name}
-                        src={`${UPLOADS_IMAGES_FOLDER}${notification.user.avatar.path}`}
-                      />
-                    </Badge>
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={
-                      <>
-                        <Link
-                          component={RouterLink}
-                          to={`/${notification.user.username}`}
-                          color="textPrimary"
-                          className={classes.username}
-                        >
-                          {notification.user.name}
-                        </Link>{' '}
-                        <Typography
-                          variant="body2"
-                          display="inline"
-                          color="textSecondary"
-                        >
-                          {getActionText(notification.action).text}
-                        </Typography>
-                      </>
+      )}
+      <>
+        {edges.map((notification, index) => {
+          return (
+            <Fragment key={index}>
+              <ListItem alignItems="flex-start">
+                <ListItemAvatar>
+                  <Badge
+                    badgeContent={
+                      getActionText(notification.action).icon
                     }
-                    secondary={
+                    color={getActionText(notification.action).color}
+                  >
+                    <Avatar
+                      alt={notification.user.name}
+                      src={`${UPLOADS_IMAGES_FOLDER}${notification.user.avatar.path}`}
+                    />
+                  </Badge>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={
+                    <>
+                      <Link
+                        component={RouterLink}
+                        to={`/${notification.user.username}`}
+                        color="textPrimary"
+                        className={classes.username}
+                      >
+                        {notification.user.name}
+                      </Link>{' '}
                       <Typography
-                        className={classes.timeAgo}
                         variant="body2"
+                        display="inline"
                         color="textSecondary"
                       >
-                        {moment(notification.createdAt).fromNow()}
+                        {getActionText(notification.action).text}
                       </Typography>
-                    }
-                  />
-                </ListItem>
-                {index !== edges.length - 1 && (
-                  <Divider variant="inset" component="li" />
-                )}
-              </Fragment>
-            );
-          })}
-        </>
-      )}
+                    </>
+                  }
+                  secondary={
+                    <Typography
+                      className={classes.timeAgo}
+                      variant="body2"
+                      color="textSecondary"
+                    >
+                      {moment(notification.createdAt).fromNow()}
+                    </Typography>
+                  }
+                />
+              </ListItem>
+              {index !== edges.length - 1 && (
+                <Divider variant="inset" component="li" />
+              )}
+            </Fragment>
+          );
+        })}
+      </>
     </List>
   );
 };

@@ -110,10 +110,11 @@ const Navigation = ({ session, match }) => {
   };
 
   const getActiveTabIndex = match => {
+    if (!session?.me) return false;
     if (match?.params?.username === session?.me?.username) return 1;
     if (match?.url === '/') return 0;
-    if (session?.me && match?.url === '/notifications') return 2;
-    if (session?.me && match?.url === '/admin') return 3;
+    if (match?.url === '/notifications') return 2;
+    if (match?.url === '/admin') return 3;
     return false;
   };
   //console.log(match);

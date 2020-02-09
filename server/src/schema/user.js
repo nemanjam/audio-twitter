@@ -2,7 +2,12 @@ import { gql } from 'apollo-server-express';
 
 export default gql`
   extend type Query {
-    users(limit: Int): [User!]
+    friends(
+      username: String!
+      isFollowing: Boolean
+      isFollowers: Boolean
+      limit: Int
+    ): [User!]
     whoToFollow(limit: Int): [User!]
     user(username: String!): User
     me: User
@@ -46,5 +51,7 @@ export default gql`
     followersCount: Int
     followingCount: Int
     messagesCount: Int
+    isFollowHim: Boolean
+    isFollowsMe: Boolean
   }
 `;

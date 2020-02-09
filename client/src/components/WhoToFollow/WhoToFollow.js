@@ -80,15 +80,6 @@ const WhoToFollow = ({ session, accountRefetch }) => {
   if (loading) return <CircularProgress color="inherit" />;
   const { whoToFollow } = data;
 
-  const amIFollowing = user =>
-    !!user.followers.find(
-      user => user.username === session?.me?.username,
-    );
-  const amIFollowed = user =>
-    !!user.following.find(
-      user => user.username === session?.me?.username,
-    );
-
   const handleFollow = async user => {
     await followUser({ variables: { username: user.username } });
     if (accountRefetch) accountRefetch();
@@ -184,7 +175,7 @@ const WhoToFollow = ({ session, accountRefetch }) => {
                     </Typography>
                   }
                 />
-                {amIFollowing(user) ? (
+                {user.isFollowHim ? (
                   <Button
                     onClick={() => handleUnfollow(user)}
                     variant="contained"
