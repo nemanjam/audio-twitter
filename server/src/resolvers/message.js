@@ -264,6 +264,7 @@ export default {
         const repostedMessage = await models.Message.create({
           fileId: originalMessage.fileId,
           userId: originalMessage.userId,
+          likesIds: originalMessage.likesIds,
           isReposted: true,
           repost: {
             reposterId: ObjectId(me.id),
@@ -331,7 +332,7 @@ export default {
     isLiked: async (message, args, { models, me }) => {
       if (!me) return false;
       const likedMessage = await models.Message.findById(message.id);
-      return likedMessage.likesIds?.includes(me.id) || false;
+      return likedMessage.likesIds?.includes(me.id) || false; //ista greska me nije dobar
     },
     repostsCount: async (message, args, { models }) => {
       //originals
@@ -397,21 +398,23 @@ export default {
           //console.log(payload);
           const reposterId =
             payload.messageCreated.message.repost.reposterId;
-          const reposter = models.User.findById(reposterId);
+          const reposter = await models.User.findById(reposterId);
           const followers = await models.User.find({
             followingIds: { $in: [reposterId] },
           });
-          const amIFollowingHim = !!followers.find(
+          const amIFollowingHim = followers.find(
             u => u.username === me.username,
           );
           // username je stranica
-          if (
-            (!me && !username) || // koji nisu logovani i na glavnom timelineu
-            username === reposter.username || //koji su na reposterovom profilu
-            amIFollowingHim || //na mom timelineu
-            username === me.username //ako sam ja na svom profilu
-          )
-            return true;
+          const cond1 = !me && !username; // koji nisu logovani i na glavnom timelineu
+          const cond2 = !!username && username === reposter.username; //koji su na reposterovom profilu
+          const cond3 =
+            !username &&
+            (amIFollowingHim || reposter.username === me.username); //na mom timelineu
+          const cond4 = username === me.username; //ako sam ja na svom profilu
+          console.log(cond1, cond2, cond3, cond4);
+
+          if (cond1 || cond2 || cond3 || cond4) return true;
           else return false;
         },
       ),
