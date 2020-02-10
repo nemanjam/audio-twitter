@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { models } from 'mongoose';
 import { combineResolvers } from 'graphql-resolvers';
 import { withFilter } from 'apollo-server';
 
@@ -107,7 +107,7 @@ export default {
         },
       ]);
 
-      console.log(messages);
+      // console.log(messages);
 
       const hasNextPage = messages.length > limit;
       const edges = hasNextPage ? messages.slice(0, -1) : messages; //-1 exclude zadnji
@@ -260,6 +260,7 @@ export default {
             message.repost.originalMessageId,
           );
         }
+
         const repostedMessage = await models.Message.create({
           fileId: originalMessage.fileId,
           userId: originalMessage.userId,
@@ -273,19 +274,19 @@ export default {
         //tu je greska, saljem staru poruku subskripciji
         //retvitovana poruka uopste ne postoji u bazi
         pubsub.publish(EVENTS.MESSAGE.CREATED, {
-          messageCreated: { message: repostedMessage },
+          messageCreated: { message: repostedMessage }, //subs treba da ubaci poruku
         });
 
         const notification = await models.Notification.findOneAndUpdate(
           {
-            ownerId: repostedMessage.userId,
-            messageId: repostedMessage._id,
+            ownerId: originalMessage.userId,
+            messageId: originalMessage.id,
             userId: me.id,
             action: 'repost',
           },
           {
-            ownerId: repostedMessage.userId,
-            messageId: repostedMessage._id,
+            ownerId: originalMessage.userId,
+            messageId: originalMessage.id,
             userId: me.id,
             action: 'repost',
           },
@@ -299,7 +300,7 @@ export default {
         pubsub.publish(EVENTS.NOTIFICATION.CREATED, {
           notificationCreated: { notification },
         });
-
+        //samo za update rt broja i zeleno
         return !!repostedMessage;
       },
     ),
@@ -337,7 +338,7 @@ export default {
       if (!message.isReposted) {
         return await models.Message.find({
           'repost.originalMessageId': message.id,
-        }).count();
+        }).countDocuments();
       } else {
         //rts
         const originalMessage = await models.Message.findById(
@@ -345,7 +346,7 @@ export default {
         );
         return await models.Message.find({
           'repost.originalMessageId': originalMessage.id,
-        }).count();
+        }).countDocuments();
       }
     },
     isRepostedByMe: async (message, args, { models, me }) => {
@@ -369,8 +370,8 @@ export default {
           'repost.originalMessageId': originalMessage.id,
         });
         //vidi dal me ima medju reposterima
-        const isRepostedByMe = allRts.find(m =>
-          m.repost.reposterId.equals(me.id),
+        const isRepostedByMe = allRts.find(
+          m => m.repost.reposterId.equals(me.id), //me nije isti kao u create message???
         );
         return !!isRepostedByMe;
       }
@@ -393,7 +394,24 @@ export default {
       subscribe: withFilter(
         () => pubsub.asyncIterator(EVENTS.MESSAGE.CREATED),
         async (payload, { username }, { me }) => {
-          if (!username || username === me?.username) return true;
+          //console.log(payload);
+          const reposterId =
+            payload.messageCreated.message.repost.reposterId;
+          const reposter = models.User.findById(reposterId);
+          const followers = await models.User.find({
+            followingIds: { $in: [reposterId] },
+          });
+          const amIFollowingHim = !!followers.find(
+            u => u.username === me.username,
+          );
+          // username je stranica
+          if (
+            (!me && !username) || // koji nisu logovani i na glavnom timelineu
+            username === reposter.username || //koji su na reposterovom profilu
+            amIFollowingHim || //na mom timelineu
+            username === me.username //ako sam ja na svom profilu
+          )
+            return true;
           else return false;
         },
       ),

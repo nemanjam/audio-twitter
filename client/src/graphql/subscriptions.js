@@ -10,6 +10,18 @@ export const MESSAGE_CREATED = gql`
         isLiked
         repostsCount
         isReposted
+        isRepostedByMe
+        repost {
+          reposter {
+            id
+            username
+            name
+          }
+          originalMessage {
+            id
+            createdAt
+          }
+        }
         user {
           id
           username

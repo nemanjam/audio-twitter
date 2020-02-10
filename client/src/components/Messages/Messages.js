@@ -140,7 +140,7 @@ const MessageList = ({
         }
 
         const { messageCreated } = subscriptionData.data;
-
+        console.log('messageCreated', messageCreated);
         return {
           ...previousResult,
           messages: {

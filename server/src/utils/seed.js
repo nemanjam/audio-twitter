@@ -123,8 +123,9 @@ export const createUsersWithMessages = async date => {
     });
   });
   // const notifications = await models.Notification.find();
-  //console.log(notifications);
+  // console.log(notifications);
 
+  /*
   //repost one message
   messages.slice(0, 1).map(async m => {
     const tomorrow = new Date();
@@ -142,4 +143,5 @@ export const createUsersWithMessages = async date => {
       },
     });
   });
+*/
 }; //

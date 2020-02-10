@@ -106,7 +106,7 @@ function MessagePlayer({
   const wavesurferId = `wavesurfer--${uuidv4()}`;
   const newIndex = useRef(0);
 
-  console.log(message);
+  // console.log(message);
 
   const [updateAutoplay] = useMutation(UPDATE_AUTOPLAY, {
     variables: { direction, createdAt, duration },
@@ -195,10 +195,10 @@ function MessagePlayer({
       const oldData = cache.readQuery({
         query: GET_PAGINATED_MESSAGES_WITH_USERS,
       });
-      console.log(oldData);
+      //console.log(oldData);
       const message = oldData.messages.edges.find(m => m.id === id);
-      message.isReposted = data.repostMessage;
-      //message.repostsCount = message.repostsCount + 1;
+      message.isRepostedByMe = data.repostMessage;
+      message.repostsCount++;
 
       const index = oldData.messages.edges.findIndex(
         m => m.id === id,
