@@ -76,6 +76,16 @@ const useStyles = makeStyles(theme => ({
   bold: {
     //fontWeight: 500,
   },
+  repost: {
+    paddingLeft: theme.spacing(6),
+    paddingBottom: 5,
+  },
+  repostIcon: {
+    color: theme.palette.text.secondary,
+    fontSize: 14,
+    marginRight: theme.spacing(1),
+    verticalAlign: 'middle',
+  },
 }));
 
 const usePrevious = value => {
@@ -288,11 +298,17 @@ function MessagePlayer({
       wavesurfer.current.stop();
     }
 
-    wavesurfer.current.on('finish', () => {
+    const finishHandler = () => {
       if (play) {
         updateAutoplay();
       }
-    });
+    };
+
+    wavesurfer.current.on('finish', finishHandler);
+
+    return () => {
+      wavesurfer.current.un('finish', finishHandler);
+    };
   }, [play, playerReady, duration]);
 
   useEffect(() => {
@@ -312,14 +328,29 @@ function MessagePlayer({
     });
 
     wavesurfer.current.load(path);
-    wavesurfer.current.on('loading', percentage => {
-      console.log('percentage', percentage);
-    });
-    wavesurfer.current.on('ready', () => {
+    // wavesurfer.current.on('loading', percentage => {
+    //   console.log('percentage', percentage);
+    // });
+
+    const readyHandler = () => {
       setPlayerReady(true);
-    });
-    wavesurfer.current.on('play', () => setIsPlaying(true));
-    wavesurfer.current.on('pause', () => setIsPlaying(false));
+    };
+    const playHandler = () => {
+      setIsPlaying(true);
+    };
+    const pauseHandler = () => {
+      setIsPlaying(false);
+    };
+
+    wavesurfer.current.on('ready', readyHandler);
+    wavesurfer.current.on('play', playHandler);
+    wavesurfer.current.on('pause', pauseHandler);
+
+    return () => {
+      wavesurfer.current.un('ready', readyHandler);
+      wavesurfer.current.un('play', playHandler);
+      wavesurfer.current.un('pause', pauseHandler);
+    };
   }, [theme]);
 
   const togglePlayback = () => {
@@ -353,125 +384,143 @@ function MessagePlayer({
   return (
     <>
       <ListItem className={classes.root}>
-        <Grid container>
-          <Grid item className={classes.avatarItem}>
-            <Link component={RouterLink} to={`/${username}`}>
-              <Avatar className={classes.avatar} src={avatar} />
-            </Link>
-          </Grid>
-          <Grid item container className={classes.flex}>
-            <Grid item>
-              <Typography
-                variant="body1"
-                color="textPrimary"
-                className={classes.bold}
-                display="inline"
-              >
-                <Link
-                  component={RouterLink}
-                  to={`/${username}`}
-                  color="inherit"
-                >
-                  {name}
-                </Link>
-              </Typography>
-              <Typography display="inline"> · </Typography>
-              <Typography
-                variant="body1"
-                color="textSecondary"
-                display="inline"
-              >
-                {`@${username}`}
-              </Typography>
-              <Typography display="inline"> · </Typography>
+        <Grid container direction="column">
+          {message.isReposted && (
+            <Grid item className={classes.repost}>
+              <RepeatIcon className={classes.repostIcon} />
               <Typography
                 variant="body2"
                 color="textSecondary"
                 display="inline"
               >
-                {moment(createdAt).fromNow()}
+                {`${message?.repost?.reposter?.name} reposted your message`}
               </Typography>
             </Grid>
-            <Grid container direction="column">
-              <Grid
-                item
-                id={wavesurferId}
-                className={classes.wavesurfer}
-              />
-              {!playerReady && (
-                <CircularProgress
-                  style={{
-                    position: 'absolute',
-                    top: '50px',
-                    right: '50%',
-                  }}
+          )}
+          <Grid container item>
+            <Grid item className={classes.avatarItem}>
+              <Link component={RouterLink} to={`/${username}`}>
+                <Avatar className={classes.avatar} src={avatar} />
+              </Link>
+            </Grid>
+            <Grid item container className={classes.flex}>
+              <Grid item>
+                <Typography
+                  variant="body1"
+                  color="textPrimary"
+                  className={classes.bold}
+                  display="inline"
+                >
+                  <Link
+                    component={RouterLink}
+                    to={`/${username}`}
+                    color="inherit"
+                  >
+                    {name}
+                  </Link>
+                </Typography>
+                <Typography display="inline"> · </Typography>
+                <Typography
+                  variant="body1"
+                  color="textSecondary"
+                  display="inline"
+                >
+                  {`@${username}`}
+                </Typography>
+                <Typography display="inline"> · </Typography>
+                <Typography
+                  variant="body2"
+                  color="textSecondary"
+                  display="inline"
+                >
+                  {moment(
+                    message.isReposted
+                      ? message.repost.originalMessage.createdAt
+                      : createdAt,
+                  ).fromNow()}
+                </Typography>
+              </Grid>
+              <Grid container direction="column">
+                <Grid
+                  item
+                  id={wavesurferId}
+                  className={classes.wavesurfer}
                 />
-              )}
-              <Grid
-                item
-                container
-                justify="space-between"
-                className={classes.buttons}
-              >
-                <Grid item container sm={5} xs={12} spacing={1}>
-                  <Grid item>{transportPlayButton}</Grid>
-                  <Grid item>
-                    <IconButton onClick={stopPlayback}>
-                      <StopIcon className={classes.icon} />
-                    </IconButton>
-                  </Grid>
-                </Grid>
+                {!playerReady && (
+                  <CircularProgress
+                    style={{
+                      position: 'absolute',
+                      top: '50px',
+                      right: '50%',
+                    }}
+                  />
+                )}
                 <Grid
                   item
                   container
-                  sm={7}
-                  xs={12}
                   justify="space-between"
+                  className={classes.buttons}
                 >
-                  <Grid item>
-                    <IconButton onClick={handleLike}>
-                      <FavoriteIcon
-                        style={
-                          message.isLiked ? { color: red[500] } : {}
-                        }
-                        className={classes.icon}
-                      />
-                    </IconButton>
-                    {message.likesCount > 0 && (
-                      <Typography
-                        display="inline"
-                        variant="body2"
-                        color="textSecondary"
-                      >
-                        {message.likesCount}
-                      </Typography>
-                    )}
+                  <Grid item container sm={5} xs={12} spacing={1}>
+                    <Grid item>{transportPlayButton}</Grid>
+                    <Grid item>
+                      <IconButton onClick={stopPlayback}>
+                        <StopIcon className={classes.icon} />
+                      </IconButton>
+                    </Grid>
                   </Grid>
-                  <Grid item>
-                    <IconButton onClick={handleRepost}>
-                      <RepeatIcon
-                        style={
-                          message.isRepostedByMe
-                            ? { color: green[500] }
-                            : {}
-                        }
-                        className={classes.icon}
-                      />
-                    </IconButton>
-                    {message.repostsCount > 0 && (
-                      <Typography
-                        display="inline"
-                        variant="body2"
-                        color="textSecondary"
-                      >
-                        {message.repostsCount}
-                      </Typography>
-                    )}
-                  </Grid>
-                  <Grid item>
-                    <IconButton>
-                      <DeleteIcon className={classes.icon} />
-                    </IconButton>
+                  <Grid
+                    item
+                    container
+                    sm={7}
+                    xs={12}
+                    justify="space-between"
+                  >
+                    <Grid item>
+                      <IconButton onClick={handleLike}>
+                        <FavoriteIcon
+                          style={
+                            message.isLiked ? { color: red[500] } : {}
+                          }
+                          className={classes.icon}
+                        />
+                      </IconButton>
+                      {message.likesCount > 0 && (
+                        <Typography
+                          display="inline"
+                          variant="body2"
+                          color="textSecondary"
+                        >
+                          {message.likesCount}
+                        </Typography>
+                      )}
+                    </Grid>
+                    <Grid item>
+                      <IconButton onClick={handleRepost}>
+                        <RepeatIcon
+                          style={
+                            message.isRepostedByMe
+                              ? { color: green[500] }
+                              : {}
+                          }
+                          className={classes.icon}
+                        />
+                      </IconButton>
+                      {message.repostsCount > 0 && (
+                        <Typography
+                          display="inline"
+                          variant="body2"
+                          color="textSecondary"
+                        >
+                          {message.repostsCount}
+                        </Typography>
+                      )}
+                    </Grid>
+                    <Grid item>
+                      <IconButton>
+                        <DeleteIcon className={classes.icon} />
+                      </IconButton>
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>

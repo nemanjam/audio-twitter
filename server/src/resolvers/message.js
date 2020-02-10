@@ -395,7 +395,7 @@ export default {
       subscribe: withFilter(
         () => pubsub.asyncIterator(EVENTS.MESSAGE.CREATED),
         async (payload, { username }, { me }) => {
-          //console.log(payload);
+          // console.log(payload);//
           const reposterId =
             payload.messageCreated.message.repost.reposterId;
           const reposter = await models.User.findById(reposterId);

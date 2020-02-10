@@ -72,9 +72,10 @@ const server = new ApolloServer({
   context: async ({ req, connection }) => {
     // subskribcije
     if (connection) {
-      // console.log('connection ', connection);
+      const me = connection.context.me;
+      console.log('ws me ', me?.username, me?.id);
       return {
-        me: connection.context.me,
+        me,
         models,
         loaders: {
           // batching, samo unique keys usera, nema ponavljanja
@@ -96,6 +97,7 @@ const server = new ApolloServer({
     // http, mutacije i queries
     if (req) {
       const me = await getMe(req);
+      console.log('http me ', me?.username, me?.id);
 
       return {
         models,
