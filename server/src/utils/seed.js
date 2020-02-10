@@ -1,5 +1,8 @@
+import mongoose from 'mongoose';
 import faker from 'faker';
 import models from '../models';
+// import moment from 'moment';
+const ObjectId = mongoose.Types.ObjectId;
 
 export const createUsersWithMessages = async date => {
   console.log('seeding automated...');
@@ -69,7 +72,7 @@ export const createUsersWithMessages = async date => {
     const message1 = new models.Message({
       fileId: audio1.id,
       userId: userId,
-      createdAt: date.setSeconds(date.getSeconds() + index),
+      createdAt: date.setSeconds(date.getSeconds() - index),
     });
     return { audio1, message1 };
   });
@@ -83,6 +86,7 @@ export const createUsersWithMessages = async date => {
     }),
   );
 
+  // like one message from each user and create notification
   // get one message from each user
   //const messages = await models.Message.find({ distinct: 'userId' });
 
@@ -95,7 +99,6 @@ export const createUsersWithMessages = async date => {
             _id: '$_id',
             userId: '$userId',
             likesIds: '$likesIds',
-            reposts: '$reposts',
           },
         },
       },
@@ -119,7 +122,24 @@ export const createUsersWithMessages = async date => {
       userId: m.docs.userId,
     });
   });
-  const notifications = await models.Notification.find();
-
+  // const notifications = await models.Notification.find();
   //console.log(notifications);
-};
+
+  //repost one message
+  messages.slice(0, 1).map(async m => {
+    const tomorrow = new Date();
+    tomorrow.setDate(new Date().getDate() + 1);
+
+    const originalMessage = await models.Message.findById(m.docs._id);
+
+    const repostedMessage = await models.Message.create({
+      fileId: originalMessage.fileId,
+      userId: originalMessage.userId,
+      isReposted: true,
+      repost: {
+        reposterId: originalMessage.userId,
+        originalMessageId: originalMessage.id,
+      },
+    });
+  });
+}; //

@@ -29,6 +29,11 @@ export default gql`
     endCursor: String!
   }
 
+  type Repost {
+    reposter: User
+    originalMessage: Message
+  }
+
   type Message {
     id: ID!
     createdAt: Date!
@@ -37,7 +42,9 @@ export default gql`
     likesCount: Int!
     isLiked: Boolean!
     repostsCount: Int!
+    isRepostedByMe: Boolean!
     isReposted: Boolean!
+    repost: Repost
   }
 
   extend type Subscription {

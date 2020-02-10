@@ -5,6 +5,7 @@ import { withFilter } from 'apollo-server';
 import pubsub, { EVENTS } from '../subscription';
 import { isAuthenticated, isMessageOwner } from './authorization';
 import { processFile } from '../utils/upload';
+const ObjectId = mongoose.Types.ObjectId;
 
 // to base64, da klijent aplikacija ne bi radila sa datumom nego sa stringom
 const toCursorHash = string => Buffer.from(string).toString('base64');
@@ -23,46 +24,40 @@ export default {
       { cursor, limit = 100, username },
       { models, me },
     ) => {
-      const ObjectId = mongoose.Types.ObjectId;
+      //user cija je profile stranica
       const user = username
         ? await models.User.findOne({
             username,
           })
         : null;
 
-      //me je user sa clienta, iz tokena
+      //me je user sa clienta, iz tokena, logovani user
       const meUser = me ? await models.User.findById(me.id) : null;
       //console.log(meUser);
 
+      const cursorTime = cursor
+        ? new Date(fromCursorHash(cursor)) //.toISOString()
+        : null;
+
+      //console.log(cursor, cursorTime);
+
       const match = {
         // za prvi upit ne treba cursor
-        ...(cursor && {
-          newCreatedAt: {
-            $lt: new Date(fromCursorHash(cursor)), //MORA NEW DATE()
+        ...(cursorTime && {
+          createdAt: {
+            $lt: cursorTime, //MORA NEW DATE(), sa toISOString ne radi
           },
         }),
         // user page
         ...(username && {
           $or: [
+            //njegovi
             {
-              //njegovi originali
-              $and: [
-                {
-                  userId: ObjectId(user.id),
-                },
-                { original: true },
-              ],
+              userId: ObjectId(user.id),
             },
             //ili tudji koje je on rt
             {
-              $and: [
-                {
-                  reposts: {
-                    $elemMatch: { reposterId: ObjectId(user.id) },
-                  },
-                },
-                { original: { $ne: true } },
-              ],
+              'repost.reposterId': ObjectId(user.id),
             },
           ],
         }),
@@ -80,23 +75,12 @@ export default {
               },
               //rt-ovi onih koje pratim i moji
               {
-                $and: [
-                  {
-                    reposts: {
-                      $elemMatch: {
-                        reposterId: {
-                          $in: [
-                            ...meUser.followingIds.map(id =>
-                              ObjectId(id),
-                            ),
-                            ObjectId(me.id),
-                          ],
-                        },
-                      },
-                    },
-                  },
-                  { original: { $ne: true } },
-                ],
+                'reposts.reposterId': {
+                  $in: [
+                    ...meUser.followingIds.map(id => ObjectId(id)),
+                    ObjectId(me.id),
+                  ],
+                },
               },
             ],
           }),
@@ -106,30 +90,16 @@ export default {
 
       // console.log(JSON.stringify(match, null, 2));
 
-      const aMessages = await models.Message.aggregate([
+      const messages = await models.Message.aggregate([
         {
           $addFields: {
-            newReposts: {
-              $concatArrays: [
-                [{ createdAt: '$createdAt', original: true }],
-                '$reposts',
-              ],
-            },
-          },
-        },
-        {
-          $unwind: '$newReposts', //pomnozi polje
-        },
-        {
-          $addFields: {
-            newCreatedAt: '$newReposts.createdAt',
-            original: '$newReposts.original',
+            id: { $toString: '$_id' },
           },
         },
         { $match: match },
         {
           $sort: {
-            newCreatedAt: -1,
+            createdAt: -1,
           },
         },
         {
@@ -137,11 +107,7 @@ export default {
         },
       ]);
 
-      const messages = aMessages.map(m => {
-        m.id = m._id.toString();
-        return m;
-      });
-      //console.log(messages);
+      console.log(messages);
 
       const hasNextPage = messages.length > limit;
       const edges = hasNextPage ? messages.slice(0, -1) : messages; //-1 exclude zadnji
@@ -151,7 +117,7 @@ export default {
         pageInfo: {
           hasNextPage,
           endCursor: toCursorHash(
-            edges[edges.length - 1].newCreatedAt.toString(),
+            edges[edges.length - 1].createdAt.toString(),
           ),
         },
       };
@@ -282,12 +248,30 @@ export default {
     repostMessage: combineResolvers(
       isAuthenticated,
       async (parent, { messageId }, { models, me }) => {
-        const repostedMessage = await models.Message.findOneAndUpdate(
-          { _id: messageId },
-          { $push: { reposts: { reposterId: me.id } } },
-          { new: true },
-        );
+        const message = await models.Message.findById(messageId);
+        let originalMessage;
 
+        if (!message.isReposted) {
+          originalMessage = message;
+        } else {
+          //retvitujem retvit
+          //nadji original
+          originalMessage = await models.Message.findById(
+            message.repost.originalMessageId,
+          );
+        }
+        const repostedMessage = await models.Message.create({
+          fileId: originalMessage.fileId,
+          userId: originalMessage.userId,
+          isReposted: true,
+          repost: {
+            reposterId: ObjectId(me.id),
+            originalMessageId: originalMessage.id,
+          },
+        });
+
+        //tu je greska, saljem staru poruku subskripciji
+        //retvitovana poruka uopste ne postoji u bazi
         pubsub.publish(EVENTS.MESSAGE.CREATED, {
           messageCreated: { message: repostedMessage },
         });
@@ -349,16 +333,58 @@ export default {
       return likedMessage.likesIds?.includes(me.id) || false;
     },
     repostsCount: async (message, args, { models }) => {
-      const rpMessage = await models.Message.findById(message.id);
-      return rpMessage.reposts?.length || 0;
+      //originals
+      if (!message.isReposted) {
+        return await models.Message.find({
+          'repost.originalMessageId': message.id,
+        }).count();
+      } else {
+        //rts
+        const originalMessage = await models.Message.findById(
+          message.repost.originalMessageId,
+        );
+        return await models.Message.find({
+          'repost.originalMessageId': originalMessage.id,
+        }).count();
+      }
     },
-    isReposted: async (message, args, { models, me }) => {
+    isRepostedByMe: async (message, args, { models, me }) => {
       if (!me) return false;
-      const rpMessage = await models.Message.findById(message.id);
-      const repost = rpMessage.reposts?.find(r =>
-        r.reposterId.equals(me.id),
+      if (!message.isReposted) {
+        const allRts = await models.Message.find({
+          'repost.originalMessageId': message.id,
+        });
+        const isRepostedByMe = allRts.find(m =>
+          m.repost.reposterId.equals(me.id),
+        );
+        return !!isRepostedByMe;
+      } else {
+        //rts
+        //nadji original
+        const originalMessage = await models.Message.findById(
+          message.repost.originalMessageId,
+        );
+        //nadji sve retvitove
+        const allRts = await models.Message.find({
+          'repost.originalMessageId': originalMessage.id,
+        });
+        //vidi dal me ima medju reposterima
+        const isRepostedByMe = allRts.find(m =>
+          m.repost.reposterId.equals(me.id),
+        );
+        return !!isRepostedByMe;
+      }
+    },
+    repost: async (message, args, { models }) => {
+      if (!message.isReposted) return null;
+
+      const reposter = await models.User.findById(
+        message.repost.reposterId,
       );
-      return !!repost;
+      const originalMessage = await models.Message.findById(
+        message.repost.originalMessageId,
+      );
+      return { reposter, originalMessage };
     },
   },
 

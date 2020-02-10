@@ -10,6 +10,18 @@ export const GET_ALL_MESSAGES_WITH_USERS = gql`
         isLiked
         repostsCount
         isReposted
+        isRepostedByMe
+        repost {
+          reposter {
+            id
+            username
+            name
+          }
+          originalMessage {
+            id
+            createdAt
+          }
+        }
         user {
           id
           username
@@ -42,6 +54,18 @@ export const GET_PAGINATED_MESSAGES_WITH_USERS = gql`
         isLiked
         repostsCount
         isReposted
+        isRepostedByMe
+        repost {
+          reposter {
+            id
+            username
+            name
+          }
+          originalMessage {
+            id
+            createdAt
+          }
+        }
         user {
           id
           username

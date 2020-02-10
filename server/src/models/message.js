@@ -13,15 +13,20 @@ const messageSchema = new mongoose.Schema(
       required: true,
     },
     likesIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    reposts: [
-      {
-        reposterId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'User',
-        },
-        createdAt: { type: Date, default: Date.now },
+    isReposted: {
+      type: mongoose.Schema.Types.Boolean,
+      default: false,
+    },
+    repost: {
+      reposterId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
       },
-    ],
+      originalMessageId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Message',
+      },
+    },
   },
   {
     timestamps: true,
