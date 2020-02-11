@@ -281,7 +281,7 @@ export default {
 
           if (myRt) {
             await publishMessageNotification(message, me, 'unrepost');
-            myRt.remove();
+            await myRt.remove();
             return true;
           } else return false;
         } else {

@@ -208,7 +208,7 @@ function MessagePlayer({
       const oldData = cache.readQuery({
         query: GET_ALL_MESSAGES_WITH_USERS,
       });
-      //console.log(oldData);
+      console.log(oldData);
       const message = oldData.messages.edges.find(m => m.id === id);
       message.isRepostedByMe = data.repostMessage;
       message.repostsCount++;
@@ -246,19 +246,46 @@ function MessagePlayer({
       });
       const message = oldData.messages.edges.find(m => m.id === id);
 
-      if (message.repostsCount === 0) return;
+      if (message.repostsCount === 0 || !message.isRepostedByMe)
+        return;
       if (data.unrepostMessage && message.repostsCount === 1) {
-        const newData = {
-          messages: {
-            ...oldData.messages,
-            edges: oldData.messages.edges.filter(
-              m => m.id !== message.id,
-            ),
-            pageInfo: {
-              ...oldData.messages.pageInfo,
+        let newData;
+        if (message.isReposted) {
+          //repost
+          newData = {
+            messages: {
+              ...oldData.messages,
+              edges: oldData.messages.edges.filter(
+                m => m.id !== message.id,
+              ),
+              pageInfo: {
+                ...oldData.messages.pageInfo,
+              },
             },
-          },
-        };
+          };
+        } else {
+          //original
+          const index = oldData.messages.edges.findIndex(
+            m => m.id === id,
+          );
+          message.isRepostedByMe = false;
+          message.isReposted = false;
+          message.repostsCount = 0;
+
+          newData = {
+            messages: {
+              ...oldData.messages,
+              edges: [
+                ...oldData.messages.edges.slice(0, index),
+                message,
+                ...oldData.messages.edges.slice(index + 1),
+              ],
+              pageInfo: {
+                ...oldData.messages.pageInfo,
+              },
+            },
+          };
+        }
         cache.writeQuery({
           query: GET_ALL_MESSAGES_WITH_USERS,
           data: newData,
