@@ -165,8 +165,8 @@ const MessageList = ({
         }
 
         const { messageCreated } = subscriptionData.data;
-        console.log('messageCreated', messageCreated);
-        return {
+
+        const result = {
           ...previousResult,
           messages: {
             ...previousResult.messages,
@@ -176,9 +176,17 @@ const MessageList = ({
             ],
           },
         };
+        console.log(
+          'message',
+          messageCreated.message,
+          'result',
+          result,
+        );
+
+        return result;
       },
     });
-  }, [subscribeToMore]);
+  }, [subscribeToMore, username]);
 
   useEffect(() => {
     subscribeToMoreMessage();

@@ -96,6 +96,7 @@ const client = new ApolloClient({
   cache,
   resolvers,
   typeDefs,
+  dataIdFromObject: o => o.id,
 });
 
 const data = {

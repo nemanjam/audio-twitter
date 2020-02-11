@@ -10,6 +10,7 @@ export const CREATE_MESSAGE = gql`
         username
       }
       file {
+        id
         path
       }
     }

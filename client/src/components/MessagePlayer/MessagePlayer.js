@@ -129,7 +129,7 @@ function MessagePlayer({
   const {
     data: { messagesVariables },
   } = useQuery(GET_MESSAGES_VARIABLES);
-  console.log(messagesVariables);
+  //console.log(messagesVariables);
 
   const [likeMessage] = useMutation(LIKE_MESSAGE, {
     variables: { messageId: id },
@@ -400,6 +400,7 @@ function MessagePlayer({
     });
 
     wavesurfer.current.load(path);
+    console.log(path);
     // wavesurfer.current.on('loading', percentage => {
     //   console.log('percentage', percentage);
     // });
@@ -423,7 +424,7 @@ function MessagePlayer({
       wavesurfer.current.un('play', playHandler);
       wavesurfer.current.un('pause', pauseHandler);
     };
-  }, [theme]);
+  }, [theme, path]);
 
   const togglePlayback = () => {
     if (!isPlaying) {

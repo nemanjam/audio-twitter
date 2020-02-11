@@ -65,7 +65,7 @@ export default {
         ? new Date(fromCursorHash(cursor)) //.toISOString()
         : null;
 
-      //console.log(cursor, cursorTime);
+      // console.log(cursor, cursorTime);
 
       const match = {
         // za prvi upit ne treba cursor
@@ -79,11 +79,11 @@ export default {
           $or: [
             //njegovi
             {
-              userId: ObjectId(user.id),
+              userId: user.id,
             },
             //ili tudji koje je on rt
             {
-              'repost.reposterId': ObjectId(user.id),
+              'repost.reposterId': user.id,
             },
           ],
         }),
@@ -93,19 +93,13 @@ export default {
             $or: [
               {
                 userId: {
-                  $in: [
-                    ...meUser.followingIds.map(id => ObjectId(id)),
-                    ObjectId(me.id),
-                  ],
+                  $in: [...meUser.followingIds, ObjectId(me.id)],
                 },
               },
               //rt-ovi onih koje pratim i moji
               {
                 'reposts.reposterId': {
-                  $in: [
-                    ...meUser.followingIds.map(id => ObjectId(id)),
-                    ObjectId(me.id),
-                  ],
+                  $in: [...meUser.followingIds, ObjectId(me.id)],
                 },
               },
             ],
@@ -113,8 +107,7 @@ export default {
         //timeline for non loged user, all tweets
         ...(!meUser && !username && {}),
       };
-
-      // console.log(JSON.stringify(match, null, 2));
+      //console.log(JSON.stringify(match, null, 2));
 
       const messages = await models.Message.aggregate([
         {
@@ -167,6 +160,7 @@ export default {
           fileId: fileSaved.id,
           userId: me.id,
         });
+
         pubsub.publish(EVENTS.MESSAGE.CREATED, {
           messageCreated: { message },
         });
@@ -255,10 +249,10 @@ export default {
         });
 
         //tu je greska, saljem staru poruku subskripciji
-        //retvitovana poruka uopste ne postoji u bazi
-        pubsub.publish(EVENTS.MESSAGE.CREATED, {
-          messageCreated: { message: repostedMessage }, //subs treba da ubaci poruku
-        });
+        // retvitovana poruka uopste ne postoji u bazi
+        // pubsub.publish(EVENTS.MESSAGE.CREATED, {
+        //   messageCreated: { message: repostedMessage }, //subs treba da ubaci poruku
+        // });
         await publishMessageNotification(
           originalMessage,
           me,
@@ -375,27 +369,49 @@ export default {
       subscribe: withFilter(
         () => pubsub.asyncIterator(EVENTS.MESSAGE.CREATED),
         async (payload, { username }, { me }) => {
-          // console.log(payload);//
-          const reposterId =
-            payload.messageCreated.message.repost.reposterId;
-          const reposter = await models.User.findById(reposterId);
-          const followers = await models.User.find({
-            followingIds: { $in: [reposterId] },
-          });
-          const amIFollowingHim = !!followers.find(
-            u => u.username === me.username,
-          );
-          // username je stranica
-          const cond1 = !me && !username; // koji nisu logovani i na glavnom timelineu
-          const cond2 = !!username && username === reposter.username; //koji su na reposterovom profilu
-          const cond3 =
-            !username &&
-            (amIFollowingHim || reposter.username === me.username); //na mom timelineu
-          const cond4 = username === me.username; //ako sam ja na svom profilu
-          console.log(cond1, cond2, cond3, cond4);
+          //console.log(payload);
+          if (payload.messageCreated.message.isReposted) {
+            const reposterId =
+              payload.messageCreated.message.repost.reposterId;
+            const reposter = await models.User.findById(reposterId);
+            const followers = await models.User.find({
+              followingIds: { $in: [reposterId] },
+            });
+            const amIFollowingHim = !!followers.find(
+              u => u.username === me.username,
+            );
+            // username je stranica
+            const cond1 = !me && !username; // koji nisu logovani i na glavnom timelineu
+            const cond2 =
+              !!username && username === reposter.username; //koji su na reposterovom profilu
+            const cond3 =
+              !username &&
+              (amIFollowingHim || reposter.username === me.username); //na mom timelineu
+            const cond4 = username === me.username; //ako sam ja na svom profilu
+            console.log('repost ', cond1, cond2, cond3, cond4);
 
-          if (cond1 || cond2 || cond3 || cond4) return true;
-          else return false;
+            if (cond1 || cond2 || cond3 || cond4) return true;
+            else return false;
+          } else {
+            const userId = payload.messageCreated.message.userId;
+            const user = await models.User.findById(userId);
+            const followers = await models.User.find({
+              followingIds: { $in: [userId] },
+            });
+            const amIFollowingHim = !!followers.find(
+              u => u.username === me.username,
+            );
+
+            const cond1 = !me && !username; // koji nisu logovani i na glavnom timelineu
+            const cond2 = !!username && username === user.username; //koji su na userovom profilu
+            const cond3 =
+              !username &&
+              (amIFollowingHim || user.username === me.username); //na mom timelineu
+            const cond4 = username === me.username; //ako sam ja na svom profilu
+            console.log('user message ', cond1, cond2, cond3, cond4);
+            if (cond1 || cond2 || cond3 || cond4) return true;
+            else return false;
+          }
         },
       ),
     },

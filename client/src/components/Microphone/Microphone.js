@@ -165,6 +165,7 @@ const Microphone = () => {
     if (tempFile) {
       try {
         const file = await BlobURLToFile(tempFile);
+
         await createMessage({
           variables: { file },
           context: {
@@ -179,6 +180,7 @@ const Microphone = () => {
             },
           },
         });
+
         setTempFile(null);
         setRecord(false);
         setOpen(false);
