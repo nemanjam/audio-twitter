@@ -119,6 +119,7 @@ function MessagePlayer({
   const [isPlaying, setIsPlaying] = useState(false);
   const wavesurferId = `wavesurfer--${uuidv4()}`;
   const newIndex = useRef(0);
+  const [reloadWaveSurfer, setReloadWaveSurfer] = useState(0);
 
   // console.log(message);
 
@@ -206,6 +207,7 @@ function MessagePlayer({
     } else {
       const liked = await likeMessage();
     }
+    setReloadWaveSurfer(Math.random());
   };
 
   const [repostMessage] = useMutation(REPOST_MESSAGE, {
@@ -216,41 +218,6 @@ function MessagePlayer({
         variables: messagesVariables,
       },
     ],
-
-    /*
-    update: (cache, { data }) => {
-      const oldData = cache.readQuery({
-        query: GET_ALL_MESSAGES_WITH_USERS,
-      });
-      console.log(oldData);
-      const message = oldData.messages.edges.find(m => m.id === id);
-      message.isRepostedByMe = data.repostMessage;
-      message.repostsCount++;
-
-      const index = oldData.messages.edges.findIndex(
-        m => m.id === id,
-      );
-
-      const newData = {
-        messages: {
-          ...oldData.messages,
-          edges: [
-            ...oldData.messages.edges.slice(0, index),
-            message,
-            ...oldData.messages.edges.slice(index + 1),
-          ],
-          pageInfo: {
-            ...oldData.messages.pageInfo,
-          },
-        },
-      };
-
-      cache.writeQuery({
-        query: GET_ALL_MESSAGES_WITH_USERS,
-        data: newData,
-      });
-    },
-    */
   });
   const [unrepostMessage] = useMutation(UNREPOST_MESSAGE, {
     variables: { messageId: id },
@@ -260,85 +227,6 @@ function MessagePlayer({
         variables: messagesVariables,
       },
     ],
-
-    /*update: (cache, { data }) => {
-      const oldData = cache.readQuery({
-        query: GET_ALL_MESSAGES_WITH_USERS,
-      });
-      const message = oldData.messages.edges.find(m => m.id === id);
-
-      if (message.repostsCount === 0 || !message.isRepostedByMe)
-        return;
-      if (data.unrepostMessage && message.repostsCount === 1) {
-        let newData;
-        if (message.isReposted) {
-          //repost
-          newData = {
-            messages: {
-              ...oldData.messages,
-              edges: oldData.messages.edges.filter(
-                m => m.id !== message.id,
-              ),
-              pageInfo: {
-                ...oldData.messages.pageInfo,
-              },
-            },
-          };
-        } else {
-          //original
-          const index = oldData.messages.edges.findIndex(
-            m => m.id === id,
-          );
-          message.isRepostedByMe = false;
-          message.isReposted = false;
-          message.repostsCount = 0;
-
-          newData = {
-            messages: {
-              ...oldData.messages,
-              edges: [
-                ...oldData.messages.edges.slice(0, index),
-                message,
-                ...oldData.messages.edges.slice(index + 1),
-              ],
-              pageInfo: {
-                ...oldData.messages.pageInfo,
-              },
-            },
-          };
-        }
-        cache.writeQuery({
-          query: GET_ALL_MESSAGES_WITH_USERS,
-          data: newData,
-        });
-      }
-      if (data.unrepostMessage && message.repostsCount > 1) {
-        const index = oldData.messages.edges.findIndex(
-          m => m.id === id,
-        );
-
-        message.isRepostedByMe = false;
-        message.repostsCount--;
-
-        const newData = {
-          messages: {
-            ...oldData.messages,
-            edges: [
-              ...oldData.messages.edges.slice(0, index),
-              message,
-              ...oldData.messages.edges.slice(index + 1),
-            ],
-            pageInfo: {
-              ...oldData.messages.pageInfo,
-            },
-          },
-        };
-        cache.writeQuery({
-          query: GET_ALL_MESSAGES_WITH_USERS,
-          data: newData,
-        });
-      }
-    },*/
   });
 
   const handleRepost = async () => {
@@ -347,6 +235,7 @@ function MessagePlayer({
     } else {
       const reposted = await repostMessage();
     }
+    setReloadWaveSurfer(Math.random());
   };
 
   // console.log(message);
@@ -384,7 +273,12 @@ function MessagePlayer({
   }, [play, playerReady, duration]);
 
   useEffect(() => {
-    if (wavesurfer.current) wavesurfer.current.destroy();
+    if (wavesurfer.current) {
+      wavesurfer.current.load(path);
+      return () => {
+        wavesurfer.current.unAll();
+      };
+    }
 
     wavesurfer.current = WaveSurfer.create({
       container: `#${wavesurferId}`,
@@ -400,7 +294,6 @@ function MessagePlayer({
     });
 
     wavesurfer.current.load(path);
-    console.log(path);
     // wavesurfer.current.on('loading', percentage => {
     //   console.log('percentage', percentage);
     // });
