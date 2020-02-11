@@ -30,7 +30,10 @@ import {
   UNREPOST_MESSAGE,
 } from '../../graphql/mutations';
 
-import { GET_PAGINATED_MESSAGES_WITH_USERS } from '../../graphql/queries';
+import {
+  GET_PAGINATED_MESSAGES_WITH_USERS,
+  GET_ALL_MESSAGES_WITH_USERS,
+} from '../../graphql/queries';
 
 import {
   UPLOADS_AUDIO_FOLDER,
@@ -203,7 +206,7 @@ function MessagePlayer({
     variables: { messageId: id },
     update: (cache, { data }) => {
       const oldData = cache.readQuery({
-        query: GET_PAGINATED_MESSAGES_WITH_USERS,
+        query: GET_ALL_MESSAGES_WITH_USERS,
       });
       //console.log(oldData);
       const message = oldData.messages.edges.find(m => m.id === id);
@@ -229,48 +232,69 @@ function MessagePlayer({
       };
 
       cache.writeQuery({
-        query: GET_PAGINATED_MESSAGES_WITH_USERS,
+        query: GET_ALL_MESSAGES_WITH_USERS,
         data: newData,
       });
     },
   });
   const [unrepostMessage] = useMutation(UNREPOST_MESSAGE, {
     variables: { messageId: id },
+    //refetchQueries: () => [{ query: GET_ALL_MESSAGES_WITH_USERS }],
     update: (cache, { data }) => {
       const oldData = cache.readQuery({
-        query: GET_PAGINATED_MESSAGES_WITH_USERS,
+        query: GET_ALL_MESSAGES_WITH_USERS,
       });
       const message = oldData.messages.edges.find(m => m.id === id);
-      message.isReposted = !data.unrepostMessage;
-      //message.repostsCount--;
 
-      const index = oldData.messages.edges.findIndex(
-        m => m.id === id,
-      );
-
-      const newData = {
-        messages: {
-          ...oldData.messages,
-          edges: [
-            ...oldData.messages.edges.slice(0, index),
-            message,
-            ...oldData.messages.edges.slice(index + 1),
-          ],
-          pageInfo: {
-            ...oldData.messages.pageInfo,
+      if (message.repostsCount === 0) return;
+      if (data.unrepostMessage && message.repostsCount === 1) {
+        const newData = {
+          messages: {
+            ...oldData.messages,
+            edges: oldData.messages.edges.filter(
+              m => m.id !== message.id,
+            ),
+            pageInfo: {
+              ...oldData.messages.pageInfo,
+            },
           },
-        },
-      };
+        };
+        cache.writeQuery({
+          query: GET_ALL_MESSAGES_WITH_USERS,
+          data: newData,
+        });
+      }
+      if (data.unrepostMessage && message.repostsCount > 1) {
+        const index = oldData.messages.edges.findIndex(
+          m => m.id === id,
+        );
 
-      cache.writeQuery({
-        query: GET_PAGINATED_MESSAGES_WITH_USERS,
-        data: newData,
-      });
+        message.isRepostedByMe = false;
+        message.repostsCount--;
+
+        const newData = {
+          messages: {
+            ...oldData.messages,
+            edges: [
+              ...oldData.messages.edges.slice(0, index),
+              message,
+              ...oldData.messages.edges.slice(index + 1),
+            ],
+            pageInfo: {
+              ...oldData.messages.pageInfo,
+            },
+          },
+        };
+        cache.writeQuery({
+          query: GET_ALL_MESSAGES_WITH_USERS,
+          data: newData,
+        });
+      }
     },
   });
 
   const handleRepost = async () => {
-    if (message.isReposted) {
+    if (message.isRepostedByMe) {
       const unreposted = await unrepostMessage();
     } else {
       const reposted = await repostMessage();
@@ -393,7 +417,7 @@ function MessagePlayer({
                 color="textSecondary"
                 display="inline"
               >
-                {`${message?.repost?.reposter?.name} reposted your message`}
+                {`${message?.repost?.reposter?.name} reposted this message`}
               </Typography>
             </Grid>
           )}

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose, { models } from 'mongoose';
 import jwt from 'jsonwebtoken';
 import { combineResolvers } from 'graphql-resolvers';
 import { AuthenticationError, UserInputError } from 'apollo-server';
@@ -12,6 +12,32 @@ const createToken = async (user, secret, expiresIn) => {
   const { id, email, username, role } = user;
   return await jwt.sign({ id, email, username, role }, secret, {
     expiresIn,
+  });
+};
+
+const publishUserNotification = async (owner, user, action) => {
+  const notification = await models.Notification.findOneAndUpdate(
+    {
+      ownerId: owner.id,
+      messageId: null,
+      userId: user.id,
+      action,
+    },
+    {
+      ownerId: owner.id,
+      messageId: null,
+      userId: user.id,
+      action,
+    },
+    {
+      upsert: true,
+      new: true,
+      setDefaultsOnInsert: true,
+    },
+  );
+
+  pubsub.publish(EVENTS.NOTIFICATION.CREATED, {
+    notificationCreated: { notification },
   });
 };
 
@@ -165,30 +191,7 @@ export default {
           { _id: me.id },
           { $push: { followingIds: followedUser.id } },
         );
-
-        const notification = await models.Notification.findOneAndUpdate(
-          {
-            ownerId: followedUser.id,
-            messageId: null,
-            userId: me.id,
-            action: 'follow',
-          },
-          {
-            ownerId: followedUser.id,
-            messageId: null,
-            userId: me.id,
-            action: 'follow',
-          },
-          {
-            upsert: true,
-            new: true,
-            setDefaultsOnInsert: true,
-          },
-        );
-
-        pubsub.publish(EVENTS.NOTIFICATION.CREATED, {
-          notificationCreated: { notification },
-        });
+        await publishUserNotification(followedUser, me, 'follow');
 
         return !!followingUser;
       },
@@ -208,30 +211,7 @@ export default {
           { _id: me.id },
           { $pull: { followingIds: unfollowedUser.id } },
         );
-
-        const notification = await models.Notification.findOneAndUpdate(
-          {
-            ownerId: unfollowedUser.id,
-            messageId: null,
-            userId: me.id,
-            action: 'unfollow',
-          },
-          {
-            ownerId: unfollowedUser.id,
-            messageId: null,
-            userId: me.id,
-            action: 'unfollow',
-          },
-          {
-            upsert: true,
-            new: true,
-            setDefaultsOnInsert: true,
-          },
-        );
-
-        pubsub.publish(EVENTS.NOTIFICATION.CREATED, {
-          notificationCreated: { notification },
-        });
+        await publishUserNotification(unfollowedUser, me, 'unfollow');
 
         return !!followingUser;
       },

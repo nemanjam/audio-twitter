@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 
 export const GET_ALL_MESSAGES_WITH_USERS = gql`
   query {
-    messages(order: "DESC") @connection(key: "MessagesConnection") {
+    messages @connection(key: "MessagesConnection") {
       edges {
         id
         createdAt

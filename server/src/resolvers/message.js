@@ -14,6 +14,32 @@ const toCursorHash = string => Buffer.from(string).toString('base64');
 const fromCursorHash = string =>
   Buffer.from(string, 'base64').toString('ascii');
 
+const publishMessageNotification = async (message, me, action) => {
+  const notification = await models.Notification.findOneAndUpdate(
+    {
+      ownerId: message.userId,
+      messageId: message.id,
+      userId: me.id,
+      action,
+    },
+    {
+      ownerId: message.userId,
+      messageId: message.id,
+      userId: me.id,
+      action,
+    },
+    {
+      upsert: true,
+      new: true,
+      setDefaultsOnInsert: true,
+    },
+  );
+
+  pubsub.publish(EVENTS.NOTIFICATION.CREATED, {
+    notificationCreated: { notification },
+  });
+};
+
 export default {
   Query: {
     // kursor je vazan za vrednost podatka, a ne index elementa kao u offset/limmit paginaciji
@@ -180,32 +206,7 @@ export default {
         });*/
 
         //GDE JE MESSAGE ID? USER MOZE SAMO JEDNU INTERAKCIJU SA DRUGIM USEROM
-        const notification = await models.Notification.findOneAndUpdate(
-          {
-            //query
-            ownerId: likedMessage.userId,
-            messageId: likedMessage._id,
-            userId: me.id,
-            action: 'like',
-          },
-          {
-            //update
-            ownerId: likedMessage.userId,
-            messageId: likedMessage._id,
-            userId: me.id,
-            action: 'like',
-          },
-          {
-            //options
-            upsert: true,
-            new: true,
-            setDefaultsOnInsert: true,
-          },
-        );
-
-        pubsub.publish(EVENTS.NOTIFICATION.CREATED, {
-          notificationCreated: { notification },
-        });
+        await publishMessageNotification(likedMessage, me, 'like');
 
         return !!likedMessage;
       },
@@ -217,30 +218,11 @@ export default {
           { _id: messageId },
           { $pull: { likesIds: me.id } },
         );
-
-        const notification = await models.Notification.findOneAndUpdate(
-          {
-            ownerId: unlikedMessage.userId,
-            messageId: unlikedMessage._id,
-            userId: me.id,
-            action: 'unlike',
-          },
-          {
-            ownerId: unlikedMessage.userId,
-            messageId: unlikedMessage._id,
-            userId: me.id,
-            action: 'unlike',
-          },
-          {
-            upsert: true,
-            new: true,
-            setDefaultsOnInsert: true,
-          },
+        await publishMessageNotification(
+          unlikedMessage,
+          me,
+          'unlike',
         );
-
-        pubsub.publish(EVENTS.NOTIFICATION.CREATED, {
-          notificationCreated: { notification },
-        });
 
         return !!unlikedMessage;
       },
@@ -277,30 +259,11 @@ export default {
         pubsub.publish(EVENTS.MESSAGE.CREATED, {
           messageCreated: { message: repostedMessage }, //subs treba da ubaci poruku
         });
-
-        const notification = await models.Notification.findOneAndUpdate(
-          {
-            ownerId: originalMessage.userId,
-            messageId: originalMessage.id,
-            userId: me.id,
-            action: 'repost',
-          },
-          {
-            ownerId: originalMessage.userId,
-            messageId: originalMessage.id,
-            userId: me.id,
-            action: 'repost',
-          },
-          {
-            upsert: true,
-            new: true,
-            setDefaultsOnInsert: true,
-          },
+        await publishMessageNotification(
+          originalMessage,
+          me,
+          'repost',
         );
-
-        pubsub.publish(EVENTS.NOTIFICATION.CREATED, {
-          notificationCreated: { notification },
-        });
         //samo za update rt broja i zeleno
         return !!repostedMessage;
       },
@@ -308,11 +271,31 @@ export default {
     unrepostMessage: combineResolvers(
       isAuthenticated,
       async (parent, { messageId }, { models, me }) => {
-        const unrepostedMessage = await models.Message.findOneAndUpdate(
-          { _id: messageId },
-          { $pull: { reposts: { reposterId: me.id } } },
-        );
-        return !!unrepostedMessage;
+        const message = await models.Message.findById(messageId);
+
+        if (!message.isReposted) {
+          const myRt = await models.Message.findOne({
+            'repost.originalMessageId': message.id,
+            'repost.reposterId': me.id,
+          });
+
+          if (myRt) {
+            await publishMessageNotification(message, me, 'unrepost');
+            myRt.remove();
+            return true;
+          } else return false;
+        } else {
+          const originalMessage = await models.Message.findById(
+            message.repost.originalMessageId,
+          );
+          await publishMessageNotification(
+            originalMessage,
+            me,
+            'unrepost',
+          );
+          await message.remove();
+          return true;
+        }
       },
     ),
   },
@@ -353,12 +336,11 @@ export default {
     isRepostedByMe: async (message, args, { models, me }) => {
       if (!me) return false;
       if (!message.isReposted) {
-        const allRts = await models.Message.find({
+        const isRepostedByMe = await models.Message.findOne({
           'repost.originalMessageId': message.id,
+          'repost.reposterId': me.id,
         });
-        const isRepostedByMe = allRts.find(m =>
-          m.repost.reposterId.equals(me.id),
-        );
+
         return !!isRepostedByMe;
       } else {
         //rts
@@ -367,13 +349,11 @@ export default {
           message.repost.originalMessageId,
         );
         //nadji sve retvitove
-        const allRts = await models.Message.find({
+        const isRepostedByMe = await models.Message.findOne({
           'repost.originalMessageId': originalMessage.id,
+          'repost.reposterId': me.id,
         });
-        //vidi dal me ima medju reposterima
-        const isRepostedByMe = allRts.find(
-          m => m.repost.reposterId.equals(me.id), //me nije isti kao u create message???
-        );
+
         return !!isRepostedByMe;
       }
     },
@@ -402,7 +382,7 @@ export default {
           const followers = await models.User.find({
             followingIds: { $in: [reposterId] },
           });
-          const amIFollowingHim = followers.find(
+          const amIFollowingHim = !!followers.find(
             u => u.username === me.username,
           );
           // username je stranica
