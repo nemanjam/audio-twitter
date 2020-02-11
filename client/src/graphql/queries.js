@@ -211,3 +211,13 @@ export const GET_REFETCH_FOLLOWERS = gql`
     }
   }
 `;
+
+export const GET_MESSAGES_VARIABLES = gql`
+  query {
+    messagesVariables @client {
+      username
+      cursor
+      limit
+    }
+  }
+`;

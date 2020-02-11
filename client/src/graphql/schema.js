@@ -12,10 +12,17 @@ export default gql`
     color: String!
   }
 
+  type MessagesVariables {
+    username: String
+    cursor: String
+    limit: Int
+  }
+
   type Query {
     autoplay: Autoplay!
     theme: Theme!
     refetchFollowers: Int!
+    messagesVariables: MessagesVariables!
   }
 
   type Mutation {
@@ -27,5 +34,10 @@ export default gql`
 
     setTheme(type: String!, color: String!): Theme!
     setRefetchFollowers: Int!
+    setMessagesVariables(
+      username: String
+      cursor: String
+      limit: Int
+    ): MessagesVariables!
   }
 `;

@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, Fragment } from 'react';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery, useMutation } from '@apollo/react-hooks';
 import moment from 'moment';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -14,7 +14,9 @@ import withSession from '../../session/withSession';
 import {
   GET_PAGINATED_MESSAGES_WITH_USERS,
   GET_AUTOPLAY,
+  GET_MESSAGES_VARIABLES,
 } from '../../graphql/queries';
+import { SET_MESSAGES_VARIABLES } from '../../graphql/mutations';
 import { MESSAGE_CREATED } from '../../graphql/subscriptions';
 
 const Messages = ({ limit, username, session }) => {
@@ -29,9 +31,14 @@ const Messages = ({ limit, username, session }) => {
     variables: { limit, username },
   });
 
+  const [setMessagesVariables] = useMutation(SET_MESSAGES_VARIABLES);
+
   useEffect(() => {
     refetch();
-  }, [username]);
+    setMessagesVariables({
+      variables: { username: username || null, limit, cursor: null },
+    });
+  }, [username, limit]);
 
   if (loading) {
     return <Loading />;
@@ -85,38 +92,56 @@ const MoreMessagesButton = ({
   fetchMore,
   children,
   username,
-}) => (
-  <Button
-    color="primary"
-    variant="contained"
-    onClick={() =>
-      fetchMore({
-        variables: {
-          cursor: pageInfo.endCursor,
-          limit,
-          username,
-        },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) {
-            return previousResult;
-          }
+}) => {
+  const {
+    data: { messagesVariables },
+  } = useQuery(GET_MESSAGES_VARIABLES);
 
-          return {
-            messages: {
-              ...fetchMoreResult.messages,
-              edges: [
-                ...previousResult.messages.edges,
-                ...fetchMoreResult.messages.edges,
-              ],
-            },
-          };
-        },
-      })
-    }
-  >
-    {children}
-  </Button>
-);
+  const [setMessagesVariables] = useMutation(SET_MESSAGES_VARIABLES);
+
+  const moreMessagesHandler = () => {
+    setMessagesVariables({
+      variables: {
+        username,
+        limit: limit + messagesVariables.limit,
+        cursor: null,
+      },
+    });
+
+    fetchMore({
+      variables: {
+        cursor: pageInfo.endCursor,
+        limit,
+        username,
+      },
+      updateQuery: (previousResult, { fetchMoreResult }) => {
+        if (!fetchMoreResult) {
+          return previousResult;
+        }
+
+        return {
+          messages: {
+            ...fetchMoreResult.messages,
+            edges: [
+              ...previousResult.messages.edges,
+              ...fetchMoreResult.messages.edges,
+            ],
+          },
+        };
+      },
+    });
+  };
+
+  return (
+    <Button
+      color="primary"
+      variant="contained"
+      onClick={moreMessagesHandler}
+    >
+      {children}
+    </Button>
+  );
+};
 
 const useStyles = makeStyles(theme => ({
   root: {},

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import WaveSurfer from 'wavesurfer.js';
 import uuidv4 from 'uuid/v4';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 import moment from 'moment';
 import { Link as RouterLink } from 'react-router-dom';
 
@@ -33,6 +33,7 @@ import {
 import {
   GET_PAGINATED_MESSAGES_WITH_USERS,
   GET_ALL_MESSAGES_WITH_USERS,
+  GET_MESSAGES_VARIABLES,
 } from '../../graphql/queries';
 
 import {
@@ -125,6 +126,11 @@ function MessagePlayer({
     variables: { direction, createdAt, duration },
   });
 
+  const {
+    data: { messagesVariables },
+  } = useQuery(GET_MESSAGES_VARIABLES);
+  console.log(messagesVariables);
+
   const [likeMessage] = useMutation(LIKE_MESSAGE, {
     variables: { messageId: id },
     update: (cache, { data }) => {
@@ -204,6 +210,14 @@ function MessagePlayer({
 
   const [repostMessage] = useMutation(REPOST_MESSAGE, {
     variables: { messageId: id },
+    refetchQueries: () => [
+      {
+        query: GET_PAGINATED_MESSAGES_WITH_USERS,
+        variables: messagesVariables,
+      },
+    ],
+
+    /*
     update: (cache, { data }) => {
       const oldData = cache.readQuery({
         query: GET_ALL_MESSAGES_WITH_USERS,
@@ -236,11 +250,18 @@ function MessagePlayer({
         data: newData,
       });
     },
+    */
   });
   const [unrepostMessage] = useMutation(UNREPOST_MESSAGE, {
     variables: { messageId: id },
-    //refetchQueries: () => [{ query: GET_ALL_MESSAGES_WITH_USERS }],
-    update: (cache, { data }) => {
+    refetchQueries: () => [
+      {
+        query: GET_PAGINATED_MESSAGES_WITH_USERS,
+        variables: messagesVariables,
+      },
+    ],
+
+    /*update: (cache, { data }) => {
       const oldData = cache.readQuery({
         query: GET_ALL_MESSAGES_WITH_USERS,
       });
@@ -317,7 +338,7 @@ function MessagePlayer({
           data: newData,
         });
       }
-    },
+    },*/
   });
 
   const handleRepost = async () => {

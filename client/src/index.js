@@ -114,6 +114,12 @@ const data = {
     __typename: 'Int',
     signal: 0,
   },
+  messagesVariables: {
+    __typename: 'MessagesVariables',
+    username: null,
+    cursor: null,
+    limit: 2,
+  },
 };
 
 cache.writeData({ data });

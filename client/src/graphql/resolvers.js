@@ -46,5 +46,20 @@ export default {
       };
       cache.writeData({ data });
     },
+    setMessagesVariables: (
+      _root,
+      { username, cursor, limit },
+      { cache, getCacheKey },
+    ) => {
+      const data = {
+        messagesVariables: {
+          username,
+          cursor,
+          limit,
+          __typename: 'MessagesVariables',
+        },
+      };
+      cache.writeData({ data });
+    },
   },
 };

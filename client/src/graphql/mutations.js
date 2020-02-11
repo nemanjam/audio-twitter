@@ -124,3 +124,13 @@ export const SET_REFETCH_FOLLOWERS = gql`
     setRefetchFollowers @client
   }
 `;
+
+export const SET_MESSAGES_VARIABLES = gql`
+  mutation($username: String, $cursor: String, $limit: Int) {
+    setMessagesVariables(
+      username: $username
+      cursor: $cursor
+      limit: $limit
+    ) @client
+  }
+`;
