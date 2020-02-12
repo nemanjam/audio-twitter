@@ -179,7 +179,7 @@ export default {
             message.repost.originalMessageId,
           );
         }
-
+        // DELETE FILE
         //nadji sve rt, obrisi njih + original
         const allRepostsIds = await models.Message.find(
           {
