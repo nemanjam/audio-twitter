@@ -54,7 +54,7 @@ const Messages = ({ limit, username, session }) => {
   // logujes error ako ne radi
   // console.log(data, error, username);
 
-  if (!data) {
+  if (!data || data.messages.edges.length === 0) {
     return (
       <div className={classes.noMessages}>
         There are no messages yet ...

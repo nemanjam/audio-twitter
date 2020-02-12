@@ -12,7 +12,7 @@ export default gql`
 
   extend type Mutation {
     createMessage(file: Upload!): Message!
-    deleteMessage(id: ID!): Boolean!
+    deleteMessage(messageId: ID!): Boolean!
     likeMessage(messageId: ID!): Boolean!
     unlikeMessage(messageId: ID!): Boolean!
     repostMessage(messageId: ID!): Boolean!

@@ -29,7 +29,7 @@ const MessageDelete = ({ message }) => {
 
   const onClick = async () => {
     await deleteMessage({
-      variables: { id: message.id },
+      variables: { messageId: message.id },
     });
   };
 

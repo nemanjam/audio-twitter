@@ -23,12 +23,12 @@ export const isAdmin = combineResolvers(
 // samo owner moze da delete svoju poruku
 export const isMessageOwner = async (
   parent,
-  { id },
+  { messageId },
   { models, me },
 ) => {
-  const message = await models.Message.findById(id);
+  const message = await models.Message.findById(messageId);
 
-  if (message.userId != me.id) {
+  if (!message.userId.equals(me.id)) {
     throw new ForbiddenError('Not authenticated as owner.');
   }
 

@@ -8,7 +8,8 @@ import { processFile } from '../utils/upload';
 const ObjectId = mongoose.Types.ObjectId;
 
 // to base64, da klijent aplikacija ne bi radila sa datumom nego sa stringom
-const toCursorHash = string => Buffer.from(string).toString('base64');
+const toCursorHash = string =>
+  string ? Buffer.from(string).toString('base64') : '';
 
 // from base64
 const fromCursorHash = string =>
@@ -132,7 +133,7 @@ export default {
         pageInfo: {
           hasNextPage,
           endCursor: toCursorHash(
-            edges[edges.length - 1].createdAt.toString(),
+            edges[edges.length - 1]?.createdAt?.toString(),
           ),
         },
       };
@@ -168,53 +169,111 @@ export default {
     deleteMessage: combineResolvers(
       isAuthenticated,
       isMessageOwner,
-      async (parent, { id }, { models }) => {
-        const message = await models.Message.findById(id);
+      async (parent, { messageId }, { models }) => {
+        const message = await models.Message.findById(messageId);
+        if (!message) return false;
 
-        if (message) {
-          await message.remove();
-          return true;
-        } else {
-          return false;
+        let originalMessage = message;
+        if (message.isReposted) {
+          originalMessage = await models.Message.findById(
+            message.repost.originalMessageId,
+          );
         }
+
+        //nadji sve rt, obrisi njih + original
+        const allRepostsIds = await models.Message.find(
+          {
+            'repost.originalMessageId': originalMessage.id,
+          },
+          '_id',
+        );
+        await models.Message.deleteMany({
+          _id: {
+            $in: [
+              ...allRepostsIds.map(i => i._id),
+              originalMessage.id,
+            ],
+          },
+        });
+        return true;
       },
     ),
 
     likeMessage: combineResolvers(
       isAuthenticated,
       async (parent, { messageId }, { models, me }) => {
-        const likedMessage = await models.Message.findOneAndUpdate(
-          { _id: messageId },
+        //da li je original
+        const message = await models.Message.findById(messageId);
+        if (!message) return false;
+
+        let originalMessage = message;
+        if (message.isReposted) {
+          originalMessage = await models.Message.findById(
+            message.repost.originalMessageId,
+          );
+        }
+        //nadji sve retvitove te poruke
+        const allRepostsIds = await models.Message.find(
+          {
+            'repost.originalMessageId': originalMessage.id,
+          },
+          '_id',
+        );
+        await models.Message.updateMany(
+          {
+            _id: {
+              $in: [
+                ...allRepostsIds.map(i => i._id),
+                originalMessage.id,
+              ],
+            },
+          },
           { $push: { likesIds: me.id } },
         );
 
-        //2 iste notifikacije ?
-        /*const notification = await models.Notification.create({
-          ownerId: likedMessage.userId,
-          userId: me.id,
-          action: 'like',
-        });*/
+        await publishMessageNotification(originalMessage, me, 'like');
 
-        //GDE JE MESSAGE ID? USER MOZE SAMO JEDNU INTERAKCIJU SA DRUGIM USEROM
-        await publishMessageNotification(likedMessage, me, 'like');
-
-        return !!likedMessage;
+        return !!originalMessage;
       },
     ),
     unlikeMessage: combineResolvers(
       isAuthenticated,
       async (parent, { messageId }, { models, me }) => {
-        const unlikedMessage = await models.Message.findOneAndUpdate(
-          { _id: messageId },
+        //identicno, samo pull
+        const message = await models.Message.findById(messageId);
+        if (!message) return false;
+
+        let originalMessage = message;
+        if (message.isReposted) {
+          originalMessage = await models.Message.findById(
+            message.repost.originalMessageId,
+          );
+        }
+        const allRepostsIds = await models.Message.find(
+          {
+            'repost.originalMessageId': originalMessage,
+          },
+          '_id',
+        );
+        await models.Message.updateMany(
+          {
+            _id: {
+              $in: [
+                ...allRepostsIds.map(i => i._id),
+                originalMessage.id,
+              ],
+            },
+          },
           { $pull: { likesIds: me.id } },
         );
+
         await publishMessageNotification(
-          unlikedMessage,
+          originalMessage,
           me,
           'unlike',
         );
 
-        return !!unlikedMessage;
+        return !!originalMessage;
       },
     ),
     repostMessage: combineResolvers(
@@ -301,7 +360,7 @@ export default {
     isLiked: async (message, args, { models, me }) => {
       if (!me) return false;
       const likedMessage = await models.Message.findById(message.id);
-      return likedMessage.likesIds?.includes(me.id) || false; //ista greska me nije dobar
+      return !!likedMessage.likesIds?.includes(me.id) || false; //ista greska me nije dobar
     },
     repostsCount: async (message, args, { models }) => {
       let originalMessage = message;
@@ -325,7 +384,7 @@ export default {
           message.repost.originalMessageId,
         );
       }
-      //nadji sve retvitove
+      //nadji retvit
       const isRepostedByMe = await models.Message.findOne({
         'repost.originalMessageId': originalMessage.id,
         'repost.reposterId': me.id,

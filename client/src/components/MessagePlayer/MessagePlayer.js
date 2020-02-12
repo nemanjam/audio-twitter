@@ -28,6 +28,8 @@ import {
   UNLIKE_MESSAGE,
   REPOST_MESSAGE,
   UNREPOST_MESSAGE,
+  DELETE_MESSAGE,
+  SET_REFETCH_FOLLOWERS,
 } from '../../graphql/mutations';
 
 import {
@@ -132,108 +134,57 @@ function MessagePlayer({
   } = useQuery(GET_MESSAGES_VARIABLES);
   //console.log(messagesVariables);
 
+  const refetchQueries = () => [
+    {
+      query: GET_PAGINATED_MESSAGES_WITH_USERS,
+      variables: messagesVariables,
+    },
+  ];
+  const [setRefetchFollowers] = useMutation(SET_REFETCH_FOLLOWERS);
+
+  const [deleteMessage] = useMutation(DELETE_MESSAGE, {
+    variables: { messageId: id },
+    refetchQueries,
+  });
+
   const [likeMessage] = useMutation(LIKE_MESSAGE, {
     variables: { messageId: id },
-    update: (cache, { data }) => {
-      const oldData = cache.readQuery({
-        query: GET_PAGINATED_MESSAGES_WITH_USERS,
-      });
-      const message = oldData.messages.edges.find(m => m.id === id);
-      message.isLiked = data.likeMessage;
-      message.likesCount++;
-
-      const index = oldData.messages.edges.findIndex(
-        m => m.id === id,
-      );
-
-      const newData = {
-        messages: {
-          ...oldData.messages,
-          edges: [
-            ...oldData.messages.edges.slice(0, index),
-            message,
-            ...oldData.messages.edges.slice(index + 1),
-          ],
-          pageInfo: {
-            ...oldData.messages.pageInfo,
-          },
-        },
-      };
-
-      cache.writeQuery({
-        query: GET_PAGINATED_MESSAGES_WITH_USERS,
-        data: newData,
-      });
-    },
+    refetchQueries,
   });
 
   const [unlikeMessage] = useMutation(UNLIKE_MESSAGE, {
     variables: { messageId: id },
-    update: (cache, { data }) => {
-      const oldData = cache.readQuery({
-        query: GET_PAGINATED_MESSAGES_WITH_USERS,
-      });
-      const message = oldData.messages.edges.find(m => m.id === id);
-      message.isLiked = !data.unlikeMessage;
-      message.likesCount--;
-
-      const index = oldData.messages.edges.findIndex(
-        m => m.id === id,
-      );
-
-      const newData = {
-        messages: {
-          ...oldData.messages,
-          edges: [
-            ...oldData.messages.edges.slice(0, index),
-            message,
-            ...oldData.messages.edges.slice(index + 1),
-          ],
-          pageInfo: {
-            ...oldData.messages.pageInfo,
-          },
-        },
-      };
-      cache.writeQuery({
-        query: GET_PAGINATED_MESSAGES_WITH_USERS,
-        data: newData,
-      });
-    },
+    refetchQueries,
   });
+
+  const [repostMessage] = useMutation(REPOST_MESSAGE, {
+    variables: { messageId: id },
+    refetchQueries,
+  });
+  const [unrepostMessage] = useMutation(UNREPOST_MESSAGE, {
+    variables: { messageId: id },
+    refetchQueries,
+  });
+
+  const handleRepost = async () => {
+    if (message.isRepostedByMe) {
+      await unrepostMessage();
+    } else {
+      await repostMessage();
+    }
+    setRefetchFollowers();
+  };
+
+  const handleDelete = async () => {
+    await deleteMessage();
+    setRefetchFollowers();
+  };
 
   const handleLike = async () => {
     if (message.isLiked) {
       const unliked = await unlikeMessage();
     } else {
       const liked = await likeMessage();
-    }
-    setReloadWaveSurfer(Math.random());
-  };
-
-  const [repostMessage] = useMutation(REPOST_MESSAGE, {
-    variables: { messageId: id },
-    refetchQueries: () => [
-      {
-        query: GET_PAGINATED_MESSAGES_WITH_USERS,
-        variables: messagesVariables,
-      },
-    ],
-  });
-  const [unrepostMessage] = useMutation(UNREPOST_MESSAGE, {
-    variables: { messageId: id },
-    refetchQueries: () => [
-      {
-        query: GET_PAGINATED_MESSAGES_WITH_USERS,
-        variables: messagesVariables,
-      },
-    ],
-  });
-
-  const handleRepost = async () => {
-    if (message.isRepostedByMe) {
-      const unreposted = await unrepostMessage();
-    } else {
-      const reposted = await repostMessage();
     }
     setReloadWaveSurfer(Math.random());
   };
@@ -326,7 +277,6 @@ function MessagePlayer({
       wavesurfer.current.pause();
     }
   };
-
   const stopPlayback = () => wavesurfer.current.stop();
 
   const classes = useStyles();
@@ -483,9 +433,11 @@ function MessagePlayer({
                       )}
                     </Grid>
                     <Grid item>
-                      <IconButton>
-                        <DeleteIcon className={classes.icon} />
-                      </IconButton>
+                      {message?.user?.id === session?.me?.id && (
+                        <IconButton onClick={handleDelete}>
+                          <DeleteIcon className={classes.icon} />
+                        </IconButton>
+                      )}
                     </Grid>
                   </Grid>
                 </Grid>
