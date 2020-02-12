@@ -66,6 +66,8 @@ This is fullstack clone of Twitter with audio instead text messages. It is made 
 
 ![Screenshot7](/screenshots/Screenshot_7.png)
 
+![Screenshot8](/screenshots/Screenshot_8.png)
+
 ## Libraries used
 
 ### Client:
