@@ -75,39 +75,35 @@ export default {
           },
         }),
         // user page
-        ...(username && {
+        ...(!!user && {
           $or: [
-            //njegovi
             {
-              userId: user.id,
+              userId: user._id, //njegovi
             },
-            //ili tudji koje je on rt
             {
-              'repost.reposterId': user.id,
+              'repost.reposterId': user._id, // ili tudji koje je on rt
             },
           ],
         }),
         // timeline, see messages only from following and me
-        ...(meUser &&
+        ...(!!meUser &&
           !username && {
             $or: [
               {
                 userId: {
-                  $in: [...meUser.followingIds, ObjectId(me.id)],
+                  $in: [...meUser.followingIds, meUser._id],
                 },
               },
-              //rt-ovi onih koje pratim i moji
               {
                 'reposts.reposterId': {
-                  $in: [...meUser.followingIds, ObjectId(me.id)],
+                  $in: [...meUser.followingIds, meUser._id], //rt-ovi onih koje pratim i moji
                 },
               },
             ],
           }),
-        //timeline for non loged user, all tweets
-        ...(!meUser && !username && {}),
+        ...(!meUser && !username && {}), //timeline for non loged user, all tweets
       };
-      //console.log(JSON.stringify(match, null, 2));
+      // console.log(match);
 
       const messages = await models.Message.aggregate([
         {
@@ -225,13 +221,10 @@ export default {
       isAuthenticated,
       async (parent, { messageId }, { models, me }) => {
         const message = await models.Message.findById(messageId);
-        let originalMessage;
+        let originalMessage = message;
 
-        if (!message.isReposted) {
-          originalMessage = message;
-        } else {
+        if (message.isReposted) {
           //retvitujem retvit
-          //nadji original
           originalMessage = await models.Message.findById(
             message.repost.originalMessageId,
           );
@@ -267,17 +260,16 @@ export default {
       async (parent, { messageId }, { models, me }) => {
         const message = await models.Message.findById(messageId);
 
-        if (!message.isReposted) {
-          const myRt = await models.Message.findOne({
-            'repost.originalMessageId': message.id,
-            'repost.reposterId': me.id,
-          });
+        //unrepost moj rt tudjeg rta
+        const myRepost = await models.Message.findOne({
+          'repost.originalMessageId': message.id,
+          'repost.reposterId': me.id,
+        });
 
-          if (myRt) {
-            await publishMessageNotification(message, me, 'unrepost');
-            await myRt.remove();
-            return true;
-          } else return false;
+        if (myRepost) {
+          await publishMessageNotification(message, me, 'unrepost');
+          await myRepost.remove();
+          return true;
         } else {
           const originalMessage = await models.Message.findById(
             message.repost.originalMessageId,
@@ -312,44 +304,34 @@ export default {
       return likedMessage.likesIds?.includes(me.id) || false; //ista greska me nije dobar
     },
     repostsCount: async (message, args, { models }) => {
-      //originals
-      if (!message.isReposted) {
-        return await models.Message.find({
-          'repost.originalMessageId': message.id,
-        }).countDocuments();
-      } else {
+      let originalMessage = message;
+      if (message.isReposted) {
         //rts
-        const originalMessage = await models.Message.findById(
+        originalMessage = await models.Message.findById(
           message.repost.originalMessageId,
         );
-        return await models.Message.find({
-          'repost.originalMessageId': originalMessage.id,
-        }).countDocuments();
       }
+      return await models.Message.find({
+        'repost.originalMessageId': originalMessage.id,
+      }).countDocuments();
     },
     isRepostedByMe: async (message, args, { models, me }) => {
       if (!me) return false;
-      if (!message.isReposted) {
-        const isRepostedByMe = await models.Message.findOne({
-          'repost.originalMessageId': message.id,
-          'repost.reposterId': me.id,
-        });
-
-        return !!isRepostedByMe;
-      } else {
+      let originalMessage = message;
+      if (message.isReposted) {
         //rts
         //nadji original
-        const originalMessage = await models.Message.findById(
+        originalMessage = await models.Message.findById(
           message.repost.originalMessageId,
         );
-        //nadji sve retvitove
-        const isRepostedByMe = await models.Message.findOne({
-          'repost.originalMessageId': originalMessage.id,
-          'repost.reposterId': me.id,
-        });
-
-        return !!isRepostedByMe;
       }
+      //nadji sve retvitove
+      const isRepostedByMe = await models.Message.findOne({
+        'repost.originalMessageId': originalMessage.id,
+        'repost.reposterId': me.id,
+      });
+
+      return !!isRepostedByMe;
     },
     repost: async (message, args, { models }) => {
       if (!message.isReposted) return null;

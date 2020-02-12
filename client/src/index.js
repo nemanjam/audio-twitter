@@ -31,6 +31,7 @@ const wsLink = new WebSocketLink({
   options: {
     reconnect: true,
     lazy: true,
+    inactivityTimeout: 1000,
     connectionParams: () => {
       const token = localStorage.getItem('token');
       return {

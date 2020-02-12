@@ -19,6 +19,14 @@ import {
 import { SET_MESSAGES_VARIABLES } from '../../graphql/mutations';
 import { MESSAGE_CREATED } from '../../graphql/subscriptions';
 
+const useStylesMessages = makeStyles(theme => ({
+  noMessages: {
+    padding: theme.spacing(2),
+    textAlign: 'center',
+    backgroundColor: theme.palette.background.paper,
+  },
+}));
+
 const Messages = ({ limit, username, session }) => {
   const {
     data,
@@ -30,7 +38,7 @@ const Messages = ({ limit, username, session }) => {
   } = useQuery(GET_PAGINATED_MESSAGES_WITH_USERS, {
     variables: { limit, username },
   });
-
+  const classes = useStylesMessages();
   const [setMessagesVariables] = useMutation(SET_MESSAGES_VARIABLES);
 
   useEffect(() => {
@@ -48,8 +56,8 @@ const Messages = ({ limit, username, session }) => {
 
   if (!data) {
     return (
-      <div>
-        There are no messages yet ... Try to create one by yourself.
+      <div className={classes.noMessages}>
+        There are no messages yet ...
       </div>
     );
   }
@@ -176,13 +184,6 @@ const MessageList = ({
             ],
           },
         };
-        console.log(
-          'message',
-          messageCreated.message,
-          'result',
-          result,
-        );
-
         return result;
       },
     });
