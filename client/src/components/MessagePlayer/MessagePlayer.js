@@ -21,6 +21,10 @@ import PauseIcon from '@material-ui/icons/Pause';
 import Grid from '@material-ui/core/Grid';
 import ListItem from '@material-ui/core/ListItem';
 import Link from '@material-ui/core/Link';
+import Popper from '@material-ui/core/Popper';
+import Fade from '@material-ui/core/Fade';
+
+import UserCard from '../UserCard/UserCard';
 
 import {
   UPDATE_AUTOPLAY,
@@ -92,6 +96,10 @@ const useStyles = makeStyles(theme => ({
     marginRight: theme.spacing(1),
     verticalAlign: 'middle',
   },
+  popper: { zIndex: 4 },
+  reposter: {
+    cursor: 'pointer',
+  },
 }));
 
 const usePrevious = value => {
@@ -123,6 +131,37 @@ function MessagePlayer({
   const newIndex = useRef(0);
   const [reloadWaveSurfer, setReloadWaveSurfer] = useState(0);
 
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [popUpEntered, setPopUpEntered] = useState(false);
+  const [nameEntered, setNameEntered] = useState(false);
+  const [usernameState, setUsernameState] = useState('');
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (!popUpEntered && !nameEntered) {
+        setAnchorEl(null);
+        setPopUpEntered(false);
+        setNameEntered(false);
+      }
+    }, 300);
+  }, [popUpEntered, nameEntered]);
+
+  const handleMouseEnter = (event, username) => {
+    setAnchorEl(event.currentTarget);
+    setNameEntered(true);
+    setUsernameState(username);
+  };
+
+  const handleMouseLeave = event => {
+    setNameEntered(false);
+  };
+
+  const handlePopUpMouseEnter = event => {
+    setPopUpEntered(true);
+  };
+  const handlePopUpMouseLeave = event => {
+    setPopUpEntered(false);
+  };
   // console.log(message);
 
   const [updateAutoplay] = useMutation(UPDATE_AUTOPLAY, {
@@ -299,6 +338,25 @@ function MessagePlayer({
 
   return (
     <>
+      <Popper
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        placement="bottom"
+        transition
+        className={classes.popper}
+      >
+        {({ TransitionProps }) => (
+          <Fade {...TransitionProps} timeout={350}>
+            <UserCard
+              onMouseEnter={handlePopUpMouseEnter}
+              onMouseLeave={handlePopUpMouseLeave}
+              username={usernameState}
+              session={session}
+            />
+          </Fade>
+        )}
+      </Popper>
+
       <ListItem className={classes.root}>
         <Grid container direction="column">
           {message.isReposted && (
@@ -308,6 +366,14 @@ function MessagePlayer({
                 variant="body2"
                 color="textSecondary"
                 display="inline"
+                onMouseEnter={e =>
+                  handleMouseEnter(
+                    e,
+                    message?.repost?.reposter?.username,
+                  )
+                }
+                onMouseLeave={handleMouseLeave}
+                className={classes.reposter}
               >
                 {`${message?.repost?.reposter?.name} reposted this message`}
               </Typography>
@@ -331,6 +397,8 @@ function MessagePlayer({
                     component={RouterLink}
                     to={`/${username}`}
                     color="inherit"
+                    onMouseEnter={e => handleMouseEnter(e, username)}
+                    onMouseLeave={handleMouseLeave}
                   >
                     {name}
                   </Link>

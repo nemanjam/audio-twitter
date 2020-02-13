@@ -15,7 +15,6 @@ import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Link from '@material-ui/core/Link';
 import Fade from '@material-ui/core/Fade';
-import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
 
 import {
@@ -73,11 +72,7 @@ const WhoToFollow = ({ session }) => {
 
   useEffect(() => {
     refetch();
-  }, [signal]);
-
-  useEffect(() => {
-    refetch();
-  }, [session?.me]);
+  }, [signal, session?.me]);
 
   useEffect(() => {
     setTimeout(() => {

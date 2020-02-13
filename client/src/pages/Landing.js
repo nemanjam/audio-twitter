@@ -49,7 +49,7 @@ const Landing = ({ session }) => {
           <Messages limit={2} session={session} />
         </Grid>
       </Grid>
-      {session && session.me && <Microphone />}
+      {session?.me && <Microphone />}
     </>
   );
 };

@@ -26,9 +26,9 @@ import { UPLOADS_IMAGES_FOLDER } from '../../constants/paths';
 
 const useStyles = makeStyles(theme => ({
   root: {
-    maxWidth: 285,
+    maxWidth: 255,
     textAlign: 'left',
-    zIndex: 2,
+    zIndex: 5,
   },
   media: {
     height: 110,
