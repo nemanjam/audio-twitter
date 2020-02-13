@@ -263,8 +263,21 @@ function MessagePlayer({
   }, [play, playerReady, duration]);
 
   useEffect(() => {
+    const readyHandler = () => {
+      setPlayerReady(true);
+    };
+    const playHandler = () => {
+      setIsPlaying(true);
+    };
+    const pauseHandler = () => {
+      setIsPlaying(false);
+    };
+
     if (wavesurfer.current) {
       wavesurfer.current.load(path);
+      wavesurfer.current.on('ready', readyHandler);
+      wavesurfer.current.on('play', playHandler);
+      wavesurfer.current.on('pause', pauseHandler);
       return () => {
         wavesurfer.current.unAll();
       };
@@ -288,24 +301,12 @@ function MessagePlayer({
     //   console.log('percentage', percentage);
     // });
 
-    const readyHandler = () => {
-      setPlayerReady(true);
-    };
-    const playHandler = () => {
-      setIsPlaying(true);
-    };
-    const pauseHandler = () => {
-      setIsPlaying(false);
-    };
-
     wavesurfer.current.on('ready', readyHandler);
     wavesurfer.current.on('play', playHandler);
     wavesurfer.current.on('pause', pauseHandler);
 
     return () => {
-      wavesurfer.current.un('ready', readyHandler);
-      wavesurfer.current.un('play', playHandler);
-      wavesurfer.current.un('pause', pauseHandler);
+      wavesurfer.current.unAll();
     };
   }, [theme, path]);
 
