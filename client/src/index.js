@@ -30,10 +30,11 @@ const wsLink = new WebSocketLink({
   uri: `ws://localhost:8000/graphql`,
   options: {
     reconnect: true,
-    lazy: true,
-    inactivityTimeout: 1000,
+    // lazy: true,
+    // inactivityTimeout: 1000,
     connectionParams: () => {
       const token = localStorage.getItem('token');
+      console.log('token ws', token);
       return {
         headers: {
           'x-token': token ? token : '',
@@ -57,6 +58,7 @@ const terminatingLink = split(
 const authLink = new ApolloLink((operation, forward) => {
   operation.setContext(({ headers = {} }) => {
     const token = localStorage.getItem('token');
+    //console.log('token http', token);
 
     if (token) {
       headers = { ...headers, 'x-token': token };
@@ -110,7 +112,7 @@ const data = {
   theme: {
     __typename: 'Theme',
     type: 'light',
-    color: 'green',
+    color: 'orange',
   },
   refetchFollowers: {
     __typename: 'Int',

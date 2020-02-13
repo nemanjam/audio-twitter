@@ -93,7 +93,7 @@ export default {
           isSeen: false,
         },
       ).countDocuments();
-
+      console.log('me query');
       pubsub.publish(EVENTS.NOTIFICATION.NOT_SEEN_UPDATED, {
         notSeenUpdated: unseenNotificationsCount,
       });

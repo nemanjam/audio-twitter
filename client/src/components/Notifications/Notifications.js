@@ -1,4 +1,9 @@
-import React, { Fragment, useEffect, useCallback } from 'react';
+import React, {
+  Fragment,
+  useEffect,
+  useCallback,
+  useState,
+} from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useQuery } from '@apollo/react-hooks';
 import moment from 'moment';
@@ -17,8 +22,12 @@ import Badge from '@material-ui/core/Badge';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import RepeatIcon from '@material-ui/icons/Repeat';
 import PersonIcon from '@material-ui/icons/Person';
+import Fade from '@material-ui/core/Fade';
+import Popper from '@material-ui/core/Popper';
 
+import UserCard from '../UserCard/UserCard';
 import Loading from '../Loading/Loading';
+
 import { GET_PAGINATED_NOTIFICATIONS } from '../../graphql/queries';
 import { NOTIFICATION_CREATED } from '../../graphql/subscriptions';
 import { UPLOADS_IMAGES_FOLDER } from '../../constants/paths';
@@ -35,6 +44,9 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(2),
     textAlign: 'center',
   },
+  popper: {
+    zIndex: 4,
+  },
 }));
 
 const Notifications = ({ session }) => {
@@ -50,6 +62,37 @@ const Notifications = ({ session }) => {
   } = useQuery(GET_PAGINATED_NOTIFICATIONS, {
     variables: { limit: 10 },
   });
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [popUpEntered, setPopUpEntered] = useState(false);
+  const [nameEntered, setNameEntered] = useState(false);
+  const [username, setUsername] = useState('');
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (!popUpEntered && !nameEntered) {
+        setAnchorEl(null);
+        setPopUpEntered(false);
+        setNameEntered(false);
+      }
+    }, 300);
+  }, [popUpEntered, nameEntered]);
+
+  const handleMouseEnter = (event, username) => {
+    setAnchorEl(event.currentTarget);
+    setNameEntered(true);
+    setUsername(username);
+    console.log(username);
+  };
+  const handleMouseLeave = event => {
+    setNameEntered(false);
+  };
+  const handlePopUpMouseEnter = event => {
+    setPopUpEntered(true);
+  };
+  const handlePopUpMouseLeave = event => {
+    setPopUpEntered(false);
+  };
 
   const subscribeToMoreNotification = useCallback(() => {
     subscribeToMore({
@@ -134,69 +177,96 @@ const Notifications = ({ session }) => {
   //console.log(data, error);
 
   return (
-    <List className={classes.root}>
-      {edges.length === 0 && (
-        <div className={classes.noNotifications}>
-          There are no notifications yet ...
-        </div>
-      )}
-      <>
-        {edges.map((notification, index) => {
-          return (
-            <Fragment key={index}>
-              <ListItem alignItems="flex-start">
-                <ListItemAvatar>
-                  <Badge
-                    badgeContent={
-                      getActionText(notification.action).icon
+    <>
+      <Popper
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        placement="bottom"
+        transition
+        className={classes.popper}
+      >
+        {({ TransitionProps }) => (
+          <Fade {...TransitionProps} timeout={350}>
+            <UserCard
+              onMouseEnter={handlePopUpMouseEnter}
+              onMouseLeave={handlePopUpMouseLeave}
+              username={username}
+              session={session}
+            />
+          </Fade>
+        )}
+      </Popper>
+      <List className={classes.root}>
+        {edges.length === 0 && (
+          <div className={classes.noNotifications}>
+            There are no notifications yet ...
+          </div>
+        )}
+        <>
+          {edges.map((notification, index) => {
+            return (
+              <Fragment key={index}>
+                <ListItem alignItems="flex-start">
+                  <ListItemAvatar>
+                    <Badge
+                      badgeContent={
+                        getActionText(notification.action).icon
+                      }
+                      color={getActionText(notification.action).color}
+                    >
+                      <Avatar
+                        alt={notification.user.name}
+                        src={`${UPLOADS_IMAGES_FOLDER}${notification.user.avatar.path}`}
+                      />
+                    </Badge>
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={
+                      <>
+                        <Link
+                          component={RouterLink}
+                          to={`/${notification.user.username}`}
+                          color="textPrimary"
+                          className={classes.username}
+                          onMouseEnter={e =>
+                            handleMouseEnter(
+                              e,
+                              notification.user.username,
+                            )
+                          }
+                          onMouseLeave={handleMouseLeave}
+                        >
+                          {notification.user.name}
+                        </Link>{' '}
+                        <Typography
+                          variant="body2"
+                          display="inline"
+                          color="textSecondary"
+                        >
+                          {getActionText(notification.action).text}
+                        </Typography>
+                      </>
                     }
-                    color={getActionText(notification.action).color}
-                  >
-                    <Avatar
-                      alt={notification.user.name}
-                      src={`${UPLOADS_IMAGES_FOLDER}${notification.user.avatar.path}`}
-                    />
-                  </Badge>
-                </ListItemAvatar>
-                <ListItemText
-                  primary={
-                    <>
-                      <Link
-                        component={RouterLink}
-                        to={`/${notification.user.username}`}
-                        color="textPrimary"
-                        className={classes.username}
-                      >
-                        {notification.user.name}
-                      </Link>{' '}
+                    secondary={
                       <Typography
+                        className={classes.timeAgo}
                         variant="body2"
-                        display="inline"
                         color="textSecondary"
                       >
-                        {getActionText(notification.action).text}
+                        {moment(notification.createdAt).fromNow()}
                       </Typography>
-                    </>
-                  }
-                  secondary={
-                    <Typography
-                      className={classes.timeAgo}
-                      variant="body2"
-                      color="textSecondary"
-                    >
-                      {moment(notification.createdAt).fromNow()}
-                    </Typography>
-                  }
-                />
-              </ListItem>
-              {index !== edges.length - 1 && (
-                <Divider variant="inset" component="li" />
-              )}
-            </Fragment>
-          );
-        })}
-      </>
-    </List>
+                    }
+                  />
+                </ListItem>
+                {index !== edges.length - 1 && (
+                  <Divider variant="inset" component="li" />
+                )}
+              </Fragment>
+            );
+          })}
+        </>
+      </List>
+    </>
   );
 };
 
