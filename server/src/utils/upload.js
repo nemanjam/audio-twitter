@@ -55,3 +55,12 @@ export const processFile = async file => {
   const { webPath } = await storeFS({ stream, filename, mimetype });
   return storeDB({ filename, mimetype, path: webPath });
 };
+
+export const deleteFile = fileName => {
+  try {
+    const path = `${uploadAudioDir}/${filename}`;
+    unlinkSync(path);
+  } catch (err) {
+    console.error(err);
+  }
+};

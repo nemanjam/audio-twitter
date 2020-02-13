@@ -6,7 +6,7 @@ const notificationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    seen: {
+    isSeen: {
       type: Boolean,
       default: false,
     },
@@ -14,11 +14,13 @@ const notificationSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Message',
     },
+    // kome izlazi notifikacija
     ownerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
+    // ko mu je dao notifikaciju
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

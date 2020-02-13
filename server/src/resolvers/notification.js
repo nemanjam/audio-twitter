@@ -69,7 +69,7 @@ export default {
       subscribe: withFilter(
         () => pubsub.asyncIterator(EVENTS.NOTIFICATION.CREATED),
         //me usera koji radi subskripciju, me usera koji radi like mutaciju je u messages resolveru
-        async (payload, args, { me }) => {
+        async (payload, args, { me, models }) => {
           //razliciti _id za ownerId i me.id, oba user0 wtf?, bajat token
           const ownerId =
             payload?.notificationCreated?.notification?.ownerId;
@@ -77,7 +77,18 @@ export default {
           // console.log(payload, me, owner, meUser);
           //if message owner === loggedin user
           const condition = owner.username === me.username;
-          //console.log(condition);
+          // console.log('condition', condition);
+          return condition;
+        },
+      ),
+    },
+    notSeenUpdated: {
+      subscribe: withFilter(
+        () =>
+          pubsub.asyncIterator(EVENTS.NOTIFICATION.NOT_SEEN_UPDATED),
+        async (payload, { username }, { me }) => {
+          const condition = username === me.username;
+          // console.log('payload', payload, condition, me); //pogresan me kroz ws opet
           return condition;
         },
       ),

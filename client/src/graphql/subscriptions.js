@@ -60,3 +60,9 @@ export const NOTIFICATION_CREATED = gql`
     }
   }
 `;
+
+export const NOT_SEEN_UPDATED = gql`
+  subscription($username: String) {
+    notSeenUpdated(username: $username)
+  }
+`;

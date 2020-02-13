@@ -1,1 +1,2 @@
 export const CREATED = 'NOTIFICATION_CREATED';
+export const NOT_SEEN_UPDATED = 'NOT_SEEN_UPDATED';

@@ -16,28 +16,24 @@ const createToken = async (user, secret, expiresIn) => {
 };
 
 const publishUserNotification = async (owner, user, action) => {
-  const notification = await models.Notification.findOneAndUpdate(
-    {
-      ownerId: owner.id,
-      messageId: null,
-      userId: user.id,
-      action,
-    },
-    {
-      ownerId: owner.id,
-      messageId: null,
-      userId: user.id,
-      action,
-    },
-    {
-      upsert: true,
-      new: true,
-      setDefaultsOnInsert: true,
-    },
-  );
+  const notification = await models.Notification.create({
+    ownerId: owner.id,
+    messageId: null,
+    userId: user.id,
+    action,
+  });
 
   pubsub.publish(EVENTS.NOTIFICATION.CREATED, {
     notificationCreated: { notification },
+  });
+
+  const unseenNotificationsCount = await models.Notification.find({
+    ownerId: notification.ownerId,
+    isSeen: false,
+  }).countDocuments();
+
+  pubsub.publish(EVENTS.NOTIFICATION.NOT_SEEN_UPDATED, {
+    notSeenUpdated: unseenNotificationsCount,
   });
 };
 
@@ -90,7 +86,18 @@ export default {
         return null;
       }
 
-      return await models.User.findById(me.id);
+      const user = await models.User.findById(me.id);
+      const unseenNotificationsCount = await models.Notification.find(
+        {
+          ownerId: user.id,
+          isSeen: false,
+        },
+      ).countDocuments();
+
+      pubsub.publish(EVENTS.NOTIFICATION.NOT_SEEN_UPDATED, {
+        notSeenUpdated: unseenNotificationsCount,
+      });
+      return user;
     },
   },
 

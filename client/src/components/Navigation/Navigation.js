@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation, useSubscription } from '@apollo/react-hooks';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -24,6 +24,7 @@ import { styled } from '@material-ui/core/styles';
 import * as routes from '../../constants/routes';
 import SignOutButton from '../SignOutButton/SignOutButton';
 import { SET_THEME } from '../../graphql/mutations';
+import { NOT_SEEN_UPDATED } from '../../graphql/subscriptions';
 
 const StyledLink = styled(Link)({
   minHeight: 64,
@@ -91,6 +92,10 @@ const Navigation = ({ session, match }) => {
 
   const [setTheme] = useMutation(SET_THEME);
 
+  const { data, loading, error } = useSubscription(NOT_SEEN_UPDATED, {
+    variables: { username: session?.me?.username },
+  });
+  console.log(data, loading, error);
   const handleMenuOpen = event => {
     setAnchorEl(event.currentTarget);
   };
@@ -186,7 +191,16 @@ const Navigation = ({ session, match }) => {
                 to={routes.NOTIFICATIONS}
                 label={
                   <div className={classes.label}>
-                    <NotificationsIcon />
+                    <Badge
+                      className={classes.margin}
+                      badgeContent={!loading && data?.notSeenUpdated}
+                      color="secondary"
+                      invisible={
+                        loading || data?.notSeenUpdated === 0
+                      }
+                    >
+                      <NotificationsIcon />
+                    </Badge>
                     <Typography
                       className={classes.typographyLabel}
                       display="inline"

@@ -19,6 +19,7 @@ export default gql`
 
   extend type Subscription {
     notificationCreated: NotificationCreated!
+    notSeenUpdated(username: String): Int!
   }
 
   type NotificationCreated {

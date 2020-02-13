@@ -4,7 +4,7 @@ import { withFilter } from 'apollo-server';
 
 import pubsub, { EVENTS } from '../subscription';
 import { isAuthenticated, isMessageOwner } from './authorization';
-import { processFile } from '../utils/upload';
+import { processFile, deleteFile } from '../utils/upload';
 const ObjectId = mongoose.Types.ObjectId;
 
 // to base64, da klijent aplikacija ne bi radila sa datumom nego sa stringom
@@ -16,28 +16,24 @@ const fromCursorHash = string =>
   Buffer.from(string, 'base64').toString('ascii');
 
 const publishMessageNotification = async (message, me, action) => {
-  const notification = await models.Notification.findOneAndUpdate(
-    {
-      ownerId: message.userId,
-      messageId: message.id,
-      userId: me.id,
-      action,
-    },
-    {
-      ownerId: message.userId,
-      messageId: message.id,
-      userId: me.id,
-      action,
-    },
-    {
-      upsert: true,
-      new: true,
-      setDefaultsOnInsert: true,
-    },
-  );
+  const notification = await models.Notification.create({
+    ownerId: message.userId,
+    messageId: message.id,
+    userId: me.id,
+    action,
+  });
 
   pubsub.publish(EVENTS.NOTIFICATION.CREATED, {
     notificationCreated: { notification },
+  });
+
+  const unseenNotificationsCount = await models.Notification.find({
+    ownerId: notification.ownerId,
+    isSeen: false,
+  }).countDocuments();
+
+  pubsub.publish(EVENTS.NOTIFICATION.NOT_SEEN_UPDATED, {
+    notSeenUpdated: unseenNotificationsCount,
   });
 };
 
@@ -179,7 +175,6 @@ export default {
             message.repost.originalMessageId,
           );
         }
-        // DELETE FILE
         //nadji sve rt, obrisi njih + original
         const allRepostsIds = await models.Message.find(
           {
@@ -187,6 +182,13 @@ export default {
           },
           '_id',
         );
+
+        // DELETE FILE
+        const file = await models.File.findById(
+          originalMessage.fileId,
+        );
+        deleteFile(file.path);
+
         await models.Message.deleteMany({
           _id: {
             $in: [
