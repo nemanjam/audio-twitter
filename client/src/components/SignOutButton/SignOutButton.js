@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { useApolloClient } from '@apollo/react-hooks';
 
 import Button from '@material-ui/core/Button';
@@ -7,7 +6,7 @@ import Button from '@material-ui/core/Button';
 import * as routes from '../../constants/routes';
 import history from '../../constants/history';
 
-const SignOutButton = ({ history }) => {
+const SignOutButton = () => {
   const client = useApolloClient();
 
   return (

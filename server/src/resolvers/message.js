@@ -32,6 +32,8 @@ const publishMessageNotification = async (message, me, action) => {
     isSeen: false,
   }).countDocuments();
 
+  console.log('unseenNotificationsCount', unseenNotificationsCount);
+
   pubsub.publish(EVENTS.NOTIFICATION.NOT_SEEN_UPDATED, {
     notSeenUpdated: unseenNotificationsCount,
   });

@@ -16,6 +16,7 @@ import { SignUpLink } from './SignUp';
 import * as routes from '../constants/routes';
 import ErrorMessage from '../components/Error/Error';
 
+import { resetWebsocket } from '../index';
 import { SIGN_IN } from '../graphql/mutations';
 
 const SignIn = ({ history, refetch }) => (
@@ -65,6 +66,7 @@ const SignInForm = ({ history, refetch }) => {
     localStorage.setItem('token', data.signIn.token);
     await refetch();
     history.push(routes.LANDING);
+    resetWebsocket();
   };
 
   const isInvalid =

@@ -10,6 +10,7 @@ import { WebSocketLink } from 'apollo-link-ws';
 import { onError } from 'apollo-link-error';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import moment from 'moment';
+import MessageTypes from 'subscriptions-transport-ws/dist/message-types';
 
 import App from './App';
 import { signOut } from './components/SignOutButton/SignOutButton';
@@ -30,8 +31,8 @@ const wsLink = new WebSocketLink({
   uri: `ws://localhost:8000/graphql`,
   options: {
     reconnect: true,
-    // lazy: true,
-    // inactivityTimeout: 1000,
+    lazy: true,
+    inactivityTimeout: 1000,
     connectionParams: () => {
       const token = localStorage.getItem('token');
       console.log('token ws', token);
@@ -41,8 +42,27 @@ const wsLink = new WebSocketLink({
         },
       };
     },
+    connectionCallback: err => {
+      console.log('callback');
+      if (err) {
+        console.log('Error Connecting to Subscriptions Server', err);
+      }
+    },
   },
 });
+
+export function resetWebsocket() {
+  if (wsLink.subscriptionClient === null) return;
+  wsLink.subscriptionClient.close();
+  wsLink.subscriptionClient.connect();
+  Object.keys(wsLink.subscriptionClient.operations).forEach(id => {
+    wsLink.subscriptionClient.sendMessage(
+      id,
+      MessageTypes.GQL_START,
+      wsLink.subscriptionClient.operations[id].options,
+    );
+  });
+}
 
 const terminatingLink = split(
   ({ query }) => {
@@ -58,7 +78,7 @@ const terminatingLink = split(
 const authLink = new ApolloLink((operation, forward) => {
   operation.setContext(({ headers = {} }) => {
     const token = localStorage.getItem('token');
-    //console.log('token http', token);
+    // console.log('token http', token);
 
     if (token) {
       headers = { ...headers, 'x-token': token };
@@ -73,7 +93,7 @@ const authLink = new ApolloLink((operation, forward) => {
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
     graphQLErrors.forEach(({ message, locations, path }) => {
-      console.log('GraphQL error', message);
+      console.log('My GraphQL error', message);
 
       if (message === 'UNAUTHENTICATED') {
         signOut(client);

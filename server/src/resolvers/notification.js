@@ -87,8 +87,8 @@ export default {
         () =>
           pubsub.asyncIterator(EVENTS.NOTIFICATION.NOT_SEEN_UPDATED),
         async (payload, { username }, { me }) => {
+          console.log('payload', payload, username, me); //pogresan me kroz ws opet
           const condition = username === me.username;
-          // console.log('payload', payload, condition, me); //pogresan me kroz ws opet
           return condition;
         },
       ),

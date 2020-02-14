@@ -82,7 +82,6 @@ const Notifications = ({ session }) => {
     setAnchorEl(event.currentTarget);
     setNameEntered(true);
     setUsername(username);
-    console.log(username);
   };
   const handleMouseLeave = event => {
     setNameEntered(false);
