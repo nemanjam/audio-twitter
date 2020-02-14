@@ -23,7 +23,7 @@ const publishMessageNotification = async (message, me, action) => {
     action,
   });
 
-  pubsub.publish(EVENTS.NOTIFICATION.CREATED, {
+  await pubsub.publish(EVENTS.NOTIFICATION.CREATED, {
     notificationCreated: { notification },
   });
 
@@ -34,7 +34,7 @@ const publishMessageNotification = async (message, me, action) => {
 
   console.log('unseenNotificationsCount', unseenNotificationsCount);
 
-  pubsub.publish(EVENTS.NOTIFICATION.NOT_SEEN_UPDATED, {
+  await pubsub.publish(EVENTS.NOTIFICATION.NOT_SEEN_UPDATED, {
     notSeenUpdated: unseenNotificationsCount,
   });
 };
