@@ -295,6 +295,7 @@ function MessagePlayer({
       responsive: true,
       fillParent: true,
     });
+    //console.log('path', path);
 
     wavesurfer.current.load(path);
     // wavesurfer.current.on('loading', percentage => {

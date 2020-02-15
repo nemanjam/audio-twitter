@@ -39,9 +39,11 @@ const Home = ({ session }) => {
           <Grid item>
             <Autoplay setMainAutoplay={setMainAutoplay} />
           </Grid>
-          <Grid item>
-            <WhoToFollow session={session} />
-          </Grid>
+          {session?.me && (
+            <Grid item>
+              <WhoToFollow session={session} />
+            </Grid>
+          )}
         </Grid>
         <Grid item md={8} sm={6} xs={12} className={classes.item}>
           <Messages limit={2} session={session} />

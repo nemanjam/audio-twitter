@@ -24,6 +24,7 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import { styled } from '@material-ui/core/styles';
+import RecordVoiceOverIcon from '@material-ui/icons/RecordVoiceOver';
 
 import * as routes from '../../constants/routes';
 import SignOutButton from '../SignOutButton/SignOutButton';
@@ -159,7 +160,7 @@ const Navigation = ({ session, match }) => {
     <>
       <AppBar position="fixed">
         <Toolbar>
-          <CameraIcon className={classes.icon} />
+          <RecordVoiceOverIcon className={classes.icon} />
           <Typography
             variant="h6"
             color="inherit"

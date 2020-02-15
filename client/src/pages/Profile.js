@@ -230,9 +230,14 @@ const ProfilePage = ({ match, session, history }) => {
           <Grid item>
             <Autoplay />
           </Grid>
-          <Grid item>
-            <WhoToFollow session={session} accountRefetch={refetch} />
-          </Grid>
+          {session?.me && (
+            <Grid item>
+              <WhoToFollow
+                session={session}
+                accountRefetch={refetch}
+              />
+            </Grid>
+          )}
         </Grid>
         <Grid
           item

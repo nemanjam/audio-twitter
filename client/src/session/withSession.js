@@ -10,6 +10,8 @@ const withSession = Component => props => {
   if (loading) {
     return null;
   }
+  resetWebsocket();
+
   console.log('withSession', data);
   // if (error) {
   //   localStorage.removeItem('token');

@@ -408,7 +408,7 @@ export default {
       return { reposter, originalMessage };
     },
   },
-
+  //za nelogovanog ne radi ni timeline ni profile
   Subscription: {
     messageCreated: {
       subscribe: withFilter(
