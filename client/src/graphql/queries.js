@@ -203,7 +203,7 @@ export const GET_AUTOPLAY = gql`
 
 export const GET_THEME = gql`
   query {
-    theme @client {
+    theme @client(always: true) {
       type
       color
     }

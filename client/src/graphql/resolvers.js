@@ -7,6 +7,12 @@ export default {
     //   console.log('autoplay resolver', autoplay);
     //   return autoplay;
     // },
+    // ima (always: true) u schemi da ne bi citao cache
+    theme: (_root, _args, { cache }) => {
+      const { theme } = JSON.parse(localStorage.getItem('theme'));
+      // console.log('theme resolver', theme);
+      return theme;
+    },
   },
   Mutation: {
     updateAutoplay: (
@@ -35,6 +41,7 @@ export default {
           __typename: 'Theme',
         },
       };
+      localStorage.setItem('theme', JSON.stringify(data));
       cache.writeData({ data });
     },
     setRefetchFollowers: (_root, args, { cache, getCacheKey }) => {
