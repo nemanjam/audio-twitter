@@ -111,7 +111,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const AccountPage = ({ match, session, history }) => {
+const ProfilePage = ({ match, session, history }) => {
   const classes = useStyles();
 
   const [open, setOpen] = useState(false);
@@ -507,4 +507,4 @@ const AccountPage = ({ match, session, history }) => {
 // export default withAuthorization(session => session && session.me)(
 //   AccountPage,
 // );
-export default AccountPage;
+export default ProfilePage;

@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
   item: { width: '100%' },
 }));
 
-const Landing = ({ session }) => {
+const Home = ({ session }) => {
   const classes = useStyles();
   const [mainAutoplay, setMainAutoplay] = useState('none');
 
@@ -52,4 +52,4 @@ const Landing = ({ session }) => {
   );
 };
 
-export default Landing;
+export default Home;

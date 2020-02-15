@@ -1,10 +1,10 @@
 import React from 'react';
 import { BrowserRouter, Switch } from 'react-router-dom';
 
-import LandingPage from './pages/Landing';
+import HomePage from './pages/Home';
 import SignUpPage from './pages/SignUp';
 import SignInPage from './pages/SignIn';
-import AccountPage from './pages/Account';
+import ProfilePage from './pages/Profile';
 import AdminPage from './pages/Admin';
 import NotFoundPage from './pages/NotFound';
 import NotificationsPage from './pages/Notifications';
@@ -18,8 +18,8 @@ const App = ({ session, refetch }) => (
   <BrowserRouter>
     <Switch>
       <RouteWithLayout
-        path={routes.LANDING}
-        component={LandingPage}
+        path={routes.HOME}
+        component={HomePage}
         componentProps={{ session }}
         layout={Layout}
         layoutProps={{ session }}
@@ -60,7 +60,7 @@ const App = ({ session, refetch }) => (
       />
       <RouteWithLayout
         path={routes.USERNAME}
-        component={AccountPage}
+        component={ProfilePage}
         componentProps={{ session }}
         layout={Layout}
         layoutProps={{ session }}

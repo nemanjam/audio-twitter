@@ -80,7 +80,7 @@ const SignUpForm = ({ history, refetch }) => {
 
     localStorage.setItem('token', data.signUp.token);
     await refetch();
-    history.push(routes.LANDING);
+    history.push(routes.HOME);
   };
 
   const isInvalid =

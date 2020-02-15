@@ -63,7 +63,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const UserCard = ({ accountRefetch, session, username, ...rest }) => {
+const UserCard = ({ session, username, ...rest }) => {
   const classes = useStyles();
 
   const { data, error, loading, refetch } = useQuery(GET_USER, {

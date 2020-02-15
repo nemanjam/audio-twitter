@@ -65,7 +65,7 @@ const SignInForm = ({ history, refetch }) => {
     setPassword('');
     localStorage.setItem('token', data.signIn.token);
     await refetch();
-    history.push(routes.LANDING);
+    history.push(routes.HOME);
     resetWebsocket();
   };
 

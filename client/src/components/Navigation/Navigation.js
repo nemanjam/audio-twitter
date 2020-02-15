@@ -149,7 +149,7 @@ const Navigation = ({ session, match }) => {
           >
             <Tab
               component={StyledLink}
-              to={routes.LANDING}
+              to={routes.HOME}
               label={
                 <div className={classes.label}>
                   <Badge
