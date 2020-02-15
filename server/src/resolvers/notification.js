@@ -54,6 +54,17 @@ export default {
         };
       },
     ),
+    notSeenNotificationsCount: combineResolvers(
+      isAuthenticated,
+      async (parent, { username }, { models, me }) => {
+        const user = await models.User.findOne({ username });
+        const count = await models.Notification.find({
+          ownerId: user.id,
+          isSeen: false,
+        }).countDocuments();
+        return count;
+      },
+    ),
   },
 
   Mutation: {},

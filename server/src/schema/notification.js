@@ -3,6 +3,7 @@ import { gql } from 'apollo-server-express';
 export default gql`
   extend type Query {
     notifications(cursor: String, limit: Int): NotificationConnection!
+    notSeenNotificationsCount(username: String!): Int!
   }
 
   type NotificationConnection {

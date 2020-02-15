@@ -43,7 +43,7 @@ const wsLink = new WebSocketLink({
       };
     },
     connectionCallback: err => {
-      console.log('callback');
+      // console.log('callback');
       if (err) {
         console.log('Error Connecting to Subscriptions Server', err);
       }

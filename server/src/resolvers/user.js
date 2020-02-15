@@ -85,18 +85,7 @@ export default {
       if (!me) {
         return null;
       }
-
       const user = await models.User.findById(me.id);
-      const unseenNotificationsCount = await models.Notification.find(
-        {
-          ownerId: user.id,
-          isSeen: false,
-        },
-      ).countDocuments();
-      console.log('me query');
-      await pubsub.publish(EVENTS.NOTIFICATION.NOT_SEEN_UPDATED, {
-        notSeenUpdated: unseenNotificationsCount,
-      });
       return user;
     },
   },

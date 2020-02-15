@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useMutation, useSubscription } from '@apollo/react-hooks';
+import {
+  useMutation,
+  useSubscription,
+  useQuery,
+} from '@apollo/react-hooks';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -24,6 +28,7 @@ import { styled } from '@material-ui/core/styles';
 import * as routes from '../../constants/routes';
 import SignOutButton from '../SignOutButton/SignOutButton';
 import { SET_THEME } from '../../graphql/mutations';
+import { GET_NOT_SEEN_NOTIFICATIONS_COUNT } from '../../graphql/queries';
 import { NOT_SEEN_UPDATED } from '../../graphql/subscriptions';
 
 const StyledLink = styled(Link)({
@@ -86,16 +91,42 @@ const useStyles = makeStyles(theme => ({
 
 const Navigation = ({ session, match }) => {
   const classes = useStyles();
-  const [random, setRandom] = useState(0);
 
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const [setTheme] = useMutation(SET_THEME);
 
-  const { data, loading, error } = useSubscription(NOT_SEEN_UPDATED, {
-    variables: { username: session?.me?.username },
-  });
-  console.log(data, loading, error);
+  const { data, loading, error, subscribeToMore } = useQuery(
+    GET_NOT_SEEN_NOTIFICATIONS_COUNT,
+    {
+      variables: { username: session?.me?.username },
+      skip: !session?.me?.username,
+    },
+  );
+
+  useEffect(() => {
+    subscribeToMore({
+      document: NOT_SEEN_UPDATED,
+      variables: { username: session?.me?.username },
+      updateQuery: (previousResult, { subscriptionData }) => {
+        if (!subscriptionData.data) {
+          return previousResult;
+        }
+        const { notSeenUpdated } = subscriptionData.data;
+
+        return {
+          notSeenNotificationsCount: notSeenUpdated,
+        };
+      },
+    });
+  }, []);
+
+  // console.log(data, loading, error);
+
+  if (loading) {
+    return null;
+  }
+
   const handleMenuOpen = event => {
     setAnchorEl(event.currentTarget);
   };
@@ -123,10 +154,6 @@ const Navigation = ({ session, match }) => {
     return false;
   };
   //console.log(match);
-
-  useEffect(() => {
-    setRandom(Math.random());
-  }, []);
 
   return (
     <>
@@ -193,10 +220,13 @@ const Navigation = ({ session, match }) => {
                   <div className={classes.label}>
                     <Badge
                       className={classes.margin}
-                      badgeContent={!loading && data?.notSeenUpdated}
+                      badgeContent={
+                        !loading && data?.notSeenNotificationsCount
+                      }
                       color="secondary"
                       invisible={
-                        loading || data?.notSeenUpdated === 0
+                        !loading &&
+                        data?.notSeenNotificationsCount === 0
                       }
                     >
                       <NotificationsIcon />
