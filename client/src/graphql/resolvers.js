@@ -9,9 +9,18 @@ export default {
     // },
     // ima (always: true) u schemi da ne bi citao cache
     theme: (_root, _args, { cache }) => {
-      const { theme } = JSON.parse(localStorage.getItem('theme'));
+      let data = JSON.parse(localStorage.getItem('theme'));
       // console.log('theme resolver', theme);
-      return theme;
+      if (!data) {
+        data = {
+          theme: {
+            __typename: 'Theme',
+            type: 'light',
+            color: 'orange',
+          },
+        };
+      }
+      return data.theme;
     },
   },
   Mutation: {
