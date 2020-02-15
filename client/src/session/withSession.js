@@ -4,10 +4,14 @@ import { useQuery } from '@apollo/react-hooks';
 import { GET_ME } from './queries';
 
 const withSession = Component => props => {
-  const { data, error, refetch } = useQuery(GET_ME);
+  const { data, loading, error, refetch } = useQuery(GET_ME);
+
+  if (loading) {
+    return null;
+  }
+  console.log('withSession', data);
   if (error) {
     localStorage.removeItem('token');
-    // return <Redirect to="/" />;
   }
 
   return <Component {...props} session={data} refetch={refetch} />;

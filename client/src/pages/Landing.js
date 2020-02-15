@@ -3,8 +3,6 @@ import React, { useState } from 'react';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 
-import withSession from '../session/withSession';
-
 import MessageCreate from '../components/MessageCreate/MessageCreate';
 import Microphone from '../components/Microphone/Microphone';
 import Messages from '../components/Messages/Messages';
@@ -54,4 +52,4 @@ const Landing = ({ session }) => {
   );
 };
 
-export default withSession(Landing);
+export default Landing;

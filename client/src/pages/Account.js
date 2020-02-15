@@ -27,7 +27,6 @@ import UsersTab from '../components/UsersTab/UsersTab';
 import Microphone from '../components/Microphone/Microphone';
 
 import withAuthorization from '../session/withAuthorization';
-import withSession from '../session/withSession';
 import { GET_USER, GET_REFETCH_FOLLOWERS } from '../graphql/queries';
 import {
   UPDATE_USER,
@@ -508,4 +507,4 @@ const AccountPage = ({ match, session, history }) => {
 // export default withAuthorization(session => session && session.me)(
 //   AccountPage,
 // );
-export default withSession(AccountPage);
+export default AccountPage;

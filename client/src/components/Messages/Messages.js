@@ -7,9 +7,7 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 
 import MessagePlayer from '../MessagePlayer/MessagePlayer';
-import MessageDelete from '../MessageDelete/MessageDelete';
 import Loading from '../Loading/Loading';
-import withSession from '../../session/withSession';
 
 import {
   GET_PAGINATED_MESSAGES_WITH_USERS,
@@ -239,19 +237,5 @@ const MessageList = ({
     </Grid>
   );
 };
-
-const MessageItemBase = ({ message, session }) => (
-  <div>
-    <h3>{message.user.username}</h3>
-    <small>{message.createdAt}</small>
-    <p>{message.file.path}</p>
-
-    {session && session.me && message.user.id === session.me.id && (
-      <MessageDelete message={message} />
-    )}
-  </div>
-);
-
-const MessageItem = withSession(MessageItemBase);
 
 export default Messages;

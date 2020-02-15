@@ -94,7 +94,7 @@ export default {
         },
       ).countDocuments();
       console.log('me query');
-      pubsub.publish(EVENTS.NOTIFICATION.NOT_SEEN_UPDATED, {
+      await pubsub.publish(EVENTS.NOTIFICATION.NOT_SEEN_UPDATED, {
         notSeenUpdated: unseenNotificationsCount,
       });
       return user;

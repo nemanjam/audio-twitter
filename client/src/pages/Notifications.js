@@ -6,6 +6,7 @@ import Grid from '@material-ui/core/Grid';
 
 import NotificationsList from '../components/Notifications/Notifications';
 import WhoToFollow from '../components/WhoToFollow/WhoToFollow';
+import withAuthorization from '../session/withAuthorization';
 
 const useStyles = makeStyles(theme => ({
   root: {},
@@ -42,4 +43,6 @@ const Notifications = ({ session }) => {
   );
 };
 
-export default Notifications;
+export default withAuthorization(session => session?.me)(
+  Notifications,
+);

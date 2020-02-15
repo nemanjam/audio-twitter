@@ -8,6 +8,7 @@ const AdminPage = () => (
   </div>
 );
 
+//session je data iz me queryja, data.me
 export default withAuthorization(
-  session => session && session.me && session.me.role === 'ADMIN',
+  session => session?.me?.role === 'ADMIN',
 )(AdminPage);

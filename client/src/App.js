@@ -20,6 +20,7 @@ const App = ({ session, refetch }) => (
       <RouteWithLayout
         path={routes.LANDING}
         component={LandingPage}
+        componentProps={{ session }}
         layout={Layout}
         layoutProps={{ session }}
         exact
@@ -60,6 +61,7 @@ const App = ({ session, refetch }) => (
       <RouteWithLayout
         path={routes.USERNAME}
         component={AccountPage}
+        componentProps={{ session }}
         layout={Layout}
         layoutProps={{ session }}
         exact
@@ -68,4 +70,5 @@ const App = ({ session, refetch }) => (
   </BrowserRouter>
 );
 
+//samo ovde withSession, pa niz tree
 export default withSession(App);
