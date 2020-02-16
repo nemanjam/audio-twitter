@@ -33,15 +33,14 @@ const wsLink = new WebSocketLink({
     reconnect: true,
     lazy: true,
     inactivityTimeout: 1000,
-    connectionParams: () => {
-      const token = localStorage.getItem('token');
-      console.log('token ws', token);
-      return {
-        authToken: token ? token : '',
-      };
-    },
+    // connectionParams: () => {
+    //   const token = localStorage.getItem('token');
+    //   console.log('token ws', token);
+    //   return {
+    //     authToken: token ? token : '',
+    //   };
+    // },
     connectionCallback: err => {
-      // console.log('callback');
       if (err) {
         console.log('Error Connecting to Subscriptions Server', err);
       }
@@ -49,17 +48,15 @@ const wsLink = new WebSocketLink({
   },
 });
 
-export const changeSubscriptionToken = token => {
-  if (
-    wsLink.subscriptionClient.connectionParams.authToken === token
-  ) {
-    return;
-  }
-
-  wsLink.subscriptionClient.connectionParams.authToken = token;
-  wsLink.subscriptionClient.close();
-  wsLink.subscriptionClient.connect();
+// https://github.com/apollographql/apollo-link/issues/197
+const subscriptionMiddleware = {
+  applyMiddleware: async (options, next) => {
+    options.authToken = localStorage.getItem('token');
+    next();
+  },
 };
+
+wsLink.subscriptionClient.use([subscriptionMiddleware]);
 
 const terminatingLink = split(
   ({ query }) => {

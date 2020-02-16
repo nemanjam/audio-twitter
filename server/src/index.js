@@ -53,11 +53,12 @@ const server = new ApolloServer({
   typeDefs: schema,
   resolvers,
   subscriptions: {
-    onConnect: async (connectionParams, webSocket, context) => {
-      const token = connectionParams.authToken;
-      const me = await jwt.verify(token, process.env.SECRET);
-      return { me };
-    },
+    keepAlive: 30000,
+    // onConnect: async (connectionParams, webSocket, context) => {
+    //   const token = connectionParams.authToken;
+    //   const me = await jwt.verify(token, process.env.SECRET);
+    //   return { me };
+    // },
   },
   formatError: error => {
     // remove the internal sequelize error message
@@ -71,10 +72,13 @@ const server = new ApolloServer({
       message,
     };
   },
-  context: async ({ req, connection }) => {
+  context: async ({ req, connection, payload }) => {
     // subskribcije
     if (connection) {
-      const me = connection.context.me;
+      // const me = connection.context.me;
+      const token = payload.authToken;
+      //console.log(payload);
+      const me = await jwt.verify(token, process.env.SECRET);
       console.log('ws me ', me?.username, me?.id);
       return {
         me,

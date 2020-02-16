@@ -66,7 +66,7 @@ const SignInForm = ({ history, refetch }) => {
     localStorage.setItem('token', data.signIn.token);
     await refetch();
     history.push(routes.HOME);
-    changeSubscriptionToken(data.signIn.token);
+    //changeSubscriptionToken(data.signIn.token);
   };
 
   const isInvalid =

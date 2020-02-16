@@ -122,7 +122,7 @@ const Navigation = ({ session, match }) => {
         };
       },
     });
-  }, []);
+  }, [session?.me?.username]); //mora preneses ili onmount undefined
 
   // console.log(data, loading, error);
 
