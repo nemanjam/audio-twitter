@@ -124,6 +124,7 @@ const UserCard = ({ session, username, ...rest }) => {
               variant="outlined"
               color="primary"
               size="small"
+              disabled={user.username === session.me.username}
             >
               Follow
             </Button>

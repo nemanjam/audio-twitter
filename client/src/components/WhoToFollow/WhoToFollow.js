@@ -65,13 +65,15 @@ const WhoToFollow = ({ session }) => {
     },
   );
   const {
-    data: refetchFollowersData,
+    data: {
+      refetchFollowers: { signal },
+    },
     loading: refetchFollowersLoading,
   } = useQuery(GET_REFETCH_FOLLOWERS);
 
   useEffect(() => {
     refetch();
-  }, [signal, session?.me]);
+  }, [signal, session?.me, refetch]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -89,13 +91,9 @@ const WhoToFollow = ({ session }) => {
 
   //console.log(refetchFollowersData, error);
 
-  if (!data || loading || refetchFollowersLoading)
-    return <CircularProgress color="inherit" />;
+  if (!data || loading) return <CircularProgress color="inherit" />;
 
   const { whoToFollow } = data;
-  const {
-    refetchFollowers: { signal },
-  } = refetchFollowersData;
 
   const handleFollow = async user => {
     await followUser({ variables: { username: user.username } });

@@ -10,7 +10,7 @@ const withSession = Component => props => {
     return null;
   }
 
-  console.log('withSession', data);
+  // console.log('withSession', data);
   // if (error) {
   //   localStorage.removeItem('token');
   // }

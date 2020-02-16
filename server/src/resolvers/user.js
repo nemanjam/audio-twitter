@@ -177,6 +177,9 @@ export default {
     followUser: combineResolvers(
       isAuthenticated,
       async (parent, { username }, { models, me }) => {
+        // dont follow myself
+        if (username === me.username) return false;
+
         const followedUser = await models.User.findOneAndUpdate(
           { username },
           { $push: { followersIds: me.id } },
@@ -196,6 +199,7 @@ export default {
     unfollowUser: combineResolvers(
       isAuthenticated,
       async (parent, { username }, { models, me }) => {
+        if (username === me.username) return false;
         const unfollowedUser = await models.User.findOneAndUpdate(
           { username },
           { $pull: { followersIds: me.id } },
