@@ -18,6 +18,7 @@ import resolvers from './resolvers';
 import models, { connectDb } from './models';
 import loaders from './loaders';
 import { createUsersWithMessages } from './utils/seed';
+import { deleteFile } from './utils/upload';
 
 const app = express();
 
@@ -53,7 +54,8 @@ const server = new ApolloServer({
   resolvers,
   subscriptions: {
     onConnect: async (connectionParams, webSocket, context) => {
-      const me = await getMe(connectionParams);
+      const token = connectionParams.authToken;
+      const me = await jwt.verify(token, process.env.SECRET);
       return { me };
     },
   },
@@ -125,9 +127,17 @@ const isTest = !!process.env.TEST_DATABASE_URL;
 const isProduction = process.env.NODE_ENV === 'production';
 const port = process.env.PORT || 8000;
 
-// vraca promise sa konekcijom koju ne kroisti
+// vraca promise sa konekcijom koju ne koristi
 connectDb().then(async connection => {
   if (isTest || isProduction) {
+    const files = await models.File.find({
+      path: { $nin: ['test.mp3', 'avatar.jpg', 'cover.jpg'] },
+    });
+    // console.log(files);
+    files.map(file => {
+      deleteFile(file.path);
+    });
+
     // reset database
     await Promise.all([
       models.User.deleteMany({}),

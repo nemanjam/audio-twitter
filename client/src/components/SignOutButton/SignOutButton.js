@@ -5,6 +5,7 @@ import Button from '@material-ui/core/Button';
 
 import * as routes from '../../constants/routes';
 import history from '../../constants/history';
+import { resetWebsocket } from '../../index';
 
 const SignOutButton = () => {
   const client = useApolloClient();
@@ -20,6 +21,7 @@ const signOut = client => {
   localStorage.removeItem('token');
   client.resetStore();
   history.push(routes.SIGN_IN);
+  //resetWebsocket();
 };
 
 export { signOut };

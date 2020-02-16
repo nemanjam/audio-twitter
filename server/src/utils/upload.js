@@ -58,7 +58,8 @@ export const processFile = async file => {
 
 export const deleteFile = fileName => {
   try {
-    const path = `${uploadAudioDir}/${filename}`;
+    const path = `${uploadAudioDir}/${fileName}`;
+    console.log(`delting file: ${path}`);
     unlinkSync(path);
   } catch (err) {
     console.error(err);

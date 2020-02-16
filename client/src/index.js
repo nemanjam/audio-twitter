@@ -37,9 +37,7 @@ const wsLink = new WebSocketLink({
       const token = localStorage.getItem('token');
       console.log('token ws', token);
       return {
-        headers: {
-          'x-token': token ? token : '',
-        },
+        authToken: token ? token : '',
       };
     },
     connectionCallback: err => {
@@ -51,18 +49,17 @@ const wsLink = new WebSocketLink({
   },
 });
 
-export function resetWebsocket() {
-  if (wsLink.subscriptionClient === null) return;
+export const changeSubscriptionToken = token => {
+  if (
+    wsLink.subscriptionClient.connectionParams.authToken === token
+  ) {
+    return;
+  }
+
+  wsLink.subscriptionClient.connectionParams.authToken = token;
   wsLink.subscriptionClient.close();
   wsLink.subscriptionClient.connect();
-  Object.keys(wsLink.subscriptionClient.operations).forEach(id => {
-    wsLink.subscriptionClient.sendMessage(
-      id,
-      MessageTypes.GQL_START,
-      wsLink.subscriptionClient.operations[id].options,
-    );
-  });
-}
+};
 
 const terminatingLink = split(
   ({ query }) => {

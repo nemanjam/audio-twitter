@@ -124,7 +124,7 @@ const Notifications = ({ session }) => {
 
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
 
   const getActionText = action => {
     switch (action) {

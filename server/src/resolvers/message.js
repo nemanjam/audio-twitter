@@ -189,7 +189,7 @@ export default {
         const file = await models.File.findById(
           originalMessage.fileId,
         );
-        deleteFile(file.path);
+        if (file.path !== 'test.mp3') deleteFile(file.path);
 
         await models.Message.deleteMany({
           _id: {

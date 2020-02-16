@@ -260,7 +260,7 @@ function MessagePlayer({
     return () => {
       wavesurfer.current.un('finish', finishHandler);
     };
-  }, [play, playerReady, duration]);
+  }, [play, playerReady, duration, prevDuration, updateAutoplay]);
 
   useEffect(() => {
     const readyHandler = () => {

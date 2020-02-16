@@ -110,6 +110,8 @@ const Navigation = ({ session, match }) => {
       document: NOT_SEEN_UPDATED,
       variables: { username: session?.me?.username },
       updateQuery: (previousResult, { subscriptionData }) => {
+        console.log('subscriptionData', subscriptionData);
+
         if (!subscriptionData.data) {
           return previousResult;
         }
