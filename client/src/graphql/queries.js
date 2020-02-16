@@ -162,8 +162,8 @@ export const GET_WHO_TO_FOLLOW = gql`
 `;
 
 export const GET_NOT_SEEN_NOTIFICATIONS_COUNT = gql`
-  query($username: String!) {
-    notSeenNotificationsCount(username: $username)
+  query {
+    notSeenNotificationsCount
   }
 `;
 

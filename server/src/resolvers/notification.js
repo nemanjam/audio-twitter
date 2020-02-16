@@ -56,10 +56,9 @@ export default {
     ),
     notSeenNotificationsCount: combineResolvers(
       isAuthenticated,
-      async (parent, { username }, { models, me }) => {
-        const user = await models.User.findOne({ username });
+      async (parent, args, { models, me }) => {
         const count = await models.Notification.find({
-          ownerId: user.id,
+          ownerId: me.id,
           isSeen: false,
         }).countDocuments();
         return count;
@@ -97,10 +96,12 @@ export default {
       subscribe: withFilter(
         () =>
           pubsub.asyncIterator(EVENTS.NOTIFICATION.NOT_SEEN_UPDATED),
-        async (payload, { username }, { me }) => {
+        async (payload, args, { me }) => {
           //username mi ne treba, sve imam na serveru, notification.ownerid===me.username
-          console.log('payload', payload, username, me); //pogresan me kroz ws opet
-          const condition = username === me.username;
+          console.log('payload', payload, me); //pogresan me kroz ws opet
+          const condition = payload.notification?.ownerId?.equals(
+            me.id,
+          );
           return condition;
         },
       ),

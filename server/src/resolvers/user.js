@@ -34,8 +34,9 @@ const publishUserNotification = async (owner, user, action) => {
 
   pubsub.publish(EVENTS.NOTIFICATION.NOT_SEEN_UPDATED, {
     notSeenUpdated: unseenNotificationsCount,
+    notification,
   });
-};
+}; //
 
 export default {
   Query: {
@@ -46,7 +47,7 @@ export default {
             _id: {
               $ne: ObjectId(me.id),
             },
-            // followersIds: { $ne: mongoose.Types.ObjectId(me.id) },
+            followersIds: { $ne: ObjectId(me.id) }, // comment this to stay with unfollow button
           }
         : {};
       return await models.User.find(filter, null, {

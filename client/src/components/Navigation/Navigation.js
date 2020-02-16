@@ -100,7 +100,7 @@ const Navigation = ({ session, match }) => {
   const { data, loading, error, subscribeToMore } = useQuery(
     GET_NOT_SEEN_NOTIFICATIONS_COUNT,
     {
-      variables: { username: session?.me?.username },
+      // variables: { x: 1 },
       skip: !session?.me?.username,
     },
   );
@@ -108,9 +108,9 @@ const Navigation = ({ session, match }) => {
   useEffect(() => {
     subscribeToMore({
       document: NOT_SEEN_UPDATED,
-      variables: { username: session?.me?.username },
+      variables: {},
       updateQuery: (previousResult, { subscriptionData }) => {
-        //console.log('subscriptionData', subscriptionData);
+        console.log('subscriptionData', subscriptionData);
 
         if (!subscriptionData.data) {
           return previousResult;
@@ -122,7 +122,7 @@ const Navigation = ({ session, match }) => {
         };
       },
     });
-  }, [session?.me?.username]); //mora preneses ili onmount undefined
+  }, [subscribeToMore]); //mora preneses ili onmount undefined
 
   // console.log(data, loading, error);
 
