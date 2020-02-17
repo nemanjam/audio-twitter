@@ -4,15 +4,13 @@ import { ThemeProvider } from '@material-ui/styles';
 import { GET_THEME } from '../graphql/queries';
 
 const withTheme = getThemeFn => Component => props => {
-  const {
-    data: {
-      theme: { type, color },
-    },
-    error,
-    loading,
-  } = useQuery(GET_THEME);
+  const { data, error, loading } = useQuery(GET_THEME);
 
   if (loading) return '';
+
+  const {
+    theme: { type, color },
+  } = data;
 
   const theme = getThemeFn(type, color);
 

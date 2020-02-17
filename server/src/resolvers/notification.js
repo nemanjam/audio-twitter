@@ -97,11 +97,12 @@ export default {
         () =>
           pubsub.asyncIterator(EVENTS.NOTIFICATION.NOT_SEEN_UPDATED),
         async (payload, args, { me }) => {
-          //username mi ne treba, sve imam na serveru, notification.ownerid===me.username
-          console.log('payload', payload, me); //pogresan me kroz ws opet
-          const condition = payload.notification?.ownerId?.equals(
-            me.id,
-          );
+          // username mi ne treba, sve imam na serveru, notification.ownerid===me.username
+          // console.log('payload', payload, me); //pogresan me kroz ws opet
+          const ownerId = payload?.notification?.ownerId;
+          const owner = await models.User.findById(ownerId);
+
+          const condition = owner.username === me.username;
           return condition;
         },
       ),

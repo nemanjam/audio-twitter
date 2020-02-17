@@ -27,41 +27,35 @@ const httpLink = createUploadLink({
 //   uri: 'http://localhost:8000/graphql',
 // });
 
-const wsLink = new ApolloLink(operation => {
-  const _wsLink = new WebSocketLink({
-    uri: `ws://localhost:8000/graphql`,
-    options: {
-      reconnect: true,
-      lazy: true,
-      inactivityTimeout: 1000,
-      // connectionParams: () => {
-      //   const token = localStorage.getItem('token');
-      //   console.log('token ws', token);
-      //   return {
-      //     authToken: token ? token : '',
-      //   };
-      // },
-      connectionCallback: err => {
-        if (err) {
-          console.log(
-            'Error Connecting to Subscriptions Server',
-            err,
-          );
-        }
-      },
+const wsLink = new WebSocketLink({
+  uri: `ws://localhost:8000/graphql`,
+  options: {
+    reconnect: true,
+    lazy: true,
+    inactivityTimeout: 1000,
+    // connectionParams: () => {
+    //   const token = localStorage.getItem('token');
+    //   console.log('token ws', token);
+    //   return {
+    //     authToken: token ? token : '',
+    //   };
+    // },
+    connectionCallback: err => {
+      if (err) {
+        console.log('Error Connecting to Subscriptions Server', err);
+      }
     },
-  });
-  _wsLink.subscriptionClient.use([subscriptionMiddleware]);
-  return _wsLink.request(operation);
+  },
 });
 
 // https://github.com/apollographql/apollo-link/issues/197
 const subscriptionMiddleware = {
-  applyMiddleware: async (options, next) => {
+  applyMiddleware: (options, next) => {
     options.authToken = localStorage.getItem('token');
     next();
   },
 };
+wsLink.subscriptionClient.use([subscriptionMiddleware]);
 
 const terminatingLink = split(
   ({ query }) => {
