@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { withRouter } from 'react-router-dom';
 import WaveSurfer from 'wavesurfer.js';
 import uuidv4 from 'uuid/v4';
 import { useMutation, useQuery } from '@apollo/react-hooks';
@@ -25,6 +26,7 @@ import Popper from '@material-ui/core/Popper';
 import Fade from '@material-ui/core/Fade';
 
 import UserCard from '../UserCard/UserCard';
+import * as routes from '../../constants/routes';
 
 import {
   UPDATE_AUTOPLAY,
@@ -116,6 +118,7 @@ function MessagePlayer({
   play,
   session,
   message,
+  history,
 }) {
   const theme = useTheme();
   const { createdAt, user, file, id } = message;
@@ -206,6 +209,9 @@ function MessagePlayer({
   });
 
   const handleRepost = async () => {
+    if (!session?.me) {
+      history.push(routes.SIGN_IN);
+    }
     if (message.isRepostedByMe) {
       await unrepostMessage();
     } else {
@@ -220,6 +226,10 @@ function MessagePlayer({
   };
 
   const handleLike = async () => {
+    if (!session?.me) {
+      history.push(routes.SIGN_IN);
+    }
+
     if (message.isLiked) {
       const unliked = await unlikeMessage();
     } else {
@@ -520,4 +530,4 @@ function MessagePlayer({
   );
 }
 
-export default MessagePlayer;
+export default withRouter(MessagePlayer);

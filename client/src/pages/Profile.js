@@ -145,7 +145,7 @@ const ProfilePage = ({ match, session, history }) => {
   // console.log(error, data, session);
 
   if (!data?.user) {
-    history.push(routes.NOTFOUND);
+    history.push(routes.HOME);
     return null;
   }
 

@@ -41,8 +41,9 @@ const Messages = ({ limit, username, session }) => {
 
   useEffect(() => {
     refetch();
+    const username = username || null;
     setMessagesVariables({
-      variables: { username: username || null, limit, cursor: null },
+      variables: { username: username, limit, cursor: null },
     });
   }, [username, limit]);
 

@@ -1,6 +1,6 @@
 import { createMuiTheme } from '@material-ui/core/styles';
 import blue from '@material-ui/core/colors/blue';
-import lightGreen from '@material-ui/core/colors/lightGreen';
+import green from '@material-ui/core/colors/green';
 import red from '@material-ui/core/colors/red';
 import deepOrange from '@material-ui/core/colors/deepOrange';
 import lightBlue from '@material-ui/core/colors/lightBlue';
@@ -11,7 +11,7 @@ const getThemeFn = (type, color) => {
     background:
       type === 'light' ? { default: 'rgb(230, 236, 240)' } : {},
     primaryMain:
-      color === 'green' ? lightGreen['A400'] : deepOrange['A400'],
+      color === 'green' ? green['A400'] : deepOrange['A400'],
     secondaryMain:
       color === 'green' ? red['A400'] : lightBlue['A400'],
   };

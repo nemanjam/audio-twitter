@@ -78,7 +78,9 @@ const server = new ApolloServer({
       // const me = connection.context.me;
       const token = payload.authToken;
       //console.log(payload);
-      const me = await jwt.verify(token, process.env.SECRET);
+      const me = token
+        ? await jwt.verify(token, process.env.SECRET)
+        : null;
       console.log('ws me ', me?.username, me?.id);
       return {
         me,

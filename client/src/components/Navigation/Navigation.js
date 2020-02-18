@@ -182,13 +182,7 @@ const Navigation = ({ session, match }) => {
               to={routes.HOME}
               label={
                 <div className={classes.label}>
-                  <Badge
-                    className={classes.margin}
-                    badgeContent={10}
-                    color="secondary"
-                  >
-                    <HomeIcon />
-                  </Badge>
+                  <HomeIcon />
                   <Typography
                     className={classes.typographyLabel}
                     display="inline"

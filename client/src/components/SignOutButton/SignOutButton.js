@@ -19,7 +19,7 @@ const SignOutButton = () => {
 const signOut = client => {
   localStorage.removeItem('token');
   client.resetStore();
-  history.push(routes.SIGN_IN);
+  history.push(routes.HOME);
 };
 
 export { signOut };
