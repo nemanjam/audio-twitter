@@ -41,6 +41,25 @@ export default {
           ? notifications.slice(0, -1)
           : notifications; //-1 exclude zadnji
 
+        //mark as seen
+        const notificationIds = edges.map(n => n.id);
+        await models.Notification.updateMany(
+          { _id: { $in: notificationIds } },
+          { $set: { isSeen: true } },
+        );
+
+        const unseenNotificationsCount = await models.Notification.find(
+          {
+            ownerId: me.id,
+            isSeen: false,
+          },
+        ).countDocuments();
+
+        await pubsub.publish(EVENTS.NOTIFICATION.NOT_SEEN_UPDATED, {
+          notSeenUpdated: unseenNotificationsCount,
+          ownerId: ObjectId(me.id),
+        });
+
         return {
           edges,
           pageInfo: {
@@ -97,8 +116,7 @@ export default {
         async (payload, args, { me }) => {
           // username mi ne treba, sve imam na serveru, notification.ownerid===me.username
           // console.log('payload', payload, me); //pogresan me kroz ws opet
-          const ownerId = payload?.notification?.ownerId;
-          const owner = await models.User.findById(ownerId);
+          const owner = await models.User.findById(payload?.ownerId);
 
           const condition = owner.username === me.username;
           return condition;

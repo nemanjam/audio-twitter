@@ -36,7 +36,7 @@ const publishMessageNotification = async (message, me, action) => {
 
   await pubsub.publish(EVENTS.NOTIFICATION.NOT_SEEN_UPDATED, {
     notSeenUpdated: unseenNotificationsCount,
-    notification,
+    ownerId: notification.ownerId,
   });
 };
 
