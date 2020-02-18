@@ -213,10 +213,15 @@ const Notifications = ({ session }) => {
                       }
                       color={getActionText(notification.action).color}
                     >
-                      <Avatar
-                        alt={notification.user.name}
-                        src={`${UPLOADS_IMAGES_FOLDER}${notification.user.avatar.path}`}
-                      />
+                      <Link
+                        component={RouterLink}
+                        to={`/${notification.user.username}`}
+                      >
+                        <Avatar
+                          alt={notification.user.name}
+                          src={`${UPLOADS_IMAGES_FOLDER}${notification.user.avatar.path}`}
+                        />
+                      </Link>
                     </Badge>
                   </ListItemAvatar>
                   <ListItemText
