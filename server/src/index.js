@@ -33,6 +33,7 @@ app.use(
   express.static(path.join(__dirname, '../uploads')),
 );
 
+/*
 app.use(async (req, res, next) => {
   // console.log(
   //   'My Time: ',
@@ -57,6 +58,7 @@ app.use(async (req, res, next) => {
 
   next();
 });
+*/
 
 // vadi usera iz tokena, a ne iz baze
 // i mece ga u context

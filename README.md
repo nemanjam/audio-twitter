@@ -14,7 +14,7 @@ This is fullstack clone of Twitter with audio instead text messages. It is made 
   - Autoplay existing messages, autoplay incoming messages
   - Limit autoplay duration to 5, 10, 15 or 20 seconds
   - Timeline feed of messages of the following users
-  - Notifications feed
+  - Notifications feed, non-seen notifications count
   - Profile page with user's messages feed, following and followers lists
   - Social network functionalities: follow/unfollow users, like/unlike messages, repost/unrepost messages
   - Local state management with Apollo cache, without Redux
@@ -25,22 +25,24 @@ This is fullstack clone of Twitter with audio instead text messages. It is made 
   - JWT auth on http and websocket links
   - Sign up with email/password, sign in
   - User/admin role
+  - Protected routes with HOCs
 
 - Design
 
   - Material-UI responsive design
   - Choose between 4 different green/orange light/dark themes
+  - Persist theme in local storage
   - Tabs navigation
   - Popover with user card
 
 - GraphQL
 
-  - Queries User: users, user, me, whoToFollow
+  - Queries User: users, user, me, whoToFollow, friends
   - Queries Message: messages, message
-  - Queries Notification: notifications
+  - Queries Notification: notifications, notSeenNotificationsCount
   - Mutations User: signUp, signIn, updateUser, deleteUser, followUser, unfollowUser
   - Mutations Message: createMessage, deleteMessage, likeMessage, unlikeMessage, repostMessage, unrepostMessage
-  - Subscriptions: messageCreated, notificationCreated
+  - Subscriptions: messageCreated, notificationCreated, notSeenUpdated
   - Relay cursor paginations: Messages, Notifications
   - Loaders: File, User
   - Client Queries: autoplay, theme
@@ -67,6 +69,12 @@ This is fullstack clone of Twitter with audio instead text messages. It is made 
 ![Screenshot7](/screenshots/Screenshot_7.png)
 
 ![Screenshot8](/screenshots/Screenshot_8.png)
+
+![Screenshot9](/screenshots/Screenshot_9.png)
+
+![Screenshot10](/screenshots/Screenshot_10.png)
+
+![Screenshot11](/screenshots/Screenshot_11.png)
 
 ## Libraries used
 
