@@ -5,6 +5,7 @@ import User from './user';
 import Message from './message';
 import File from './file';
 import Notification from './notification';
+import Seed from './seed';
 
 const connectDb = () => {
   if (process.env.TEST_DATABASE_URL) {
@@ -28,7 +29,7 @@ const connectDb = () => {
   }
 };
 
-const models = { User, Message, File, Notification };
+const models = { User, Message, File, Notification, Seed };
 
 export { connectDb };
 

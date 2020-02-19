@@ -1,4 +1,4 @@
-import { resolve } from 'path';
+import { resolve, join } from 'path';
 import { createWriteStream, unlinkSync } from 'fs';
 import { sync } from 'mkdirp';
 import uuidv4 from 'uuid/v4';
@@ -30,8 +30,8 @@ const storeFS = ({ stream, filename, mimetype }) => {
   const id = uuidv4();
   let path;
   if (mimetype.includes('audio'))
-    path = `${uploadAudioDir}/${id}-${filename}`;
-  else path = `${uploadImagesDir}/${id}-${filename}`;
+    path = join(uploadAudioDir, `${id}-${filename}`);
+  else path = join(uploadImagesDir, `${id}-${filename}`);
 
   const webPath = `${id}-${filename}`;
 
@@ -57,8 +57,15 @@ export const processFile = async file => {
 };
 
 export const deleteFile = fileName => {
+  const isImage =
+    fileName.endsWith('.jpg') ||
+    fileName.endsWith('.jpeg') ||
+    fileName.endsWith('.png');
+
+  const dir = isImage ? uploadImagesDir : uploadAudioDir;
+
   try {
-    const path = `${uploadAudioDir}/${fileName}`;
+    const path = join(dir, fileName); //image or audio folders
     console.log(`delting file: ${path}`);
     unlinkSync(path);
   } catch (err) {

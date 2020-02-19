@@ -7,6 +7,9 @@ const ObjectId = mongoose.Types.ObjectId;
 export const createUsersWithMessages = async date => {
   console.log('seeding automated...');
 
+  const seed = new models.Seed({});
+  seed.save();
+
   // 10 users
   const usersPromises = [...Array(10).keys()].map((index, i) => {
     const avatar1 = new models.File({

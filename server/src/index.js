@@ -12,6 +12,7 @@ import {
 
 import { existsSync, mkdirSync } from 'fs';
 import path from 'path';
+import moment from 'moment';
 
 import schema from './schema';
 import resolvers from './resolvers';
@@ -31,6 +32,31 @@ app.use(
   '/uploads',
   express.static(path.join(__dirname, '../uploads')),
 );
+
+app.use(async (req, res, next) => {
+  // console.log(
+  //   'My Time: ',
+  //   moment().format('dddd, MMMM Do YYYY, k:mm:ss'),
+  // );
+
+  const seed = await models.Seed.findOne({
+    seed: 'seed',
+  });
+
+  console.log('Database created: ', moment(seed.createdAt).fromNow());
+
+  const databaseOldInMinutes = moment().diff(
+    moment(seed.createdAt),
+    'minutes',
+  );
+
+  if (databaseOldInMinutes > process.env.RESEED_DATABASE_MINUTES) {
+    reseedDatabase();
+    console.log('Older than 5min, reseeding...');
+  }
+
+  next();
+});
 
 // vadi usera iz tokena, a ne iz baze
 // i mece ga u context
@@ -136,26 +162,31 @@ const port = process.env.PORT || 8000;
 // vraca promise sa konekcijom koju ne koristi
 connectDb().then(async connection => {
   if (isTest || isProduction) {
-    const files = await models.File.find({
-      path: { $nin: ['test.mp3', 'avatar.jpg', 'cover.jpg'] },
-    });
-    // console.log(files);
-    files.map(file => {
-      deleteFile(file.path);
-    });
-
-    // reset database
-    await Promise.all([
-      models.User.deleteMany({}),
-      models.Message.deleteMany({}),
-      models.File.deleteMany({}),
-      models.Notification.deleteMany({}),
-    ]);
-
-    await createUsersWithMessages(new Date());
+    await reseedDatabase();
   }
 
   httpServer.listen({ port }, () => {
     console.log(`Apollo Server on http://localhost:${port}/graphql`);
   });
 });
+
+const reseedDatabase = async () => {
+  const files = await models.File.find({
+    path: { $nin: ['test.mp3', 'avatar.jpg', 'cover.jpg'] },
+  });
+  // console.log(files);
+  files.map(file => {
+    deleteFile(file.path);
+  });
+
+  // reset database
+  await Promise.all([
+    models.User.deleteMany({}),
+    models.Message.deleteMany({}),
+    models.File.deleteMany({}),
+    models.Notification.deleteMany({}),
+    models.Seed.deleteMany({}),
+  ]);
+
+  await createUsersWithMessages(new Date());
+};
