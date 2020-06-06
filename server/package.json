@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "apollo-server": "^2.9.15",
-    "apollo-server-express": "^2.9.15",
+    "apollo-server-express": "^2.14.2",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dataloader": "^1.4.0",
