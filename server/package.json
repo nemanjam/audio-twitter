@@ -21,7 +21,7 @@
     "@babel/plugin-proposal-optional-chaining": "^7.8.3",
     "@babel/preset-env": "^7.1.6",
     "@babel/register": "^7.0.0",
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
     "morgan": "^1.9.1",
